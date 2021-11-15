@@ -8,9 +8,19 @@ generator client {
 }
 
 model Person {
-  id        Int      @id @default(autoincrement())
+  id        Int         @id @default(autoincrement())
   fullname  String
-  published Boolean  @default(false)
-  friend    Person[] @relation("Person2Person", references: [id])
-  friends   Person[] @relation("Person2Person", references: [id])
+  published Boolean     @default(false)
+  Friends   Relations[] @relation("PersonA")
+  FriendsOf Relations[] @relation("PersonB")
+}
+
+model Relations {
+  personA   Person @relation("PersonA", fields: [personAId], references: [id])
+  personAId Int
+
+  PersonB   Person @relation("PersonB", fields: [personBId], references: [id])
+  personBId Int
+
+  @@id([personAId, personBId])
 }
