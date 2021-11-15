@@ -2,6 +2,7 @@
   "name": "script",
   "license": "MIT",
   "devDependencies": {
+    "@types/jest": "^27.0.2",
     "@types/node": "16.11.7",
     "prisma": "3.4.2",
     "ts-node": "10.4.0",
@@ -31,7 +32,8 @@
     "@prisma/client": "3.4.2",
     "cross-env": "^7.0.3",
     "dotenv": "^10.0.0",
-    "dotenv-cli": "^4.1.0"
+    "dotenv-cli": "^4.1.0",
+    "ts-jest": "^27.0.7"
   },
   "engines": {
     "node": ">=12.2.0"
