@@ -2,3 +2,4 @@ node_modules
 *.tmp
 notes.txt
 coverage
+prisma/*
