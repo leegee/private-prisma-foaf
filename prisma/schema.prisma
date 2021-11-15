@@ -7,14 +7,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model person {
-  id            Int             @id @default(autoincrement())
-  fullname      String
-  published     Boolean         @default(false)
-  person2person person2person[]
-}
-
-model person2person {
-  id     Int    @id @default(autoincrement())
-  person person @relation(fields: [id], references: [id])
+model Person {
+  id        Int      @id @default(autoincrement())
+  fullname  String
+  published Boolean  @default(false)
+  friend    Person[] @relation("Person2Person", references: [id])
+  friends   Person[] @relation("Person2Person", references: [id])
 }

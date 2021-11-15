@@ -22,9 +22,10 @@
     "db:start": "docker-compose up -d --remove-orphans",
     "db:stop": "docker-compose down",
     "db:shell": "docker exec -it postgres psql -U admin -a foaf",
-    "db:sql": "docker exec -it db psql -U admin -a foaf -c 'SELECT * FROM person;'",
+    "db:sql": "docker exec -it postgres psql -U admin -a foaf -c 'SELECT * FROM person;'",
     "db:init": "npx prisma migrate dev",
-    "db:postinit": "npm run u"
+    "predb:init": "rm -rf prisma/migrations && docker exec -it postgres psql -U admin -a postgres -c \"DROP DATABASE foaf\" || true",
+    "postdb:init": "npm run u && npm test"
   },
   "dependencies": {
     "@prisma/client": "3.4.2",
