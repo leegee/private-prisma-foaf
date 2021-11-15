@@ -1,5 +1,5 @@
 datasource db {
-  provider = "postgres"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -7,14 +7,14 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Person {
+model person {
   id            Int             @id @default(autoincrement())
   fullname      String
   published     Boolean         @default(false)
-  person2person Person2Person[]
+  person2person person2person[]
 }
 
-model Person2Person {
+model person2person {
   id     Int    @id @default(autoincrement())
-  person Person @relation(fields: [id], references: [id])
+  person person @relation(fields: [id], references: [id])
 }

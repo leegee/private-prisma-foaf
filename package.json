@@ -8,6 +8,7 @@
     "typescript": "4.4.4"
   },
   "scripts": {
+    "init": "npm run db:init",
     "dev": "ts-node ./bin/script.ts",
     "prebuild": "rimraf dist",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -21,8 +22,8 @@
     "db:start": "docker-compose up -d --remove-orphans",
     "db:stop": "docker-compose down",
     "db:shell": "docker exec -it postgres psql -U admin -a foaf",
-    "db:sql": "docker exec -it db psql -U admin -a foaf -c 'SELECT * FROM posts;'",
-    "db:init": "bash ./sql/init.sh",
+    "db:sql": "docker exec -it db psql -U admin -a foaf -c 'SELECT * FROM person;'",
+    "db:init": "npx prisma migrate dev",
     "db:postinit": "npm run u"
   },
   "dependencies": {
