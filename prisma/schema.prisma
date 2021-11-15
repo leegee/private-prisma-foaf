@@ -21,21 +21,24 @@ model Verb {
 
 model Person {
   id        Int         @id @default(autoincrement())
-  fullname  String
+  fullname  String // knownas String    // eg JFK
+  // givenname String                   // eg John
+  // middlenames String                 // eg Fitzgerald
+  // familyname String                  // eg Kennedy
   published Boolean     @default(false)
-  Friends   Relations[] @relation("Subject")
-  FriendsOf Relations[] @relation("Object")
+  Subject   Relations[] @relation("Subject")
+  Object    Relations[] @relation("Object")
 }
 
 model Relations {
-  Subject   Person @relation("Subject", fields: [subjectId], references: [id])
   subjectId Int
+  Subject   Person @relation("Subject", fields: [subjectId], references: [id])
 
-  Object   Person @relation("Object", fields: [objectId], references: [id])
   objectId Int
+  Object   Person @relation("Object", fields: [objectId], references: [id])
 
-  Verb   Verb @relation(fields: [verbId], references: [id])
   verbId Int
+  Verb   Verb @relation(fields: [verbId], references: [id])
 
-  @@id([subjectId, objectId])
+  @@id([subjectId, objectId, verbId])
 }
