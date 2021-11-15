@@ -28,14 +28,14 @@ model Person {
 }
 
 model Relations {
-  Subject   Person @relation("Subject", fields: [SubjectId], references: [id])
-  SubjectId Int
+  Subject   Person @relation("Subject", fields: [subjectId], references: [id])
+  subjectId Int
 
-  Object   Person @relation("Object", fields: [ObjectId], references: [id])
-  ObjectId Int
+  Object   Person @relation("Object", fields: [objectId], references: [id])
+  objectId Int
 
   Verb   Verb @relation(fields: [verbId], references: [id])
   verbId Int
 
-  @@id([SubjectId, ObjectId])
+  @@id([subjectId, objectId])
 }
