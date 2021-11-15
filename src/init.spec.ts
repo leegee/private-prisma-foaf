@@ -3,8 +3,8 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 beforeAll(async () => {
-  const assassin = await prisma.verb.create({
-    data: { name: 'assassin' }
+  const assassinate = await prisma.verb.create({
+    data: { name: 'assassinate' }
   });
 
   const jfk = await prisma.person.create({
@@ -15,12 +15,19 @@ beforeAll(async () => {
     data: { fullname: 'Lee Harvey Oswald', },
   });
 
-
+  const relation = await prisma.relations.create({
+    data: {
+      verbId: assassinate.id,
+      objectId: jfk.id,
+      subjectId: oswald.id,
+    },
+  });
 });
 
 afterAll(async () => {
-  await prisma.person.deleteMany();
+  await prisma.relations.deleteMany();
   await prisma.verb.deleteMany();
+  await prisma.person.deleteMany();
   await prisma.$disconnect()
 });
 
@@ -28,6 +35,33 @@ afterAll(async () => {
 describe('Initial scheme', () => {
   it('has people', async () => {
     const allUsers = await prisma.person.findMany();
+    expect(allUsers).toEqual([
+      {
+        "fullname": "John F Kennedy",
+        "id": 1,
+        "published": false,
+      },
+      {
+        "fullname": "Lee Harvey Oswald",
+        "id": 2,
+        "published": false,
+      },
+    ])
+  });
+
+  it('has people with relations', async () => {
+    const allUsers = await prisma.person.findMany({
+      include: {
+        Friends: {
+          include: {
+            Verb: true
+          }
+        }
+      }
+    });
+
+    console.dir(allUsers, { depth: null });
+
     expect(allUsers).toEqual([
       {
         "fullname": "John F Kennedy",
