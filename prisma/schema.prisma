@@ -7,6 +7,18 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator erd {
+  provider = "prisma-erd-generator"
+  output   = "../erd.svg"
+}
+
+model Verb {
+  id          Int         @id @default(autoincrement())
+  name        String
+  description String
+  Relations   Relations[]
+}
+
 model Person {
   id        Int         @id @default(autoincrement())
   fullname  String
@@ -16,11 +28,14 @@ model Person {
 }
 
 model Relations {
-  personA   Person @relation("PersonA", fields: [personAId], references: [id])
+  PersonA   Person @relation("PersonA", fields: [personAId], references: [id])
   personAId Int
 
   PersonB   Person @relation("PersonB", fields: [personBId], references: [id])
   personBId Int
+
+  Verb   Verb @relation(fields: [verbId], references: [id])
+  verbId Int
 
   @@id([personAId, personBId])
 }

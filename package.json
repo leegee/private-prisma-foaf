@@ -25,7 +25,7 @@
     "db:stop": "docker-compose down",
     "db:shell": "docker exec -it postgres psql -U admin -a foaf",
     "db:sql": "docker exec -it postgres psql -U admin -a foaf -c 'SELECT * FROM person;'",
-    "db:init": "npx prisma migrate dev",
+    "db:init": "npx prisma migrate dev --name init",
     "predb:init": "rimraf prisma/migrations && docker exec -it postgres psql -U admin -a postgres -c \"DROP DATABASE foaf\" || true",
     "postdb:init": "npm run u && npm run erd && npm test",
     "erd": "npx prisma generate"

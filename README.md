@@ -3,5 +3,5 @@
   # docker up postgres db
   npm run db:start
 
-  # build scheme, populate db, create erd, test
+  # build scheme, populate db, create erd, jest
   npm run init
