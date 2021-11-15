@@ -1,3 +1,5 @@
+SET search_path TO public;
+
 DROP TABLE IF EXISTS Person2Person;
 DROP TABLE IF EXISTS Person;
 

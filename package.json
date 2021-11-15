@@ -18,14 +18,12 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "u": "prisma generate",
-    "db:init": "ts-node ./bin/db-init.ts",
     "db:start": "docker-compose up -d --remove-orphans",
     "db:stop": "docker-compose down",
     "db:shell": "docker exec -it postgres psql -U admin -a foaf",
     "db:sql": "docker exec -it db psql -U admin -a foaf -c 'SELECT * FROM posts;'",
-    "db:pop": "npm run db:pop:setup & npm run db:pop:main",
-    "db:pop:setup": "docker cp ./sql/scheme.sql postgres:scheme.sql",
-    "db:pop:main": "sh ./sql/init.sh"
+    "db:init": "bash ./sql/init.sh",
+    "db:postinit": "npm run u"
   },
   "dependencies": {
     "@prisma/client": "3.4.2",
