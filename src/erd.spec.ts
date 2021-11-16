@@ -1,8 +1,13 @@
 import { prisma, setup, teardown } from 'testlib/fixtures';
 import { erd } from './erd';
 
-beforeAll(async () => await setup);
-afterAll(async () => await teardown);
+const testId = 'erd';
+
+const fixtures = beforeAll(async () => {
+  return await setup(testId)
+});
+
+afterAll(async () => await teardown(fixtures));
 
 describe('erd', () => {
   it('...', async () => {

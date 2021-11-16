@@ -9,7 +9,7 @@
 
 
 # TODO
-
+* Allows tests to run in parallel
 * Playwrite
 * Percy
 * Mermaid
