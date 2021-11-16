@@ -56,11 +56,11 @@ afterAll(async () => {
 
 describe('Initial scheme', () => {
   it('has people', async () => {
-    const allUsers = await prisma.person.findMany();
-    expect(allUsers).toHaveLength(3);
-    expect(allUsers[0].knownas).toBe("John F Kennedy");
-    expect(allUsers[1].knownas).toBe("Lee Harvey Oswald");
-    expect(allUsers[2].knownas).toBe("Arthur Young");
+    const people = await prisma.person.findMany();
+    expect(people).toHaveLength(3);
+    expect(people[0].knownas).toBe("John F Kennedy");
+    expect(people[1].knownas).toBe("Lee Harvey Oswald");
+    expect(people[2].knownas).toBe("Arthur Young");
   });
 
   it('has people with action', async () => {
