@@ -85,8 +85,8 @@ describe('Initial scheme', () => {
     expect(rv[1].Subject.knownas).toBe('Arthur Young');
     expect(rv[1].Object.knownas).toBe('Lee Harvey Oswald');
     expect(rv[1].Verb.name).toBe('hosts');
-    // expect(DateTime2Date(rv[1].start)).toBe('1963-11-21');
-    // expect(DateTime2Date(rv[1].end)).toBe('1963-11-22');
+    expect(rv[1].start).toBeDate('1963-11-21');
+    expect(rv[1].end).toBeDate('1963-11-22');
   });
 });
 
