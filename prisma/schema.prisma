@@ -1,3 +1,5 @@
+// https://prismadb.readthedocs.io/en/stable/data-types/
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -13,24 +15,37 @@ generator erd {
 }
 
 model Verb {
-  id          Int         @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   name        String
   description String?
-  Relations   Relations[]
+  Action      Action[]
+}
+
+model ActionDateRange {
+  start DateTime @db.Date
+  end   DateTime @db.Date
+
+  Action          Action? @relation(fields: [actionSubjectId, actionObjectId, actionVerbId], references: [subjectId, objectId, verbId])
+  actionSubjectId Int?
+  actionObjectId  Int?
+  actionVerbId    Int?
+  @@unique([start, end])
 }
 
 model Person {
-  id        Int         @id @default(autoincrement())
-  fullname  String // knownas String    // eg JFK
-  // givenname String                   // eg John
-  // middlenames String                 // eg Fitzgerald
-  // familyname String                  // eg Kennedy
-  published Boolean     @default(false)
-  Subject   Relations[] @relation("Subject")
-  Object    Relations[] @relation("Object")
+  id          Int       @id @default(autoincrement())
+  knownas     String //  eg JFK
+  givenname   String? // eg John
+  middlenames String? // eg Fitzgerald
+  familyname  String? // eg Kennedy
+  dob         DateTime? @db.Date
+  dod         DateTime? @db.Date
+  published   Boolean   @default(false)
+  Subject     Action[]  @relation("Subject")
+  Object      Action[]  @relation("Object")
 }
 
-model Relations {
+model Action {
   subjectId Int
   Subject   Person @relation("Subject", fields: [subjectId], references: [id])
 
@@ -39,6 +54,8 @@ model Relations {
 
   verbId Int
   Verb   Verb @relation(fields: [verbId], references: [id])
+
+  dateRanges ActionDateRange[]
 
   @@id([subjectId, objectId, verbId])
 }
