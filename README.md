@@ -5,3 +5,11 @@
 
   # build scheme, populate db, create erd, jest
   npm run init
+
+
+
+# TODO
+
+* Playwrite
+* Percy
+* Mermaid
