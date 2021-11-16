@@ -1,17 +1,17 @@
-import { Person, PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from "@prisma/client";
 
-const prisma = new PrismaClient();
+export async function erd(
+  prisma: PrismaClient<Prisma.PrismaClientOptions, never, Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined>,
+  knownas: string
+) {
 
-export async function erd(person: Person) {
-
-  const rv = await prisma.action.findMany({
+  const rv = await prisma.person.findFirst({
+    where: { knownas },
     select: {
-      start: true,
-      end: true,
       Subject: true,
       Object: true,
-      Verb: true,
     }
   });
 
+  return rv;
 }

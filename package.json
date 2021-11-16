@@ -12,11 +12,12 @@
   "scripts": {
     "dev": "ts-node ./bin/script.ts",
     "prebuild": "rimraf dist",
+    "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
+    "lint": "eslint \"{src,test}/**/*.ts\" --fix",
+    "test": "jest -i",
+    "test:watch": "jest -i --watch",
+    "test:cov": "jest -i --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "u": "prisma generate",
@@ -34,16 +35,20 @@
     "cross-env": "^7.0.3",
     "dotenv": "^10.0.0",
     "dotenv-cli": "^4.1.0",
+    "module-alias": "^2.2.2",
     "ts-jest": "^27.0.7"
   },
   "engines": {
     "node": ">=16.0.0"
   },
+  "_moduleAliases": {
+    "@src": "./src",
+    "@test": "./test"
+  },
   "jest": {
     "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
+      "ts",
+      "js"
     ],
     "rootDir": ".",
     "testMatch": [
@@ -60,6 +65,44 @@
     "testEnvironment": "node",
     "setupFilesAfterEnv": [
       "./test/lib/jest-setup.ts"
-    ]
+    ],
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/src/$1",
+      "^testlib/(.*)$": "<rootDir>/test/lib/$1"
+    }
+  },
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "all"
+  },
+  "eslintConfig": {
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "project": "tsconfig.json",
+      "sourceType": "module"
+    },
+    "plugins": [
+      "@typescript-eslint/eslint-plugin"
+    ],
+    "extends": [
+      "plugin:@typescript-eslint/recommended",
+      "plugin:prettier/recommended"
+    ],
+    "root": true,
+    "env": {
+      "node": true,
+      "jest": true
+    },
+    "ignorePatterns": [],
+    "rules": {
+      "@typescript-eslint/interface-name-prefix": "off",
+      "@typescript-eslint/explicit-function-return-type": "off",
+      "@typescript-eslint/explicit-module-boundary-types": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "space-in-parens": [
+        1,
+        "always"
+      ]
+    }
   }
 }

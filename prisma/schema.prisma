@@ -19,6 +19,8 @@ model Verb {
   name        String
   description String?
   Action      Action[]
+
+  @@unique([name])
 }
 
 model Person {
@@ -32,6 +34,9 @@ model Person {
   published   Boolean   @default(false)
   Subject     Action[]  @relation("Subject")
   Object      Action[]  @relation("Object")
+
+  @@unique([knownas, dob, dod])
+  @@unique([givenname, middlenames, familyname, dob, dod])
 }
 
 model Action {
