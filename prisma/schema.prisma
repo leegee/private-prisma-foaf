@@ -21,17 +21,6 @@ model Verb {
   Action      Action[]
 }
 
-model ActionDateRange {
-  start DateTime @db.Date
-  end   DateTime @db.Date
-
-  Action          Action? @relation(fields: [actionSubjectId, actionObjectId, actionVerbId], references: [subjectId, objectId, verbId])
-  actionSubjectId Int?
-  actionObjectId  Int?
-  actionVerbId    Int?
-  @@unique([start, end])
-}
-
 model Person {
   id          Int       @id @default(autoincrement())
   knownas     String //  eg JFK
@@ -55,7 +44,8 @@ model Action {
   verbId Int
   Verb   Verb @relation(fields: [verbId], references: [id])
 
-  dateRanges ActionDateRange[]
+  start DateTime @db.Date
+  end   DateTime @db.Date
 
   @@id([subjectId, objectId, verbId])
 }
