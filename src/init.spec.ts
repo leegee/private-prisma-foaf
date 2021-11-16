@@ -66,9 +66,11 @@ describe('Initial scheme', () => {
   it('has people with action', async () => {
     const rv = await prisma.action.findMany({
       select: {
+        start: true,
+        end: true,
         Subject: true,
         Object: true,
-        Verb: true
+        Verb: true,
       }
     });
 
@@ -77,10 +79,14 @@ describe('Initial scheme', () => {
     expect(rv[0].Subject.knownas).toBe('John F Kennedy');
     expect(rv[0].Object.knownas).toBe('Lee Harvey Oswald');
     expect(rv[0].Verb.name).toBe('assassinates');
+    expect(rv[0].start).toBeDate('1963-11-22');
+    expect(rv[0].end).toBeDate('1963-11-22');
 
     expect(rv[1].Subject.knownas).toBe('Arthur Young');
     expect(rv[1].Object.knownas).toBe('Lee Harvey Oswald');
     expect(rv[1].Verb.name).toBe('hosts');
+    // expect(DateTime2Date(rv[1].start)).toBe('1963-11-21');
+    // expect(DateTime2Date(rv[1].end)).toBe('1963-11-22');
   });
 });
 
