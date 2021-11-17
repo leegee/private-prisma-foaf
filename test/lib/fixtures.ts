@@ -52,7 +52,19 @@ export async function setup(testId: string): Promise<IFixtures> {
 }
 
 export async function teardown() {
-  console.dir(fixtures, { depth: null });
+  // await prisma.action.deleteMany({
+  //   where: {
+  //     OR: [{
+  //       verbId: fixtures.assassinates.id,
+  //       subjectId: fixtures.jfk.id,
+  //       objectId: fixtures.oswald.id,
+  //     }, {
+  //       verbId: fixtures.hosts.id,
+  //       subjectId: fixtures.arthur.id,
+  //       objectId: fixtures.oswald.id,
+  //     }]
+  //   }
+  // });
 
   await prisma.person.deleteMany({
     where: {
@@ -63,5 +75,15 @@ export async function teardown() {
       ]
     }
   });
+
+  await prisma.verb.deleteMany({
+    where: {
+      OR: [
+        { id: fixtures.assassinates.id },
+        { id: fixtures.hosts.id },
+      ]
+    }
+  });
+
   await prisma.$disconnect();
 }
