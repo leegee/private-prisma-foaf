@@ -35,8 +35,8 @@ export async function setup(testId: string): Promise<IFixtures> {
   fixtures[testId].oswaldAssassinatesJfk = await prisma.action.create({
     data: {
       verbId: fixtures[testId].assassinates.id,
-      subjectId: fixtures[testId].jfk.id,
-      objectId: fixtures[testId].oswald.id,
+      objectId: fixtures[testId].jfk.id,
+      subjectId: fixtures[testId].oswald.id,
       start: new Date('1963-11-22'),
       end: new Date('1963-11-22'),
     },
@@ -45,8 +45,8 @@ export async function setup(testId: string): Promise<IFixtures> {
   fixtures[testId].arthurHostsOswald = await prisma.action.create({
     data: {
       verbId: fixtures[testId].hosts.id,
-      subjectId: fixtures[testId].arthur.id,
-      objectId: fixtures[testId].oswald.id,
+      objectId: fixtures[testId].arthur.id,
+      subjectId: fixtures[testId].oswald.id,
       start: new Date('1963-11-21'),
       end: new Date('1963-11-22'),
     },

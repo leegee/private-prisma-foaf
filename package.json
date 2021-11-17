@@ -4,6 +4,8 @@
   "devDependencies": {
     "@types/jest": "^27.0.2",
     "@types/node": "16.11.7",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
     "jest-mock-extended": "^2.0.4",
     "prisma": "^3.5.0",
     "prisma-erd-generator": "^0.6.0",
@@ -83,9 +85,11 @@
       "sourceType": "module"
     },
     "plugins": [
-      "@typescript-eslint/eslint-plugin"
+      "@typescript-eslint/eslint-plugin",
+      "prettier"
     ],
     "extends": [
+      "plugin:@typescript-eslint/eslint-recommended",
       "plugin:@typescript-eslint/recommended",
       "plugin:prettier/recommended"
     ],
@@ -103,7 +107,9 @@
       "space-in-parens": [
         1,
         "always"
-      ]
+      ],
+      "no-console": 1,
+      "prettier/prettier": 2
     }
   }
 }
