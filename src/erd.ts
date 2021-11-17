@@ -12,9 +12,10 @@ export async function erd(
     Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
   >,
   knownas: string,
+  savepath: string,
 ) {
   const actions = await _getActions(prisma, knownas);
-  _save(actions);
+  _save(actions, savepath);
   return actions;
 }
 
@@ -51,13 +52,13 @@ async function _getActions(
   return actions;
 }
 
-function _save(actions: any[]) {
+function _save(actions: any[], savepath: string): void {
   let mermaid = 'graph TD\n';
 
   actions.forEach((action) => {
     mermaid +=
       'Person' +
-      (action as any).Object.id +
+      (action as any).Subject.id +
       '[' +
       (action as any).Subject.knownas +
       ']' +
@@ -65,14 +66,14 @@ function _save(actions: any[]) {
       (action as any).Verb.name +
       '|' +
       'Person' +
-      (action as any).Subject.id +
+      (action as any).Object.id +
       '[' +
       (action as any).Object.knownas +
-      ']';
+      ']'
+      + "\n";
   });
 
   const tmpDir = fs.mkdtempSync(os.tmpdir() + path.sep + 'prisma-erd-');
-  const output = './temp.svg';
   const theme = 'forest';
 
   const tempMermaidFile = path.resolve(path.join(tmpDir, 'prisma.mmd'));
@@ -86,11 +87,9 @@ function _save(actions: any[]) {
   );
 
   child_process.execSync(
-    `${mermaidCliNodePath} -i ${tempMermaidFile} -o ${output} -t ${theme} -c ${tempConfigFile}`,
+    `${mermaidCliNodePath} -i ${tempMermaidFile} -o ${savepath} -t ${theme} -c ${tempConfigFile}`,
     {
       stdio: 'inherit',
     },
   );
-
-  return actions;
 }

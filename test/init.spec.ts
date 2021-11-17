@@ -36,10 +36,10 @@ describe('Initial scheme', () => {
         }
       });
 
-      if (person.knownas.match(/Oswald/)) {
-        expect(rv).toHaveLength(2);
-      } else {
+      if (person.knownas.match(/Kennedy/)) {
         expect(rv).toHaveLength(0);
+      } else {
+        expect(rv).toHaveLength(1);
       }
     });
   });
