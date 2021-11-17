@@ -23,33 +23,46 @@ afterAll(async () => {
   await teardown(testId);
 });
 
+
 describe('erd', () => {
-  it('Lee Harvey Oswald', async () => {
-    const savepath = './temp.svg';
-    const knownas = fixtures.oswald.knownas;
+  const knownas = fixtures.oswald.knownas;
 
-    if (fs.existsSync(savepath)) {
-      fs.unlinkSync(savepath);
-    }
+  describe('Lee Harvey Oswald', async () => {
+    it('public', async () => {
+      const savepath = './temp-pub.svg';
+      if (fs.existsSync(savepath)) {
+        fs.unlinkSync(savepath);
+      }
 
-    // const rvArray = await erd(prisma, fixtures.oswald.knownas, savepath);
-    const rvArray = await _getActions(prisma, knownas);
-    expect(rvArray).toBeDefined();
+      erd(prisma, knownas, savepath, true);
 
-    rvArray.forEach((rv) => {
-      expect(rv).not.toBeNull();
-      expect(rv).toHaveProperty('Subject');
-      expect(rv).toHaveProperty('Object');
-      expect(rv).toHaveProperty('Verb');
+      expect(fs.existsSync(savepath)).toBeTruthy();
+      // fs.unlinkSync(savepath);
     });
 
-    const actionsSubjectObject = await _getActionsGraph(prisma, knownas);
-    const actionsObjectSubject = await _getActionsGraph(prisma, knownas, true);
+    it('internals', async () => {
+      const savepath = './temp-int.svg';
+      if (fs.existsSync(savepath)) {
+        fs.unlinkSync(savepath);
+      }
 
-    _save([actionsSubjectObject, actionsObjectSubject], savepath);
+      const rvArray = await _getActions(prisma, knownas);
+      expect(rvArray).toBeDefined();
 
-    expect(fs.existsSync(savepath)).toBeTruthy();
+      rvArray.forEach((rv) => {
+        expect(rv).not.toBeNull();
+        expect(rv).toHaveProperty('Subject');
+        expect(rv).toHaveProperty('Object');
+        expect(rv).toHaveProperty('Verb');
+      });
 
-    // fs.unlinkSync(savepath);
+      const actionsSubjectObject = await _getActionsGraph(prisma, knownas);
+      const actionsObjectSubject = await _getActionsGraph(prisma, knownas, true);
+
+      _save([actionsSubjectObject, actionsObjectSubject], savepath);
+
+      expect(fs.existsSync(savepath)).toBeTruthy();
+      // fs.unlinkSync(savepath);
+    });
   });
 });

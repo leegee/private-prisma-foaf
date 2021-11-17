@@ -1,10 +1,11 @@
+// Rendering based on node_modules\prisma-erd-generator\src\generate.ts
+
 import * as path from 'path';
 import * as child_process from 'child_process';
 import fs from 'fs';
 import os from 'os';
 import { PrismaClient, Prisma } from '@prisma/client';
 
-// Rendering based on node_modules\prisma-erd-generator\src\generate.ts
 export async function erd(
   prisma: PrismaClient<
     Prisma.PrismaClientOptions,
@@ -13,10 +14,19 @@ export async function erd(
   >,
   knownas: string,
   savepath: string,
+  invertedRelationship = false
 ): Promise<void> {
+  const actions = [];
   const actionsSubjectObject = await _getActionsGraph(prisma, knownas);
-  const actionsObjectSubject = await _getActionsGraph(prisma, knownas, true);
-  _save([actionsSubjectObject, actionsObjectSubject], savepath);
+
+  actions.push(actionsSubjectObject);
+
+  if (invertedRelationship) {
+    const actionsObjectSubject = await _getActionsGraph(prisma, knownas, true);
+    actions.push(actionsObjectSubject);
+  }
+
+  _save(actions, savepath);
 }
 
 
