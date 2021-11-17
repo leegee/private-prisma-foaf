@@ -13,19 +13,21 @@ export async function erd(
   >,
   knownas: string,
   savepath: string,
-) {
-  const actions = await _getActions(prisma, knownas);
-  _save(actions, savepath);
-  return actions;
+): Promise<void> {
+  const actionsSubjectObject = await _getActionsGraph(prisma, knownas);
+  const actionsObjectSubject = await _getActionsGraph(prisma, knownas, true);
+  _save([actionsSubjectObject, actionsObjectSubject], savepath);
 }
 
-async function _getActions(
+
+export async function _getActions(
   prisma: PrismaClient<
     Prisma.PrismaClientOptions,
     never,
     Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
   >,
   knownas: string,
+  invertedRelationship = false
 ) {
   const person = await prisma.person.findFirst({
     where: { knownas },
@@ -36,8 +38,10 @@ async function _getActions(
     throw new Error(`No such person knownas "${knownas}"`);
   }
 
+  const where = invertedRelationship ? { objectId: person.id } : { subjectId: person.id };
+
   const actions = await prisma.action.findMany({
-    where: { subjectId: person.id },
+    where,
     select: {
       Subject: true,
       Object: true,
@@ -45,40 +49,66 @@ async function _getActions(
     },
   });
 
+  return actions;
+}
+
+
+export async function _getActionsGraph(
+  prisma: PrismaClient<
+    Prisma.PrismaClientOptions,
+    never,
+    Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
+  >,
+  knownas: string,
+  invertedRelationship = false,
+) {
+  const actions = await _getActions(prisma, knownas, invertedRelationship);
+
   if (actions.length === 0) {
     throw new Error(`No actions for ${knownas}`);
   }
 
-  return actions;
-}
-
-function _graphForActions(actions: any[], suffix = '') {
-  // ummmmmmmm
   let mermaid = '';
 
   actions.forEach((action) => {
-    mermaid +=
-      'Person' +
-      (action as any).Subject.id +
-      '[' +
-      (action as any).Subject.knownas +
-      ']-->|' +
-      (action as any).Verb.name +
-      (suffix ? ' ' + suffix : '') +
-      '|Person' +
-      (action as any).Object.id +
-      '[' +
-      (action as any).Object.knownas +
-      ']' +
-      '\n';
+    if (invertedRelationship) {
+      mermaid +=
+        'Person' +
+        (action as any).Subject.id +
+        '[' +
+        (action as any).Subject.knownas +
+        ']-->|' +
+        (action as any).Verb.name +
+        '|Person' +
+        (action as any).Object.id +
+        '[' +
+        (action as any).Object.knownas +
+        ']' +
+        '\n';
+    } else {
+      mermaid +=
+        'Person' +
+        (action as any).Subject.id +
+        '[' +
+        (action as any).Subject.knownas +
+        ']-->|' +
+        (action as any).Verb.name +
+        '|Person' +
+        (action as any).Object.id +
+        '[' +
+        (action as any).Object.knownas +
+        ']' +
+        '\n';
+    }
   });
+
   return mermaid;
 }
 
-function _save(actions: any[], savepath: string): void {
+export function _save(graphedActions: string[], savepath: string): void {
   let mermaid = 'graph TD\n';
 
-  mermaid += _graphForActions(actions);
+  mermaid += graphedActions.join("\n");
 
   const tmpDir = fs.mkdtempSync(os.tmpdir() + path.sep + 'prisma-erd-');
   const theme = 'forest';
