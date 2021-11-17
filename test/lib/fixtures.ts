@@ -1,10 +1,13 @@
 import { PrismaClient } from '@prisma/client';
 
 export const prisma = new PrismaClient();
+export interface IFixtures {
+  [key: string]: any
+}
 
-export async function setup(testId: string) {
-  const fixtures = {} as any;
+let fixtures: IFixtures = {};
 
+export async function setup(testId: string): Promise<IFixtures> {
   fixtures.assassinates = await prisma.verb.create({
     data: { name: 'assassinates' + testId }
   });
@@ -35,7 +38,6 @@ export async function setup(testId: string) {
     },
   });
 
-  // https://www.prisma.io/docs/concepts/components/prisma-client/relation-queries#create-a-new-profile-record-then-connect-it-to-an-existing-user-record-or-create-a-new-user
   fixtures.arthurHostsOswald = await prisma.action.create({
     data: {
       verbId: fixtures.hosts.id,
@@ -49,9 +51,16 @@ export async function setup(testId: string) {
   return fixtures;
 }
 
-export async function teardown(fixtures: {}) {
-  await prisma.action.deleteMany();
-  await prisma.verb.deleteMany();
-  await prisma.person.deleteMany();
+export async function teardown() {
+  console.dir(fixtures, { depth: null });
+
+  await prisma.person.deleteMany({
+    where: {
+      OR: [
+        { id: fixtures.jfk.id },
+        { id: fixtures.arthur.id },
+      ]
+    }
+  });
   await prisma.$disconnect();
 }

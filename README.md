@@ -1,15 +1,13 @@
 # Testing Prisma
 
-  # docker up postgres db
-  npm run db:start
+# docker up postgres db
+npm run db:start
 
-  # build scheme, populate db, create erd, jest
-  npm run init
-
+# build scheme, populate db, create erd, jest
+npm run anew
 
 
 # TODO
-* Allows tests to run in parallel
 * Playwrite
 * Percy
 * Mermaid

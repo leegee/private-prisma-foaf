@@ -41,13 +41,13 @@ model Person {
 
 model Action {
   subjectId Int
-  Subject   Person @relation("Subject", fields: [subjectId], references: [id])
+  Subject   Person @relation("Subject", fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   objectId Int
-  Object   Person @relation("Object", fields: [objectId], references: [id])
+  Object   Person @relation("Object", fields: [objectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   verbId Int
-  Verb   Verb @relation(fields: [verbId], references: [id])
+  Verb   Verb @relation(fields: [verbId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   start DateTime @db.Date
   end   DateTime @db.Date
