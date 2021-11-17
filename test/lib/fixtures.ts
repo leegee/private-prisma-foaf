@@ -9,6 +9,7 @@ export interface IFixtures {
 let fixtures: IFixtures = {};
 
 export async function setup(testId: string): Promise<IFixtures> {
+  // await prisma.$queryRaw`BEGIN`;
 
   fixtures[testId] = {} as IFixtures;
 
@@ -56,19 +57,7 @@ export async function setup(testId: string): Promise<IFixtures> {
 }
 
 export async function teardown(testId: string) {
-  // await prisma.action.deleteMany({
-  //   where: {
-  //     OR: [{
-  //       verbId: fixtures[testId].assassinated.id,
-  //       subjectId: fixtures[testId].jfk.id,
-  //       objectId: fixtures[testId].oswald.id,
-  //     }, {
-  //       verbId: fixtures[testId].hosted.id,
-  //       subjectId: fixtures[testId].arthur.id,
-  //       objectId: fixtures[testId].oswald.id,
-  //     }]
-  //   }
-  // });
+  // await prisma.$queryRaw`ROLLBACK`;
 
   await prisma.person.deleteMany({
     where: {

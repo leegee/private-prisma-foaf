@@ -59,8 +59,8 @@ model Action {
   start DateTime @db.Date
   end   DateTime @db.Date
 
-  citationId Int
-  Citation   Citation @relation(fields: [citationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  citationId Int?
+  Citation   Citation? @relation(fields: [citationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([subjectId, objectId, verbId])
 }

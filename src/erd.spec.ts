@@ -19,7 +19,9 @@ beforeAll(async () => {
   fixtures = await setup(testId);
 });
 
-afterAll(async () => await teardown(testId));
+afterAll(async () => {
+  await teardown(testId);
+});
 
 describe('erd', () => {
   it('Lee Harvey Oswald', async () => {

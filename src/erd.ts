@@ -52,8 +52,9 @@ async function _getActions(
   return actions;
 }
 
-function _save(actions: any[], savepath: string): void {
-  let mermaid = 'graph TD\n';
+function _graphForActions(actions: any[], suffix = '') {
+  // ummmmmmmm
+  let mermaid = '';
 
   actions.forEach((action) => {
     mermaid +=
@@ -61,17 +62,23 @@ function _save(actions: any[], savepath: string): void {
       (action as any).Subject.id +
       '[' +
       (action as any).Subject.knownas +
-      ']' +
-      '-->|' +
+      ']-->|' +
       (action as any).Verb.name +
-      '|' +
-      'Person' +
+      (suffix ? ' ' + suffix : '') +
+      '|Person' +
       (action as any).Object.id +
       '[' +
       (action as any).Object.knownas +
-      ']'
-      + "\n";
+      ']' +
+      '\n';
   });
+  return mermaid;
+}
+
+function _save(actions: any[], savepath: string): void {
+  let mermaid = 'graph TD\n';
+
+  mermaid += _graphForActions(actions);
 
   const tmpDir = fs.mkdtempSync(os.tmpdir() + path.sep + 'prisma-erd-');
   const theme = 'forest';
