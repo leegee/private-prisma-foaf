@@ -59,6 +59,7 @@ export async function teardown() {
       OR: [
         { id: fixtures.jfk.id },
         { id: fixtures.arthur.id },
+        { id: fixtures.oswald.id },
       ]
     }
   });
