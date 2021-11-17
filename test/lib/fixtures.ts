@@ -12,12 +12,12 @@ export async function setup(testId: string): Promise<IFixtures> {
 
   fixtures[testId] = {} as IFixtures;
 
-  fixtures[testId].assassinates = await prisma.verb.create({
-    data: { name: 'assassinates' + testId }
+  fixtures[testId].assassinated = await prisma.verb.create({
+    data: { name: 'assassinated' + testId }
   });
 
-  fixtures[testId].hosts = await prisma.verb.create({
-    data: { name: 'hosts' + testId }
+  fixtures[testId].hosted = await prisma.verb.create({
+    data: { name: 'hosted' + testId }
   });
 
   fixtures[testId].jfk = await prisma.person.create({
@@ -32,9 +32,9 @@ export async function setup(testId: string): Promise<IFixtures> {
     data: { knownas: 'Arthur Young' + testId },
   });
 
-  fixtures[testId].oswaldAssassinatesJfk = await prisma.action.create({
+  fixtures[testId].oswaldassassinatedJfk = await prisma.action.create({
     data: {
-      verbId: fixtures[testId].assassinates.id,
+      verbId: fixtures[testId].assassinated.id,
       objectId: fixtures[testId].jfk.id,
       subjectId: fixtures[testId].oswald.id,
       start: new Date('1963-11-22'),
@@ -42,9 +42,9 @@ export async function setup(testId: string): Promise<IFixtures> {
     },
   });
 
-  fixtures[testId].arthurHostsOswald = await prisma.action.create({
+  fixtures[testId].arthurhostedOswald = await prisma.action.create({
     data: {
-      verbId: fixtures[testId].hosts.id,
+      verbId: fixtures[testId].hosted.id,
       subjectId: fixtures[testId].arthur.id,
       objectId: fixtures[testId].oswald.id,
       start: new Date('1963-11-21'),
@@ -59,11 +59,11 @@ export async function teardown(testId: string) {
   // await prisma.action.deleteMany({
   //   where: {
   //     OR: [{
-  //       verbId: fixtures[testId].assassinates.id,
+  //       verbId: fixtures[testId].assassinated.id,
   //       subjectId: fixtures[testId].jfk.id,
   //       objectId: fixtures[testId].oswald.id,
   //     }, {
-  //       verbId: fixtures[testId].hosts.id,
+  //       verbId: fixtures[testId].hosted.id,
   //       subjectId: fixtures[testId].arthur.id,
   //       objectId: fixtures[testId].oswald.id,
   //     }]
@@ -83,8 +83,8 @@ export async function teardown(testId: string) {
   await prisma.verb.deleteMany({
     where: {
       OR: [
-        { id: fixtures[testId].assassinates.id },
-        { id: fixtures[testId].hosts.id },
+        { id: fixtures[testId].assassinated.id },
+        { id: fixtures[testId].hosted.id },
       ]
     }
   });
