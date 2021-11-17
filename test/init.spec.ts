@@ -2,13 +2,11 @@ import { IFixtures, prisma, setup, teardown } from 'testlib/fixtures';
 
 const testId = "init";
 
-let fixtures: IFixtures;
-
 beforeAll(async () => {
-  fixtures = await setup(testId)
+  await setup(testId)
 });
 
-afterAll(async () => await teardown());
+afterAll(async () => await teardown(testId));
 
 describe('Initial scheme', () => {
   it('has people', async () => {

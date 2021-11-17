@@ -37,6 +37,7 @@ model Person {
 
   @@unique([knownas, dob, dod])
   @@unique([givenname, middlenames, familyname, dob, dod])
+  @@index([knownas, id])
 }
 
 model Action {

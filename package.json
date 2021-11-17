@@ -4,6 +4,7 @@
   "devDependencies": {
     "@types/jest": "^27.0.2",
     "@types/node": "16.11.7",
+    "jest-mock-extended": "^2.0.4",
     "prisma": "^3.5.0",
     "prisma-erd-generator": "^0.6.0",
     "ts-node": "10.4.0",
@@ -16,7 +17,7 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
     "test": "jest -i",
-    "test:watch": "jest -i --watch",
+    "test:watch": "cross-env JEST_WATCH=1 jest -i --watch",
     "test:cov": "jest -i --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
