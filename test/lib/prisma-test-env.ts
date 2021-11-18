@@ -1,15 +1,16 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-// https://github.com/ctrlplusb/prisma-pg-jest/blob/master/prisma/prisma-test-environment.js
+// @see https://github.com/ctrlplusb/prisma-pg-jest/blob/master/prisma/prisma-test-environment.js
+// @see https://jestjs.io/docs/configuration#testenvironment-string
 
 require('dotenv').config();
 const { Client } = require("pg");
 const NodeEnvironment = require("jest-environment-node");
 const { nanoid } = require("nanoid");
 const util = require("util");
-const exec = util.promisify(require("child_process").exec);
+const child_process = require("child_process");
 
-const prismaBinary = 'npx prisma'; // "./node_modules/.bin/prisma2";
+const prismaBinary = 'npx prisma';
 
 class PrismaTestEnvironment extends NodeEnvironment {
   constructor(config: any) {
@@ -23,19 +24,18 @@ class PrismaTestEnvironment extends NodeEnvironment {
   }
 
   async setup() {
-    // Set the required environment variable to contain the connection string
-    // to our database test schema
+    // Set the required environment variable to contain the connection string for the database test schema
     process.env.POSTGRES_URL = this.connectionString;
     this.global.process.env.POSTGRES_URL = this.connectionString;
 
     // Run the migrations to ensure our schema has the required structure
-    await exec(`${prismaBinary} migrate dev`);
+    child_process.execSync(`${prismaBinary} migrate dev`);
 
     return super.setup();
   }
 
+  // Drop the schema after the tests have completed
   async teardown() {
-    // Drop the schema after the tests have completed
     const client = new Client({
       connectionString: this.connectionString,
     });
