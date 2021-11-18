@@ -2,10 +2,12 @@
  * @jest-environment ./test/lib/prisma-test-env.ts
  */
 
+import { Person, Action } from '@prisma/client';
+import { MockProxy } from 'jest-mock-extended';
 import { mockPrisma } from 'testlib/mock-prisma';
 import { Erd } from './erd';
 
-const actionFixture = {
+const actionFixture: MockProxy<Action> = {
   start: new Date(),
   end: new Date(),
   subjectId: 1,
@@ -13,7 +15,7 @@ const actionFixture = {
   verbId: 1
 };
 
-const personFixture = {
+const personFixture: MockProxy<Person> = {
   id: 1,
   knownas: 'Oswald',
   givenname: '',
