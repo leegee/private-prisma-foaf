@@ -3,7 +3,7 @@
 import * as fs from 'fs';
 
 import { IFixtures, prisma, setup, teardown } from 'testlib/fixtures';
-import { erd, _composeGraph, _getActions, _getActionsGraph, _save } from './erd';
+import { Erd } from './erd';
 
 // jest.mock('@prisma/client', () => ({
 //   PrismaClient: function () {
@@ -28,21 +28,24 @@ afterAll(async () => {
 
 describe('erd', () => {
   describe('Lee Harvey Oswald', () => {
-    it('internals', async () => {
-      const savepath = './temp-int.svg';
-      if (fs.existsSync(savepath)) {
-        fs.unlinkSync(savepath);
-      }
+    /*
+    it('_getActions', async () => {
+      const actionsArray = await _getActions(prisma, knownas);
+      expect(actionsArray).toBeDefined();
 
-      const rvArray = await _getActions(prisma, knownas);
-      expect(rvArray).toBeDefined();
-
-      rvArray.forEach((rv) => {
+      actionsArray.forEach((rv) => {
         expect(rv).not.toBeNull();
         expect(rv).toHaveProperty('Subject');
         expect(rv).toHaveProperty('Object');
         expect(rv).toHaveProperty('Verb');
       });
+    });
+
+    it('_getActionsGraph _composeGraph _save', async () => {
+      const savepath = './temp-int.svg';
+      if (fs.existsSync(savepath)) {
+        fs.unlinkSync(savepath);
+      }
 
       const actionsSubjectObject = await _getActionsGraph(prisma, knownas);
       const actionsObjectSubject = await _getActionsGraph(prisma, knownas, true);
@@ -54,14 +57,16 @@ describe('erd', () => {
       expect(fs.existsSync(savepath)).toBeTruthy();
       // fs.unlinkSync(savepath);
     });
+    */
 
-    it('public method', async () => {
+    it.only('public method', async () => {
       const savepath = './temp-pub.svg';
       if (fs.existsSync(savepath)) {
         fs.unlinkSync(savepath);
       }
 
-      erd({ prisma, knownas, savepath, invertedRelationship: true });
+      const erd = new Erd({ prisma, knownas, savepath, invertedRelationship: true });
+      await erd.createFile();
 
       const exists = fs.existsSync(savepath);
 

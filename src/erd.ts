@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as child_process from 'child_process';
 import fs from 'fs';
 import os from 'os';
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient, Prisma, Person } from '@prisma/client';
 
 export interface IErdArgs {
   prisma: PrismaClient<
@@ -17,142 +17,142 @@ export interface IErdArgs {
   invertedRelationship: boolean
 }
 
-export async function erd({
-  prisma,
-  knownas,
-  savepath,
-  invertedRelationship = false,
-}: IErdArgs): Promise<void> {
-  const actions = [];
-  const actionsSubjectObject = await _getActionsGraph(prisma, knownas);
+export class Erd {
+  prisma: PrismaClient<Prisma.PrismaClientOptions, never, Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined>;
+  knownas: string;
+  savepath: string;
+  invertedRelationship: boolean;
+  personId: number | undefined;
 
-  actions.push(actionsSubjectObject);
-
-  if (invertedRelationship) {
-    const actionsObjectSubject = await _getActionsGraph(prisma, knownas, true);
-    actions.push(actionsObjectSubject);
+  constructor({
+    prisma,
+    knownas,
+    savepath,
+    invertedRelationship = false,
+  }: IErdArgs
+  ) {
+    this.prisma = prisma;
+    this.knownas = knownas;
+    this.savepath = savepath;
+    this.invertedRelationship = invertedRelationship;
   }
 
-  const graph = _composeGraph(actions);
-
-  _save(graph, savepath);
-}
-
-/**
- * @throws If no person or no actions are found
- */
-export async function _getActions(
-  prisma: PrismaClient<
-    Prisma.PrismaClientOptions,
-    never,
-    Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
-  >,
-  knownas: string,
-  invertedRelationship = false
-) {
-  const person = await prisma.person.findFirst({
-    where: { knownas },
-    select: { id: true },
-  });
-
-  if (!person) {
-    throw new Error(`No such person knownas "${knownas}"`);
+  async createFile() {
+    const graph = await this._create();
+    this._save(graph);
   }
 
-  const where = invertedRelationship ? { objectId: person.id } : { subjectId: person.id };
+  async _create() {
+    const actions = [];
 
-  const actions = await prisma.action.findMany({
-    where,
-    select: {
-      Subject: true,
-      Object: true,
-      Verb: true,
-    },
-  });
+    const actionsSubjectObject = await this._getActionsGraph();
 
-  if (actions.length === 0) {
-    throw new Error(`No actions for ${knownas}`);
-  }
+    actions.push(actionsSubjectObject);
 
-  return actions;
-}
-
-
-export async function _getActionsGraph(
-  prisma: PrismaClient<
-    Prisma.PrismaClientOptions,
-    never,
-    Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
-  >,
-  knownas: string,
-  invertedRelationship = false,
-) {
-  const actions = await _getActions(prisma, knownas, invertedRelationship);
-
-  let mermaid = '';
-
-  actions.forEach((action) => {
-    if (invertedRelationship) {
-      mermaid +=
-        'Person' +
-        (action as any).Subject.id +
-        '[' +
-        (action as any).Subject.knownas +
-        ']-->|' +
-        (action as any).Verb.name +
-        '|Person' +
-        (action as any).Object.id +
-        '[' +
-        (action as any).Object.knownas +
-        ']' +
-        '\n';
-    } else {
-      mermaid +=
-        'Person' +
-        (action as any).Subject.id +
-        '[' +
-        (action as any).Subject.knownas +
-        ']-->|' +
-        (action as any).Verb.name +
-        '|Person' +
-        (action as any).Object.id +
-        '[' +
-        (action as any).Object.knownas +
-        ']' +
-        '\n';
+    if (this.invertedRelationship) {
+      const actionsObjectSubject = await this._getActionsGraph();
+      actions.push(actionsObjectSubject);
     }
-  });
 
-  return mermaid;
-}
+    return this._composeGraph(actions);
+  }
 
-export function _composeGraph(graphedActions: string[]): string {
-  return 'graph TD\n' + graphedActions.join("\n");
-}
+  async _getActionsGraph() {
+    const actions = await this._getActions();
 
-export function _save(graph: string, savepath: string): void {
-  const tmpDir = fs.mkdtempSync(os.tmpdir() + path.sep + 'person-erd-');
-  const theme = 'forest';
+    let mermaid = '';
 
-  const tempMermaidFile = path.resolve(path.join(tmpDir, 'person-erd.mmd'));
-  fs.writeFileSync(tempMermaidFile, graph);
+    actions.forEach((action) => {
+      if (this.invertedRelationship) {
+        mermaid +=
+          'Person' +
+          (action as any).Subject.id +
+          '[' +
+          (action as any).Subject.knownas +
+          ']-->|' +
+          (action as any).Verb.name +
+          '|Person' +
+          (action as any).Object.id +
+          '[' +
+          (action as any).Object.knownas +
+          ']' +
+          '\n';
+      } else {
+        mermaid +=
+          'Person' +
+          (action as any).Subject.id +
+          '[' +
+          (action as any).Subject.knownas +
+          ']-->|' +
+          (action as any).Verb.name +
+          '|Person' +
+          (action as any).Object.id +
+          '[' +
+          (action as any).Object.knownas +
+          ']' +
+          '\n';
+      }
+    });
 
-  const tempConfigFile = path.resolve(path.join(tmpDir, 'config.json'));
-  fs.writeFileSync(tempConfigFile, JSON.stringify({ deterministicIds: true }));
+    return mermaid;
+  }
 
-  const mermaidCliNodePath = path.resolve(
-    path.join('node_modules', '.bin', 'mmdc'),
-  );
 
-  child_process.execSync(
-    `${mermaidCliNodePath} -i ${tempMermaidFile} -o ${savepath} -t ${theme} -c ${tempConfigFile}`,
-    {
-      stdio: 'inherit',
-    },
-  );
+  async _getActions() {
+    if (!!this.personId) {
+      const person = await this.prisma.person.findFirst({
+        where: { knownas: this.knownas },
+        select: { id: true },
+      });
+      if (!person) {
+        throw new Error(`No such person knownas "${this.knownas}"`);
+      }
 
-  fs.unlinkSync(tempMermaidFile);
-  fs.unlinkSync(tempConfigFile);
+      this.personId = person.id;
+    }
 
-  console.info('Wrote', savepath);
+    const where = this.invertedRelationship ? { objectId: this.personId } : { subjectId: this.personId };
+
+    const actions = await this.prisma.action.findMany({
+      where,
+      select: {
+        Subject: true,
+        Object: true,
+        Verb: true,
+      },
+    });
+
+    return actions;
+  }
+
+  _composeGraph(graphedActions: string[]): string {
+    return 'graph TD\n' + graphedActions.join("\n");
+  }
+
+  _save(graph: string): void {
+    const tmpDir = fs.mkdtempSync(os.tmpdir() + path.sep + 'person-erd-');
+    const theme = 'forest';
+
+    const tempMermaidFile = path.resolve(path.join(tmpDir, 'person-erd.mmd'));
+    fs.writeFileSync(tempMermaidFile, graph);
+
+    const tempConfigFile = path.resolve(path.join(tmpDir, 'config.json'));
+    fs.writeFileSync(tempConfigFile, JSON.stringify({ deterministicIds: true }));
+
+    const mermaidCliNodePath = path.resolve(
+      path.join('node_modules', '.bin', 'mmdc'),
+    );
+
+    child_process.execSync(
+      `${mermaidCliNodePath} -i ${tempMermaidFile} -o ${this.savepath} -t ${theme} -c ${tempConfigFile}`,
+      {
+        stdio: 'inherit',
+      },
+    );
+
+    fs.unlinkSync(tempMermaidFile);
+    fs.unlinkSync(tempConfigFile);
+
+    // todo: throw on write error
+  }
 }
