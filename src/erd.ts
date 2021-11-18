@@ -13,13 +13,13 @@ export interface IErdArgs {
     Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
   >,
   knownas: string,
-  savepath: string,
+  savepath?: string,
 }
 
 export class Erd {
   prisma: PrismaClient<Prisma.PrismaClientOptions, never, Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined>;
   knownas: string;
-  savepath: string;
+  savepath?: string;
   personId: number | undefined;
   tmpDir = fs.mkdtempSync(os.tmpdir() + path.sep + 'person-erd-');
   theme = 'forest';
@@ -33,7 +33,9 @@ export class Erd {
   ) {
     this.prisma = prisma;
     this.knownas = knownas;
-    this.savepath = savepath;
+    if (savepath) {
+      this.savepath = savepath
+    };
   }
 
   async createFile() {
@@ -117,6 +119,10 @@ export class Erd {
   }
 
   _save(graph: string): void {
+    if (!this.savepath) {
+      throw new Error('savepath was not supplied during construction');
+    }
+
     const tempMermaidFile = path.resolve(path.join(this.tmpDir, 'person-erd.mmd'));
     fs.writeFileSync(tempMermaidFile, graph);
 

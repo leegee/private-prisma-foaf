@@ -38,11 +38,12 @@ describe('erd', () => {
     erd._save(`graph TD; A-->B; A-->C; B-->D; C-->D;`);
 
     expect(fs.existsSync(savepath)).toBeTruthy();
+    fs.unlinkSync(savepath);
   });
 
   describe('Lee Harvey Oswald', () => {
     it('_getActions', async () => {
-      const erd = new Erd({ prisma, knownas, savepath: 'savepath' });
+      const erd = new Erd({ prisma, knownas, });
       const actionsArray = await erd._getActions();
 
       expect(actionsArray).toBeDefined();
@@ -56,7 +57,7 @@ describe('erd', () => {
     });
 
     it('_getActionsGraph', async () => {
-      const erd = new Erd({ prisma, knownas, savepath: 'savepath' });
+      const erd = new Erd({ prisma, knownas, });
       const graph = await erd._getActionsGraph();
 
       [
