@@ -6,4 +6,5 @@ prisma/migrations
 erd.svg
 prisma.mmd
 *.svg
+dist/
 

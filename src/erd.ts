@@ -6,7 +6,7 @@ import fs from 'fs';
 import os from 'os';
 import { PrismaClient, Prisma } from '@prisma/client';
 
-export async function erd(
+export interface IErdArgs {
   prisma: PrismaClient<
     Prisma.PrismaClientOptions,
     never,
@@ -14,8 +14,15 @@ export async function erd(
   >,
   knownas: string,
   savepath: string,
-  invertedRelationship = false
-): Promise<void> {
+  invertedRelationship: boolean
+}
+
+export async function erd({
+  prisma,
+  knownas,
+  savepath,
+  invertedRelationship = false,
+}: IErdArgs): Promise<void> {
   const actions = [];
   const actionsSubjectObject = await _getActionsGraph(prisma, knownas);
 
@@ -26,10 +33,14 @@ export async function erd(
     actions.push(actionsObjectSubject);
   }
 
-  _save(actions, savepath);
+  const graph = _composeGraph(actions);
+
+  _save(graph, savepath);
 }
 
-
+/**
+ * @throws If no person or no actions are found
+ */
 export async function _getActions(
   prisma: PrismaClient<
     Prisma.PrismaClientOptions,
@@ -59,6 +70,10 @@ export async function _getActions(
     },
   });
 
+  if (actions.length === 0) {
+    throw new Error(`No actions for ${knownas}`);
+  }
+
   return actions;
 }
 
@@ -73,10 +88,6 @@ export async function _getActionsGraph(
   invertedRelationship = false,
 ) {
   const actions = await _getActions(prisma, knownas, invertedRelationship);
-
-  if (actions.length === 0) {
-    throw new Error(`No actions for ${knownas}`);
-  }
 
   let mermaid = '';
 
@@ -115,16 +126,16 @@ export async function _getActionsGraph(
   return mermaid;
 }
 
-export function _save(graphedActions: string[], savepath: string): void {
-  let mermaid = 'graph TD\n';
+export function _composeGraph(graphedActions: string[]): string {
+  return 'graph TD\n' + graphedActions.join("\n");
+}
 
-  mermaid += graphedActions.join("\n");
-
-  const tmpDir = fs.mkdtempSync(os.tmpdir() + path.sep + 'prisma-erd-');
+export function _save(graph: string, savepath: string): void {
+  const tmpDir = fs.mkdtempSync(os.tmpdir() + path.sep + 'person-erd-');
   const theme = 'forest';
 
-  const tempMermaidFile = path.resolve(path.join(tmpDir, 'prisma.mmd'));
-  fs.writeFileSync(tempMermaidFile, mermaid);
+  const tempMermaidFile = path.resolve(path.join(tmpDir, 'person-erd.mmd'));
+  fs.writeFileSync(tempMermaidFile, graph);
 
   const tempConfigFile = path.resolve(path.join(tmpDir, 'config.json'));
   fs.writeFileSync(tempConfigFile, JSON.stringify({ deterministicIds: true }));
@@ -139,4 +150,9 @@ export function _save(graphedActions: string[], savepath: string): void {
       stdio: 'inherit',
     },
   );
+
+  fs.unlinkSync(tempMermaidFile);
+  fs.unlinkSync(tempConfigFile);
+
+  console.info('Wrote', savepath);
 }

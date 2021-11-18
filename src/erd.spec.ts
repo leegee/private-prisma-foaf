@@ -3,7 +3,7 @@
 import * as fs from 'fs';
 
 import { IFixtures, prisma, setup, teardown } from 'testlib/fixtures';
-import { erd, _getActions, _getActionsGraph, _save } from './erd';
+import { erd, _composeGraph, _getActions, _getActionsGraph, _save } from './erd';
 
 // jest.mock('@prisma/client', () => ({
 //   PrismaClient: function () {
@@ -28,18 +28,6 @@ afterAll(async () => {
 
 describe('erd', () => {
   describe('Lee Harvey Oswald', () => {
-    it('public', async () => {
-      const savepath = './temp-pub.svg';
-      if (fs.existsSync(savepath)) {
-        fs.unlinkSync(savepath);
-      }
-
-      erd(prisma, knownas, savepath, true);
-
-      expect(fs.existsSync(savepath)).toBeTruthy();
-      // fs.unlinkSync(savepath);
-    });
-
     it('internals', async () => {
       const savepath = './temp-int.svg';
       if (fs.existsSync(savepath)) {
@@ -59,10 +47,27 @@ describe('erd', () => {
       const actionsSubjectObject = await _getActionsGraph(prisma, knownas);
       const actionsObjectSubject = await _getActionsGraph(prisma, knownas, true);
 
-      _save([actionsSubjectObject, actionsObjectSubject], savepath);
+      const graph = _composeGraph([actionsSubjectObject, actionsObjectSubject]);
+
+      _save(graph, savepath);
 
       expect(fs.existsSync(savepath)).toBeTruthy();
       // fs.unlinkSync(savepath);
     });
+
+    it('public method', async () => {
+      const savepath = './temp-pub.svg';
+      if (fs.existsSync(savepath)) {
+        fs.unlinkSync(savepath);
+      }
+
+      erd({ prisma, knownas, savepath, invertedRelationship: true });
+
+      const exists = fs.existsSync(savepath);
+
+      expect(exists).toBeTruthy();
+      // fs.unlinkSync(savepath);
+    });
+
   });
 });
