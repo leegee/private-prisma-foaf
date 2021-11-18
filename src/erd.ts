@@ -14,27 +14,26 @@ export interface IErdArgs {
   >,
   knownas: string,
   savepath: string,
-  invertedRelationship: boolean
 }
 
 export class Erd {
   prisma: PrismaClient<Prisma.PrismaClientOptions, never, Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined>;
   knownas: string;
   savepath: string;
-  invertedRelationship: boolean;
   personId: number | undefined;
+  tmpDir = fs.mkdtempSync(os.tmpdir() + path.sep + 'person-erd-');
+  theme = 'forest';
 
-  constructor({
-    prisma,
-    knownas,
-    savepath,
-    invertedRelationship = false,
-  }: IErdArgs
+  constructor(
+    {
+      prisma,
+      knownas,
+      savepath,
+    }: IErdArgs
   ) {
     this.prisma = prisma;
     this.knownas = knownas;
     this.savepath = savepath;
-    this.invertedRelationship = invertedRelationship;
   }
 
   async createFile() {
@@ -43,17 +42,7 @@ export class Erd {
   }
 
   async _create() {
-    const actions = [];
-
-    const actionsSubjectObject = await this._getActionsGraph();
-
-    actions.push(actionsSubjectObject);
-
-    if (this.invertedRelationship) {
-      const actionsObjectSubject = await this._getActionsGraph();
-      actions.push(actionsObjectSubject);
-    }
-
+    const actions = await this._getActionsGraph();
     return this._composeGraph(actions);
   }
 
@@ -63,35 +52,34 @@ export class Erd {
     let mermaid = '';
 
     actions.forEach((action) => {
-      if (this.invertedRelationship) {
-        mermaid +=
-          'Person' +
-          (action as any).Subject.id +
-          '[' +
-          (action as any).Subject.knownas +
-          ']-->|' +
-          (action as any).Verb.name +
-          '|Person' +
-          (action as any).Object.id +
-          '[' +
-          (action as any).Object.knownas +
-          ']' +
-          '\n';
-      } else {
-        mermaid +=
-          'Person' +
-          (action as any).Subject.id +
-          '[' +
-          (action as any).Subject.knownas +
-          ']-->|' +
-          (action as any).Verb.name +
-          '|Person' +
-          (action as any).Object.id +
-          '[' +
-          (action as any).Object.knownas +
-          ']' +
-          '\n';
-      }
+      mermaid +=
+        'Person' +
+        (action as any).Subject.id +
+        '[' +
+        (action as any).Subject.knownas +
+        ']-->|' +
+        (action as any).Verb.name +
+        '|Person' +
+        (action as any).Object.id +
+        '[' +
+        (action as any).Object.knownas +
+        ']' +
+        '\n';
+      // } else {
+      //   mermaid +=
+      //     'Person' +
+      //     (action as any).Subject.id +
+      //     '[' +
+      //     (action as any).Subject.knownas +
+      //     ']-->|' +
+      //     (action as any).Verb.name +
+      //     '|Person' +
+      //     (action as any).Object.id +
+      //     '[' +
+      //     (action as any).Object.knownas +
+      //     ']' +
+      //     '\n';
+      // }
     });
 
     return mermaid;
@@ -104,6 +92,7 @@ export class Erd {
         where: { knownas: this.knownas },
         select: { id: true },
       });
+
       if (!person) {
         throw new Error(`No such person knownas "${this.knownas}"`);
       }
@@ -111,10 +100,8 @@ export class Erd {
       this.personId = person.id;
     }
 
-    const where = this.invertedRelationship ? { objectId: this.personId } : { subjectId: this.personId };
-
     const actions = await this.prisma.action.findMany({
-      where,
+      where: { objectId: this.personId },
       select: {
         Subject: true,
         Object: true,
@@ -125,18 +112,15 @@ export class Erd {
     return actions;
   }
 
-  _composeGraph(graphedActions: string[]): string {
-    return 'graph TD\n' + graphedActions.join("\n");
+  _composeGraph(graphedActions: string): string {
+    return 'graph TD\n' + graphedActions + "\n";
   }
 
   _save(graph: string): void {
-    const tmpDir = fs.mkdtempSync(os.tmpdir() + path.sep + 'person-erd-');
-    const theme = 'forest';
-
-    const tempMermaidFile = path.resolve(path.join(tmpDir, 'person-erd.mmd'));
+    const tempMermaidFile = path.resolve(path.join(this.tmpDir, 'person-erd.mmd'));
     fs.writeFileSync(tempMermaidFile, graph);
 
-    const tempConfigFile = path.resolve(path.join(tmpDir, 'config.json'));
+    const tempConfigFile = path.resolve(path.join(this.tmpDir, 'config.json'));
     fs.writeFileSync(tempConfigFile, JSON.stringify({ deterministicIds: true }));
 
     const mermaidCliNodePath = path.resolve(
@@ -144,15 +128,13 @@ export class Erd {
     );
 
     child_process.execSync(
-      `${mermaidCliNodePath} -i ${tempMermaidFile} -o ${this.savepath} -t ${theme} -c ${tempConfigFile}`,
-      {
-        stdio: 'inherit',
-      },
+      `${mermaidCliNodePath} -i ${tempMermaidFile} -o ${this.savepath} -t ${this.theme} -c ${tempConfigFile}`,
+      { stdio: 'inherit' },
     );
 
     fs.unlinkSync(tempMermaidFile);
     fs.unlinkSync(tempConfigFile);
 
-    // todo: throw on write error
+    // todo: nicer errors
   }
 }

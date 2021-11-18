@@ -27,10 +27,24 @@ afterAll(async () => {
 
 
 describe('erd', () => {
+
+  it('_save', async () => {
+    const savepath = './temp-int.svg';
+    if (fs.existsSync(savepath)) {
+      fs.unlinkSync(savepath);
+    }
+
+    const erd = new Erd({ prisma, knownas, savepath });
+    erd._save(`graph TD; A-->B; A-->C; B-->D; C-->D;`);
+
+    expect(fs.existsSync(savepath)).toBeTruthy();
+  });
+
   describe('Lee Harvey Oswald', () => {
-    /*
     it('_getActions', async () => {
-      const actionsArray = await _getActions(prisma, knownas);
+      const erd = new Erd({ prisma, knownas, savepath: 'savepath' });
+      const actionsArray = await erd._getActions();
+
       expect(actionsArray).toBeDefined();
 
       actionsArray.forEach((rv) => {
@@ -41,31 +55,25 @@ describe('erd', () => {
       });
     });
 
-    it('_getActionsGraph _composeGraph _save', async () => {
-      const savepath = './temp-int.svg';
-      if (fs.existsSync(savepath)) {
-        fs.unlinkSync(savepath);
-      }
+    it('_getActionsGraph', async () => {
+      const erd = new Erd({ prisma, knownas, savepath: 'savepath' });
+      const graph = await erd._getActionsGraph();
 
-      const actionsSubjectObject = await _getActionsGraph(prisma, knownas);
-      const actionsObjectSubject = await _getActionsGraph(prisma, knownas, true);
-
-      const graph = _composeGraph([actionsSubjectObject, actionsObjectSubject]);
-
-      _save(graph, savepath);
-
-      expect(fs.existsSync(savepath)).toBeTruthy();
-      // fs.unlinkSync(savepath);
+      [
+        new RegExp('Person\d+\[' + fixtures.oswald.knownas + ']-->\|' + fixtures.assassinated.name + '\|Person\d+\[' + fixtures.jfk.knownas + '\];'),
+        new RegExp('Person\d+\[' + fixtures.arthur.knownas + ']-->\|' + fixtures.hosted.name + '\|Person\d+\[' + fixtures.oswald.knownas + '\];'),
+      ].forEach(re => {
+        expect(graph).toMatch(re);
+      });
     });
-    */
 
-    it.only('public method', async () => {
-      const savepath = './temp-pub.svg';
+    it('createFile', async () => {
+      const savepath = './temp-createFile.svg';
       if (fs.existsSync(savepath)) {
         fs.unlinkSync(savepath);
       }
 
-      const erd = new Erd({ prisma, knownas, savepath, invertedRelationship: true });
+      const erd = new Erd({ prisma, knownas, savepath });
       await erd.createFile();
 
       const exists = fs.existsSync(savepath);
