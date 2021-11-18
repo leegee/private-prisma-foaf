@@ -41,9 +41,12 @@ model Person {
 }
 
 model Citation {
-  id     Int      @id @default(autoincrement())
-  url    String
-  Action Action[]
+  id              Int     @id @default(autoincrement())
+  url             String
+  Action          Action? @relation(fields: [actionSubjectId, actionObjectId, actionVerbId], references: [subjectId, objectId, verbId])
+  actionSubjectId Int?
+  actionObjectId  Int?
+  actionVerbId    Int?
 }
 
 model Action {
@@ -59,8 +62,7 @@ model Action {
   start DateTime @db.Date
   end   DateTime @db.Date
 
-  citationId Int?
-  Citation   Citation? @relation(fields: [citationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  citations Citation[]
 
   @@id([subjectId, objectId, verbId])
 }
