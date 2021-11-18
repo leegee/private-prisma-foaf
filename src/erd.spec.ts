@@ -1,13 +1,9 @@
-import { mockDeep } from 'jest-mock-extended';
-import { Action, PrismaClient as OriginalPrismaClient } from '@prisma/client';
+// import { mockDeep } from 'jest-mock-extended';
+// import { PrismaClient as OriginalPrismaClient } from '@prisma/client';
 import * as fs from 'fs';
 
 import { IFixtures, prisma, setup, teardown } from 'testlib/fixtures';
 import { erd, _getActions, _getActionsGraph, _save } from './erd';
-
-const testId = 'erd';
-
-let fixtures: IFixtures;
 
 // jest.mock('@prisma/client', () => ({
 //   PrismaClient: function () {
@@ -15,8 +11,14 @@ let fixtures: IFixtures;
 //   }
 // }));
 
+const testId = 'erd';
+
+let fixtures: IFixtures;
+let knownas: string;
+
 beforeAll(async () => {
   fixtures = await setup(testId);
+  knownas = fixtures.oswald.knownas;
 });
 
 afterAll(async () => {
@@ -25,9 +27,7 @@ afterAll(async () => {
 
 
 describe('erd', () => {
-  const knownas = fixtures.oswald.knownas;
-
-  describe('Lee Harvey Oswald', async () => {
+  describe('Lee Harvey Oswald', () => {
     it('public', async () => {
       const savepath = './temp-pub.svg';
       if (fs.existsSync(savepath)) {
