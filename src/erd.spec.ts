@@ -25,9 +25,7 @@ afterAll(async () => {
   await teardown(testId);
 });
 
-
 describe('erd', () => {
-
   it('_save', async () => {
     const savepath = './temp-int.svg';
     if (fs.existsSync(savepath)) {
@@ -86,7 +84,7 @@ describe('erd', () => {
       const exists = fs.existsSync(savepath);
 
       expect(exists).toBeTruthy();
-      // fs.unlinkSync(savepath);
+      fs.unlinkSync(savepath);
     });
 
   });
