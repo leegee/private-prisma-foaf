@@ -38,6 +38,25 @@ export class Erd {
     };
   }
 
+  async createString(): Promise<string> {
+    let remove = false;
+    if (!this.savepath) {
+      remove = true;
+      this.savepath = 'temp.svg';
+    }
+
+    await this.createFile();
+
+    const svg = fs.readFileSync(this.savepath, 'utf8');
+
+    if (remove) {
+      fs.unlinkSync(this.savepath);
+      delete this.savepath;
+    }
+
+    return svg;
+  }
+
   async createFile() {
     const graph = await this._create();
     this._save(graph);

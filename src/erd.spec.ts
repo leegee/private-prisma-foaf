@@ -68,6 +68,12 @@ describe('erd', () => {
       });
     });
 
+    it('createString', async () => {
+      const erd = new Erd({ prisma, knownas });
+      const svg = await erd.createString();
+      expect(svg).toMatch(/^<svg/);
+    });
+
     it('createFile', async () => {
       const savepath = './temp-createFile.svg';
       if (fs.existsSync(savepath)) {
