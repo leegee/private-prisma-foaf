@@ -23,7 +23,6 @@ class PrismaTestEnvironment extends NodeEnvironment {
   }
 
   async setup() {
-    console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx setup');
     // Set the required environment variable to contain the connection string
     // to our database test schema
     process.env.POSTGRES_URL = this.connectionString;
