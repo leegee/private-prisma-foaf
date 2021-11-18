@@ -67,7 +67,6 @@
     ],
     "coverageDirectory": "./coverage",
     "preset": "ts-jest",
-    "old-testEnvironment": "node",
     "testEnvironment": "./prisma/prisma-test-env.ts",
     "setupFilesAfterEnv": [
       "./test/lib/jest-setup.ts"

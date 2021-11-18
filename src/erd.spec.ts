@@ -11,18 +11,16 @@ import { Erd } from './erd';
 //   }
 // }));
 
-const testId = 'erd';
-
 let fixtures: IFixtures;
 let knownas: string;
 
 beforeAll(async () => {
-  fixtures = await setup(testId);
+  fixtures = await setup();
   knownas = fixtures.oswald.knownas;
 });
 
 afterAll(async () => {
-  await teardown(testId);
+  await teardown();
 });
 
 describe('erd', () => {
