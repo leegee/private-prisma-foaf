@@ -13,26 +13,30 @@ export async function setup(): Promise<IFixtures> {
 
   fixtures = {};
 
-  // fixtures.bell = await prisma.organisation.create({
-  //   data: {
-  //     knownas: 'bell',
-  //     formalname: 'Bell Aereospace'
-  //   }
-  // });
-
-  // fixtures.cia = await prisma.organisation.create({
-  //   data: {
-  //     knownas: 'cia',
-  //     formalname: 'Central Intelligence Agency'
-  //   }
-  // });
-
   fixtures.assassinated = await prisma.verb.create({
     data: { name: 'assassinated' }
   });
 
   fixtures.hosted = await prisma.verb.create({
     data: { name: 'hosted' }
+  });
+
+  fixtures.heads = await prisma.verb.create({
+    data: { name: 'heads' }
+  });
+
+  fixtures.bell = await prisma.entity.create({
+    data: {
+      knownas: 'bell',
+      formalname: 'Bell Aereospace'
+    }
+  });
+
+  fixtures.cia = await prisma.entity.create({
+    data: {
+      knownas: 'cia',
+      formalname: 'Central Intelligence Agency'
+    }
   });
 
   fixtures.jfk = await prisma.entity.create({
@@ -52,23 +56,21 @@ export async function setup(): Promise<IFixtures> {
     }
   });
 
-  // // Could create & connect at once if cia wasn't used elsewehre
-  // fixtures.jfk2cia = await prisma.entity.update({
-  //   where: { id: fixtures.jfk.id },
-  //   data: {
-  //     Organisations: {
-  //       connect: {
-  //         id: fixtures.cia.id
-  //       }
-  //     }
-  //   }
-  // });
+  fixtures.jfkHeadsCia = await prisma.action.create({
+    data: {
+      verbId: fixtures.heads.id,
+      subjectId: fixtures.jfk.id,
+      objectId: fixtures.cia.id,
+      start: new Date('1961-01-20'),
+      end: new Date('1963-11-22'),
+    },
+  });
 
   fixtures.oswaldassassinatedJfk = await prisma.action.create({
     data: {
       verbId: fixtures.assassinated.id,
-      objectId: fixtures.jfk.id,
       subjectId: fixtures.oswald.id,
+      objectId: fixtures.jfk.id,
       start: new Date('1963-11-22'),
       end: new Date('1963-11-22'),
     },
@@ -88,26 +90,5 @@ export async function setup(): Promise<IFixtures> {
 }
 
 export async function teardown() {
-  // await prisma.$queryRaw`ROLLBACK`;
-
-  await prisma.entity.deleteMany({
-    where: {
-      OR: [
-        { id: fixtures.jfk.id },
-        { id: fixtures.arthur.id },
-        { id: fixtures.oswald.id },
-      ]
-    }
-  });
-
-  await prisma.verb.deleteMany({
-    where: {
-      OR: [
-        { id: fixtures.assassinated.id },
-        { id: fixtures.hosted.id },
-      ]
-    }
-  });
-
   await prisma.$disconnect();
 }

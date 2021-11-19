@@ -2,40 +2,43 @@
  * @jest-environment ./test/lib/prisma-test-env.ts
  */
 
+import { Entity } from '@prisma/client';
 import { prisma, setup, teardown } from 'testlib/fixtures';
 
 beforeAll(async () => await setup());
 
 afterAll(async () => await teardown());
 
+let entities: Entity[];
+
 describe('Initial scheme', () => {
-  it('has people', async () => {
-    const people = await prisma.entity.findMany();
-    expect(people).toHaveLength(3);
-    expect(people[0].formalname).toBe("John F Kennedy");
-    expect(people[1].formalname).toBe("Lee Harvey Oswald");
-    expect(people[2].formalname).toBe("Arthur M Young");
+  beforeAll(async () => {
+    entities = await prisma.entity.findMany();
+  });
 
-    people.forEach(async (entity) => {
-      const rv = await prisma.action.findMany({
-        where: {
-          subjectId: entity.id
-        },
-        select: {
-          start: true,
-          end: true,
-          Subject: true,
-          Object: true,
-          Verb: true,
-        }
-      });
+  it('all entities are connected', async () => {
+    expect(entities).toBeInstanceOf(Array);
+    expect(entities.map(_ => _.formalname)).toContain("John F Kennedy");
+    expect(entities.map(_ => _.formalname)).toContain("Lee Harvey Oswald");
+    expect(entities.map(_ => _.formalname)).toContain("Arthur M Young");
 
-      if (entity.knownas.match(/JFK/)) {
-        expect(rv).toHaveLength(0);
-      } else {
-        expect(rv).toHaveLength(1);
-      }
-    });
+    // entities.forEach(async (entity) => {
+    //   const rv = await prisma.action.findMany({
+    //     where: {
+    //       subjectId: entity.id
+    //     },
+    //     select: {
+    //       start: true,
+    //       end: true,
+    //       Subject: true,
+    //       Object: true,
+    //       Verb: true,
+    //     }
+    //   });
+
+    //   console.log(entity.knownas, rv);
+    //   expect(rv).toHaveLength(1);
+    // });
   });
 });
 
