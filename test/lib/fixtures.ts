@@ -13,19 +13,19 @@ export async function setup(): Promise<IFixtures> {
 
   fixtures = {};
 
-  fixtures.bell = await prisma.organisation.create({
-    data: {
-      knownas: 'bell',
-      formalname: 'Bell Aereospace'
-    }
-  });
+  // fixtures.bell = await prisma.organisation.create({
+  //   data: {
+  //     knownas: 'bell',
+  //     formalname: 'Bell Aereospace'
+  //   }
+  // });
 
-  fixtures.cia = await prisma.organisation.create({
-    data: {
-      knownas: 'cia',
-      formalname: 'Central Intelligence Agency'
-    }
-  });
+  // fixtures.cia = await prisma.organisation.create({
+  //   data: {
+  //     knownas: 'cia',
+  //     formalname: 'Central Intelligence Agency'
+  //   }
+  // });
 
   fixtures.assassinated = await prisma.verb.create({
     data: { name: 'assassinated' }
@@ -35,29 +35,34 @@ export async function setup(): Promise<IFixtures> {
     data: { name: 'hosted' }
   });
 
-  fixtures.jfk = await prisma.person.create({
-    data: { knownas: 'John F Kennedy' },
+  fixtures.jfk = await prisma.entity.create({
+    data: { knownas: 'JFK', formalname: 'John F Kennedy' },
   });
 
-  fixtures.oswald = await prisma.person.create({
-    data: { knownas: 'Lee Harvey Oswald' },
+  fixtures.oswald = await prisma.entity.create({
+    data: { knownas: 'Oswald', formalname: 'Lee Harvey Oswald' },
   });
 
-  fixtures.arthur = await prisma.person.create({
-    data: { knownas: 'Arthur Young' }
-  });
-
-  // Could create & connect at once if cia wasn't used elsewehre
-  fixtures.jfk2cia = await prisma.person.update({
-    where: { id: fixtures.jfk.id },
+  fixtures.arthur = await prisma.entity.create({
     data: {
-      Organisations: {
-        connect: {
-          id: fixtures.cia.id
-        }
-      }
+      knownas: 'Arthur Young',
+      formalname: 'Arthur M Young',
+      dob: new Date('1905-11-03'),
+      dod: new Date('1995-05-30')
     }
   });
+
+  // // Could create & connect at once if cia wasn't used elsewehre
+  // fixtures.jfk2cia = await prisma.entity.update({
+  //   where: { id: fixtures.jfk.id },
+  //   data: {
+  //     Organisations: {
+  //       connect: {
+  //         id: fixtures.cia.id
+  //       }
+  //     }
+  //   }
+  // });
 
   fixtures.oswaldassassinatedJfk = await prisma.action.create({
     data: {
@@ -85,7 +90,7 @@ export async function setup(): Promise<IFixtures> {
 export async function teardown() {
   // await prisma.$queryRaw`ROLLBACK`;
 
-  await prisma.person.deleteMany({
+  await prisma.entity.deleteMany({
     where: {
       OR: [
         { id: fixtures.jfk.id },

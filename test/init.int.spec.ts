@@ -10,16 +10,16 @@ afterAll(async () => await teardown());
 
 describe('Initial scheme', () => {
   it('has people', async () => {
-    const people = await prisma.person.findMany();
+    const people = await prisma.entity.findMany();
     expect(people).toHaveLength(3);
-    expect(people[0].knownas).toBe("John F Kennedy");
-    expect(people[1].knownas).toBe("Lee Harvey Oswald");
-    expect(people[2].knownas).toBe("Arthur Young");
+    expect(people[0].formalname).toBe("John F Kennedy");
+    expect(people[1].formalname).toBe("Lee Harvey Oswald");
+    expect(people[2].formalname).toBe("Arthur M Young");
 
-    people.forEach(async (person) => {
+    people.forEach(async (entity) => {
       const rv = await prisma.action.findMany({
         where: {
-          subjectId: person.id
+          subjectId: entity.id
         },
         select: {
           start: true,
@@ -30,7 +30,7 @@ describe('Initial scheme', () => {
         }
       });
 
-      if (person.knownas.match(/Kennedy/)) {
+      if (entity.knownas.match(/JFK/)) {
         expect(rv).toHaveLength(0);
       } else {
         expect(rv).toHaveLength(1);

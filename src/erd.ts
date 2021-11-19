@@ -4,12 +4,12 @@ import * as path from 'path';
 import * as child_process from 'child_process';
 import fs from 'fs';
 import os from 'os';
-import { PrismaClient, Prisma, Person } from '@prisma/client';
+import { PrismaClient, Prisma, Entity } from '@prisma/client';
 
-export class PersonNotFoundError extends Error {
+export class EntityNotFoundError extends Error {
   constructor(message: string) {
-    super(`No such person knownas "${message}".`);
-    Object.setPrototypeOf(this, PersonNotFoundError.prototype);
+    super(`No such entity knownas "${message}".`);
+    Object.setPrototypeOf(this, EntityNotFoundError.prototype);
   }
 }
 
@@ -31,8 +31,8 @@ export class Erd {
   >;
   knownas: string;
   savepath?: string;
-  personId: number | undefined;
-  tmpDir = fs.mkdtempSync(os.tmpdir() + path.sep + 'person-erd-');
+  entityId: number | undefined;
+  tmpDir = fs.mkdtempSync(os.tmpdir() + path.sep + 'entity-erd-');
   theme = 'forest';
 
   constructor({ prisma, knownas, savepath }: IErdArgs) {
@@ -79,13 +79,13 @@ export class Erd {
 
     actions.forEach((action) => {
       mermaid +=
-        'Person' +
+        'Entity' +
         (action as any).Subject.id +
         '[' +
         (action as any).Subject.knownas +
         ']-->|' +
         (action as any).Verb.name +
-        '|Person' +
+        '|Entity' +
         (action as any).Object.id +
         '[' +
         (action as any).Object.knownas +
@@ -97,24 +97,24 @@ export class Erd {
   }
 
   async _getActions() {
-    if (!this.personId) {
-      const person = await this.prisma.person.findFirst({
+    if (!this.entityId) {
+      const entity = await this.prisma.entity.findFirst({
         where: { knownas: this.knownas },
         select: { id: true },
       });
 
-      if (person === null) {
-        throw new PersonNotFoundError(this.knownas);
+      if (entity === null) {
+        throw new EntityNotFoundError(this.knownas);
       }
 
-      this.personId = person?.id;
+      this.entityId = entity?.id;
     }
 
     const actions = await this.prisma.action.findMany({
       where: {
         OR: [
-          { objectId: this.personId },
-          { subjectId: this.personId },
+          { objectId: this.entityId },
+          { subjectId: this.entityId },
         ],
       },
       select: {
@@ -137,7 +137,7 @@ export class Erd {
     }
 
     const tempMermaidFile = path.resolve(
-      path.join(this.tmpDir, 'person-erd.mmd'),
+      path.join(this.tmpDir, 'entity-erd.mmd'),
     );
     fs.writeFileSync(tempMermaidFile, graph);
 

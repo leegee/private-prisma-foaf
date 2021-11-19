@@ -2,10 +2,10 @@
  * @jest-environment ./test/lib/prisma-test-env.ts
  */
 
-import { Person, Action } from '@prisma/client';
+import { Entity, Action } from '@prisma/client';
 import { MockProxy } from 'jest-mock-extended';
 import { mockPrisma } from 'testlib/mock-prisma';
-import { Erd, PersonNotFoundError } from './erd';
+import { Erd, EntityNotFoundError } from './erd';
 
 const actionFixture: MockProxy<Action> = {
   start: new Date(),
@@ -15,9 +15,10 @@ const actionFixture: MockProxy<Action> = {
   verbId: 1
 };
 
-const personFixture: MockProxy<Person> = {
+const entityFixture: MockProxy<Entity> = {
   id: 1,
   knownas: 'Oswald',
+  formalname: 'Lee Harvey Oswald',
   givenname: '',
   middlenames: null,
   familyname: '',
@@ -28,21 +29,21 @@ const personFixture: MockProxy<Person> = {
 
 describe('erd', () => {
   describe('_getActions', () => {
-    it('throws the correct error when person not found', async () => {
-      mockPrisma.person.findFirst.mockResolvedValue(null);
+    it('throws the correct error when entity not found', async () => {
+      mockPrisma.entity.findFirst.mockResolvedValue(null);
 
-      const erd = new Erd({ prisma: mockPrisma, knownas: 'no person' });
+      const erd = new Erd({ prisma: mockPrisma, knownas: 'no entity' });
 
       await expect(
         erd._getActions()
-      ).rejects.toBeInstanceOf(PersonNotFoundError);
+      ).rejects.toBeInstanceOf(EntityNotFoundError);
     });
 
     it('returns actions', async () => {
       mockPrisma.action.findMany.mockResolvedValue([actionFixture]);
-      mockPrisma.person.findFirst.mockResolvedValue(personFixture);
+      mockPrisma.entity.findFirst.mockResolvedValue(entityFixture);
 
-      const erd = new Erd({ prisma: mockPrisma, knownas: personFixture.knownas, });
+      const erd = new Erd({ prisma: mockPrisma, knownas: entityFixture.knownas, });
       const actionsArray = await erd._getActions();
 
       expect(actionsArray).toBeDefined();

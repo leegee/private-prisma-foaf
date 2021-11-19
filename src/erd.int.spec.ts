@@ -53,8 +53,8 @@ describe('erd', () => {
       const graph = await erd._getActionsGraph();
 
       [
-        new RegExp('Person\\d+\\[' + fixtures.oswald.knownas + ']-->\\|' + fixtures.assassinated.name + '\\|Person\\d+\\[' + fixtures.jfk.knownas + '\\]', 'g'),
-        new RegExp('Person\\d+\\[' + fixtures.arthur.knownas + ']-->\\|' + fixtures.hosted.name + '\\|Person\\d+\\[' + fixtures.oswald.knownas + '\\]', 'g'),
+        new RegExp('Entity\\d+\\[' + fixtures.oswald.knownas + ']-->\\|' + fixtures.assassinated.name + '\\|Entity\\d+\\[' + fixtures.jfk.knownas + '\\]', 'g'),
+        new RegExp('Entity\\d+\\[' + fixtures.arthur.knownas + ']-->\\|' + fixtures.hosted.name + '\\|Entity\\d+\\[' + fixtures.oswald.knownas + '\\]', 'g'),
       ].forEach(re => {
         expect(graph).toMatch(re);
       });

@@ -23,17 +23,10 @@ model Verb {
   @@unique([name])
 }
 
-model Organisation {
-  id         Int    @id @default(autoincrement())
-  knownas    String
-  formalname String
-
-  @@unique([knownas])
-}
-
-model Person {
+model Entity {
   id          Int       @id @default(autoincrement())
-  knownas     String //  eg JFK
+  knownas     String //  eg JFK, Bell
+  formalname  String // eg John F Kennedy, Bell Aircraft Corporation
   givenname   String? // eg John
   middlenames String? // eg Fitzgerald
   familyname  String? // eg Kennedy
@@ -59,10 +52,10 @@ model Citation {
 
 model Action {
   subjectId Int
-  Subject   Person @relation("Subject", fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  Subject   Entity @relation("Subject", fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   objectId Int
-  Object   Person @relation("Object", fields: [objectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  Object   Entity @relation("Object", fields: [objectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   verbId Int
   Verb   Verb @relation(fields: [verbId], references: [id], onDelete: Cascade, onUpdate: Cascade)
