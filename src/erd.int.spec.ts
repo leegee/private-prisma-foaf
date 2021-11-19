@@ -36,7 +36,7 @@ describe('erd', () => {
   describe('Lee Harvey Oswald', () => {
     it('_getActions', async () => {
       const erd = new Erd({ prisma, knownas, });
-      const actionsArray = await erd._getActions();
+      const actionsArray = await erd._getActionsForOne();
 
       expect(actionsArray).toBeDefined();
 
@@ -62,7 +62,7 @@ describe('erd', () => {
 
     it('createString', async () => {
       const erd = new Erd({ prisma, knownas });
-      const svg = await erd.createString();
+      const svg = await erd.createStringForOne();
       expect(svg).toMatch(/^<svg/);
     });
 
@@ -73,7 +73,7 @@ describe('erd', () => {
       }
 
       const erd = new Erd({ prisma, knownas, savepath });
-      await erd.createFile();
+      await erd.createFileForOne();
 
       const exists = fs.existsSync(savepath);
 

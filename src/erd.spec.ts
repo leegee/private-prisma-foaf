@@ -35,7 +35,7 @@ describe('erd', () => {
       const erd = new Erd({ prisma: mockPrisma, knownas: 'no entity' });
 
       await expect(
-        erd._getActions()
+        erd._getActionsForOne()
       ).rejects.toBeInstanceOf(EntityNotFoundError);
     });
 
@@ -44,7 +44,7 @@ describe('erd', () => {
       mockPrisma.entity.findFirst.mockResolvedValue(entityFixture);
 
       const erd = new Erd({ prisma: mockPrisma, knownas: entityFixture.knownas, });
-      const actionsArray = await erd._getActions();
+      const actionsArray = await erd._getActionsForOne();
 
       expect(actionsArray).toBeDefined();
       expect(actionsArray).toHaveLength(1);

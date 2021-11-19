@@ -4,7 +4,13 @@ import * as path from 'path';
 import * as child_process from 'child_process';
 import fs from 'fs';
 import os from 'os';
-import { PrismaClient, Prisma, Entity } from '@prisma/client';
+import { PrismaClient, Prisma, Entity, Verb } from '@prisma/client';
+
+export type SubjectVerbObject = {
+  Subject: Entity,
+  Verb: Verb,
+  Object: Entity,
+}
 
 export class EntityNotFoundError extends Error {
   constructor(message: string) {
@@ -43,14 +49,14 @@ export class Erd {
     }
   }
 
-  async createString(): Promise<string> {
+  async createStringForOne(): Promise<string> {
     let remove = false;
     if (!this.savepath) {
       remove = true;
       this.savepath = 'temp.svg';
     }
 
-    await this.createFile();
+    await this.createFileForOne();
 
     const svg = fs.readFileSync(this.savepath, 'utf8');
 
@@ -62,19 +68,18 @@ export class Erd {
     return svg;
   }
 
-  async createFile() {
-    const graph = await this._create();
+  async createFileForOne() {
+    const graph = await this._createForOne();
     this._save(graph);
   }
 
-  async _create() {
-    const actions = await this._getActionsGraph();
-    return this._composeGraph(actions);
+  async _createForOne() {
+    const actions = await this._getActionsForOne();
+    const graphedActions = await this._getActionsGraph(actions);
+    return this._composeGraph(graphedActions);
   }
 
-  async _getActionsGraph() {
-    const actions = await this._getActions();
-
+  async _getActionsGraph(actions: SubjectVerbObject[]) {
     let mermaid = '';
 
     actions.forEach((action) => {
@@ -96,7 +101,7 @@ export class Erd {
     return mermaid;
   }
 
-  async _getActions() {
+  async _getActionsForOne(): Promise<SubjectVerbObject[]> {
     if (!this.entityId) {
       const entity = await this.prisma.entity.findFirst({
         where: { knownas: this.knownas },
@@ -110,7 +115,7 @@ export class Erd {
       this.entityId = entity?.id;
     }
 
-    const actions = await this.prisma.action.findMany({
+    const actions: SubjectVerbObject[] = await this.prisma.action.findMany({
       where: {
         OR: [
           { objectId: this.entityId },
