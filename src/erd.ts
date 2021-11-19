@@ -111,7 +111,12 @@ export class Erd {
     }
 
     const actions = await this.prisma.action.findMany({
-      where: { objectId: this.personId },
+      where: {
+        OR: [
+          { objectId: this.personId },
+          { subjectId: this.personId },
+        ],
+      },
       select: {
         Subject: true,
         Object: true,
