@@ -2,18 +2,10 @@
  * @jest-environment ./test/lib/prisma-test-env.ts
  */
 
-// import { mockDeep } from 'jest-mock-extended';
-// import { PrismaClient as OriginalPrismaClient } from '@prisma/client';
 import * as fs from 'fs';
 
 import { IFixtures, prisma, setup, teardown } from 'testlib/fixtures';
 import { Erd } from './erd';
-
-// jest.mock('@prisma/client', () => ({
-//   PrismaClient: function () {
-//     return mockDeep<OriginalPrismaClient>();
-//   }
-// }));
 
 let fixtures: IFixtures;
 let knownas: string;
@@ -60,9 +52,11 @@ describe('erd', () => {
       const erd = new Erd({ prisma, knownas, });
       const graph = await erd._getActionsGraph();
 
+      console.log(graph);
+
       [
-        new RegExp('Person\d+\[' + fixtures.oswald.knownas + ']-->\|' + fixtures.assassinated.name + '\|Person\d+\[' + fixtures.jfk.knownas + '\];'),
-        new RegExp('Person\d+\[' + fixtures.arthur.knownas + ']-->\|' + fixtures.hosted.name + '\|Person\d+\[' + fixtures.oswald.knownas + '\];'),
+        new RegExp('Person\\d+\\[' + fixtures.oswald.knownas + ']-->\\|' + fixtures.assassinated.name + '\\|Person\\d+\\[' + fixtures.jfk.knownas + '\\];', 'g'),
+        new RegExp('Person\\d+\\[' + fixtures.arthur.knownas + ']-->\\|' + fixtures.hosted.name + '\\|Person\\d+\\[' + fixtures.oswald.knownas + '\\];', 'g'),
       ].forEach(re => {
         expect(graph).toMatch(re);
       });
