@@ -19,6 +19,8 @@ class PrismaTestEnvironment extends NodeEnvironment {
     // Generate a unique schema identifier for this test context
     this.schema = `test_${nanoid()}`;
 
+    console.info('# Using scheme:', this.schema);
+
     // Generate the pg connection string for the test schema
     this.connectionString = `postgresql://${process.env.DB_USER}:${process.env.DB_PASS}@localhost:${process.env.DB_PORT}/${process.env.DB_NAME}?schema=${this.schema}`;
   }
