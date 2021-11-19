@@ -25,7 +25,7 @@ export interface IErdArgs {
     never,
     Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
   >;
-  knownas: string;
+  knownas?: string;
   savepath?: string;
 }
 
@@ -35,7 +35,8 @@ export class Erd {
     never,
     Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
   >;
-  knownas: string;
+  actions: SubjectVerbObject[] = [];
+  knownas: string | undefined = undefined;
   savepath?: string;
   entityId: number | undefined;
   tmpDir = fs.mkdtempSync(os.tmpdir() + path.sep + 'entity-erd-');
@@ -43,8 +44,10 @@ export class Erd {
 
   constructor({ prisma, knownas, savepath }: IErdArgs) {
     this.prisma = prisma;
-    this.knownas = knownas;
-    if (savepath) {
+    if (!!knownas) {
+      this.knownas = knownas;
+    }
+    if (!!savepath) {
       this.savepath = savepath;
     }
   }
@@ -69,39 +72,68 @@ export class Erd {
   }
 
   async createFileForOne() {
-    const graph = await this._createForOne();
+    const graph = await this.create();
     this._save(graph);
   }
 
-  async _createForOne() {
-    const actions = await this._getActionsForOne();
-    const graphedActions = await this._getActionsGraph(actions);
+  async create() {
+    if (this.knownas !== undefined) {
+      await this._getActionsForOne();
+    } else {
+      await this._graphActionsForAll();
+    }
+    const graphedActions = await this._graphActions();
     return this._composeGraph(graphedActions);
   }
 
-  async _getActionsGraph(actions: SubjectVerbObject[]) {
+  async _graphActions(): Promise<string> {
     let mermaid = '';
 
-    actions.forEach((action) => {
-      mermaid +=
-        'Entity' +
-        (action as any).Subject.id +
-        '[' +
-        (action as any).Subject.knownas +
-        ']-->|' +
-        (action as any).Verb.name +
-        '|Entity' +
-        (action as any).Object.id +
-        '[' +
-        (action as any).Object.knownas +
-        ']' +
-        '\n';
+    this.actions.forEach((action) => {
+      if (action.Subject.id && action.Verb.id && action.Object.id) {
+        mermaid +=
+          'Entity' + action.Subject.id +
+          '[' + action.Subject.knownas + ']-->' +
+          '|' + action.Verb.name + '|' +
+          'Entity' + action.Object.id +
+          '[' + action.Object.knownas + ']' +
+          '\n';
+      }
     });
 
     return mermaid;
   }
 
-  async _getActionsForOne(): Promise<SubjectVerbObject[]> {
+  async _graphActionsForAll() {
+    const entities = await this.prisma.entity.findMany({
+      select: { id: true }
+    });
+
+    entities.forEach(async (entity) => {
+      const actions: SubjectVerbObject[] = await this.prisma.action.findMany({
+        where: {
+          OR: [
+            { objectId: entity.id },
+            { subjectId: entity.id },
+          ],
+        },
+        select: {
+          Subject: true,
+          Object: true,
+          Verb: true,
+        },
+      });
+
+      this.actions.push(...actions);
+    });
+
+  }
+
+  async _getActionsForOne() {
+    if (this.knownas === undefined) {
+      throw new TypeError('._getActionsForOne called without .knownas');
+    }
+
     if (!this.entityId) {
       const entity = await this.prisma.entity.findFirst({
         where: { knownas: this.knownas },
@@ -129,7 +161,8 @@ export class Erd {
       },
     });
 
-    return actions;
+
+    this.actions.push(...actions);
   }
 
   _composeGraph(graphedActions: string): string {

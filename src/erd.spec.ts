@@ -44,11 +44,11 @@ describe('erd', () => {
       mockPrisma.entity.findFirst.mockResolvedValue(entityFixture);
 
       const erd = new Erd({ prisma: mockPrisma, knownas: entityFixture.knownas, });
-      const actionsArray = await erd._getActionsForOne();
+      await erd._getActionsForOne();
 
-      expect(actionsArray).toBeDefined();
-      expect(actionsArray).toHaveLength(1);
-      expect(actionsArray[0]).toEqual(actionFixture);
+      expect(erd.actions).toBeDefined();
+      expect(erd.actions).toHaveLength(1);
+      expect(erd.actions[0]).toEqual(actionFixture);
     });
   });
 });

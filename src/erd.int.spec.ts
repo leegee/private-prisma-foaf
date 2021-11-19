@@ -34,13 +34,13 @@ describe('erd', () => {
   });
 
   describe('Lee Harvey Oswald', () => {
-    it('_getActions', async () => {
+    it('gets subject-verb-object', async () => {
       const erd = new Erd({ prisma, knownas, });
-      const actionsArray = await erd._getActionsForOne();
+      await erd._getActionsForOne();
 
-      expect(actionsArray).toBeDefined();
+      expect(erd.actions).toBeDefined();
 
-      actionsArray.forEach((rv) => {
+      erd.actions.forEach((rv) => {
         expect(rv).not.toBeNull();
         expect(rv).toHaveProperty('Subject');
         expect(rv).toHaveProperty('Object');
@@ -48,9 +48,15 @@ describe('erd', () => {
       });
     });
 
-    it('_getActionsGraph', async () => {
+    it('creates a valid graph', async () => {
       const erd = new Erd({ prisma, knownas, });
-      const graph = await erd._getActionsGraph();
+      expect(erd.actions).toHaveLength(0);
+
+      await erd._getActionsForOne();
+      expect(erd.actions.length).toBeGreaterThan(0);
+
+      const graph = await erd._graphActions();
+      expect(graph).toBeDefined();
 
       [
         new RegExp('Entity\\d+\\[' + fixtures.oswald.knownas + ']-->\\|' + fixtures.assassinated.name + '\\|Entity\\d+\\[' + fixtures.jfk.knownas + '\\]', 'g'),
@@ -60,14 +66,8 @@ describe('erd', () => {
       });
     });
 
-    it('createString', async () => {
-      const erd = new Erd({ prisma, knownas });
-      const svg = await erd.createStringForOne();
-      expect(svg).toMatch(/^<svg/);
-    });
-
-    it('createFile', async () => {
-      const savepath = './temp-createFile.svg';
+    it('saves  to file', async () => {
+      const savepath = './temp-oswald.svg';
       if (fs.existsSync(savepath)) {
         fs.unlinkSync(savepath);
       }
@@ -76,7 +76,6 @@ describe('erd', () => {
       await erd.createFileForOne();
 
       const exists = fs.existsSync(savepath);
-
       expect(exists).toBeTruthy();
 
       if (!process.env.CRUFT) {
@@ -84,5 +83,29 @@ describe('erd', () => {
       }
     });
 
+    it('creates <svg>', async () => {
+      const erd = new Erd({ prisma, knownas });
+      const svg = await erd.createStringForOne();
+      expect(svg).toMatch(/^<svg/);
+    });
+  });
+
+  describe('All', () => {
+    it('saves  to file', async () => {
+      const savepath = './temp-all.svg';
+      if (fs.existsSync(savepath)) {
+        fs.unlinkSync(savepath);
+      }
+
+      const erd = new Erd({ prisma, savepath });
+      await erd.createFileForOne();
+
+      const exists = fs.existsSync(savepath);
+      expect(exists).toBeTruthy();
+
+      if (!process.env.CRUFT) {
+        fs.unlinkSync(savepath);
+      }
+    });
   });
 });
