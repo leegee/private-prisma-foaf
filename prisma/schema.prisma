@@ -1,4 +1,4 @@
-// https://prismadb.readthedocs.io/en/stable/data-types/
+// https://www.prisma.io/docs/concepts/database-connectors/postgresql#type-mapping-between-postgresql-to-prisma-schema
 
 datasource db {
   provider = "postgresql"
@@ -16,7 +16,7 @@ generator erd {
 
 model Verb {
   id          Int      @id @default(autoincrement())
-  name        String
+  name        String   @db.VarChar(127)
   description String?
   Action      Action[]
 
@@ -25,11 +25,11 @@ model Verb {
 
 model Entity {
   id          Int       @id @default(autoincrement())
-  knownas     String //  eg JFK, Bell
-  formalname  String // eg John F Kennedy, Bell Aircraft Corporation
-  givenname   String? // eg John
-  middlenames String? // eg Fitzgerald
-  familyname  String? // eg Kennedy
+  knownas     String    @db.VarChar(127) //  eg JFK, Bell
+  formalname  String    @db.VarChar(127) // eg John F Kennedy, Bell Aircraft Corporation
+  givenname   String?   @db.VarChar(127) // eg John
+  middlenames String?   @db.VarChar(127) // eg Fitzgerald
+  familyname  String?   @db.VarChar(127) // eg Kennedy
   dob         DateTime? @db.Date
   dod         DateTime? @db.Date
   published   Boolean   @default(false)
