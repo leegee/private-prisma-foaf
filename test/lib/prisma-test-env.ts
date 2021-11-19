@@ -17,9 +17,8 @@ class PrismaTestEnvironment extends NodeEnvironment {
     super(config);
 
     // Generate a unique schema identifier for this test context
-    this.schema = `test_${nanoid()}`;
-
-    console.info('# Using scheme:', this.schema);
+    // this.schema = `test_${nanoid()}_${process.hrtime.bigint()}`;
+    this.schema = `test_${+ new Date()}_${process.hrtime.bigint()}`;
 
     // Generate the pg connection string for the test schema
     this.connectionString = `postgresql://${process.env.DB_USER}:${process.env.DB_PASS}@localhost:${process.env.DB_PORT}/${process.env.DB_NAME}?schema=${this.schema}`;
@@ -27,11 +26,11 @@ class PrismaTestEnvironment extends NodeEnvironment {
 
   async setup() {
     // Set the required environment variable to contain the connection string for the database test schema
-    process.env.POSTGRES_URL = this.connectionString;
-    this.global.process.env.POSTGRES_URL = this.connectionString;
+    process.env.DATABASE_URL = this.connectionString;
+    this.global.process.env.DATABASE_URL = this.connectionString;
 
     // Run the migrations to ensure our schema has the required structure
-    child_process.execSync(`${prismaBinary} migrate dev`);
+    child_process.execSync(`${prismaBinary} migrate deploy`);
 
     return super.setup();
   }
