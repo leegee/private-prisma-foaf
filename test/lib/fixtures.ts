@@ -11,7 +11,21 @@ let fixtures: IFixtures = {};
 export async function setup(): Promise<IFixtures> {
   // await prisma.$queryRaw`BEGIN`;
 
-  fixtures = {} as IFixtures;
+  fixtures = {};
+
+  fixtures.bell = await prisma.organisation.create({
+    data: {
+      knownas: 'bell',
+      formalname: 'Bell Aereospace'
+    }
+  });
+
+  fixtures.cia = await prisma.organisation.create({
+    data: {
+      knownas: 'cia',
+      formalname: 'Central Intelligence Agency'
+    }
+  });
 
   fixtures.assassinated = await prisma.verb.create({
     data: { name: 'assassinated' }
@@ -30,7 +44,19 @@ export async function setup(): Promise<IFixtures> {
   });
 
   fixtures.arthur = await prisma.person.create({
-    data: { knownas: 'Arthur Young' },
+    data: { knownas: 'Arthur Young' }
+  });
+
+  // Could create & connect at once if cia wasn't used elsewehre
+  fixtures.jfk2cia = await prisma.person.update({
+    where: { id: fixtures.jfk.id },
+    data: {
+      Organisations: {
+        connect: {
+          id: fixtures.cia.id
+        }
+      }
+    }
   });
 
   fixtures.oswaldassassinatedJfk = await prisma.action.create({

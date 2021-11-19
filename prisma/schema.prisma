@@ -23,6 +23,14 @@ model Verb {
   @@unique([name])
 }
 
+model Organisation {
+  id         Int    @id @default(autoincrement())
+  knownas    String
+  formalname String
+
+  @@unique([knownas])
+}
+
 model Person {
   id          Int       @id @default(autoincrement())
   knownas     String //  eg JFK
