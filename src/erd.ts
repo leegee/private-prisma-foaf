@@ -22,6 +22,7 @@ export interface IErdArgs {
   knownas: string;
   savepath?: string;
 }
+
 export class Erd {
   prisma: PrismaClient<
     Prisma.PrismaClientOptions,
