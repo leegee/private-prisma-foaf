@@ -69,4 +69,7 @@ model Action {
   citations Citation[]
 
   @@id([subjectId, objectId, verbId])
+  @@index([objectId])
+  @@index([subjectId])
+  @@index([verbId])
 }

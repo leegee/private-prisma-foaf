@@ -4,9 +4,10 @@ import * as readline from 'readline';
 import xre from 'xre';
 import XRegExp from 'xregexp';
 
-xre.configure({ XRegExp });
+import { Prisma, PrismaClient } from '@prisma/client';
+import { logger } from 'src/logger';
 
-import { PrismaClient } from '.prisma/client';
+xre.configure({ XRegExp });
 
 export interface IRE {
   [key: string]: RegExp
@@ -32,7 +33,6 @@ export const RE = {
     \w*                     # May be whitespace at the end of the line
   $/`),
 };
-
 export class GrammarError extends Error {
   constructor(message: string) {
     super(`No such entity knownas "${message}".`);
@@ -40,7 +40,15 @@ export class GrammarError extends Error {
   }
 }
 
-async function parseFile(prisma: PrismaClient, filepath: string): Promise<void> {
+export async function parseFile(
+  prisma: PrismaClient<
+    Prisma.PrismaClientOptions,
+    never,
+    Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
+  >,
+  filepath: string,
+): Promise<void> {
+
   const rl = readline.createInterface({
     input: fs.createReadStream(filepath),
     output: process.stdout,
@@ -57,41 +65,26 @@ async function parseFile(prisma: PrismaClient, filepath: string): Promise<void> 
   });
 }
 
-interface IMatch {
-  subject: string,
-  verb: string,
-  object: string
-}
-
 async function _ingestLine(prisma: PrismaClient, inputTextLine: string): Promise<void> {
   console.log(inputTextLine);
 
   const groups = XRegExp.exec(inputTextLine, RE.entity)?.groups;
-  const subjectToFind = groups?.subject;
-  const verbToFind = groups?.verb;
-  const objectToFind = groups?.object;
+  const subjectToFind = {
+    knownas: groups?.subject,
+    formalname: groups?.subject,
+  };
+  const verbToFind = { name: groups?.verb };
+  const objectToFind = {
+    formalname: groups?.object,
+    knownas: groups?.object,
+  };
 
   if (!!subjectToFind || !!verbToFind || !!objectToFind) {
     throw new GrammarError(`subjectToFind:${subjectToFind} verbToFind:${verbToFind} objectToFind:${objectToFind}`);
   }
 
   let subject = await prisma.entity.findFirst({
-    where: {
-      OR: [
-        { knownas: subjectToFind },
-        { formalname: subjectToFind },
-      ],
-    },
-    select: { id: true },
-  });
-
-  let object = await prisma.entity.findFirst({
-    where: {
-      OR: [
-        { knownas: objectToFind },
-        { formalname: subjectToFind },
-      ],
-    },
+    where: { OR: [subjectToFind] },
     select: { id: true },
   });
 
@@ -100,29 +93,28 @@ async function _ingestLine(prisma: PrismaClient, inputTextLine: string): Promise
     select: { id: true },
   });
 
+  let object = await prisma.entity.findFirst({
+    where: { OR: [objectToFind] },
+    select: { id: true },
+  });
+
   if (subject === null) {
     subject = await prisma.entity.create({
-      data: {
-        knownas: subjectToFind,
-        formalname: subjectToFind,
-      },
+      data: subjectToFind,
       include: { Subject: true }
     });
   }
 
   if (object === null) {
     object = await prisma.entity.create({
-      data: {
-        knownas: objectToFind,
-        formalname: objectToFind,
-      },
+      data: objectToFind,
       include: { Object: true }
     });
   }
 
   if (verb === null) {
     verb = await prisma.verb.create({
-      data: { name: verbToFind }
+      data: verbToFind
     });
   }
 
@@ -130,11 +122,24 @@ async function _ingestLine(prisma: PrismaClient, inputTextLine: string): Promise
     throw new GrammarError(inputTextLine);
   }
 
-  await prisma.action.create({
-    data: {
-      Subject: { connect: { id: subject.id } },
-      Verb: { connect: { id: verb.id } },
-      Object: { connect: { id: object.id } },
+  const actionExists = await prisma.action.findFirst({
+    where: {
+      subjectId: subject.id,
+      verbId: verb.id,
+      objectId: object.id,
     }
   });
+
+  if (!!actionExists) {
+    await prisma.action.create({
+      data: {
+        Subject: { connect: { id: subject.id } },
+        Verb: { connect: { id: verb.id } },
+        Object: { connect: { id: object.id } },
+      }
+    });
+    logger.info(`Created: ${subjectToFind} ${verbToFind} ${objectToFind}`);
+  } else {
+    logger.info(`Link to: ${subjectToFind} ${verbToFind} ${objectToFind}`);
+  }
 }
