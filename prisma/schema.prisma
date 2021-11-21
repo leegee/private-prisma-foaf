@@ -32,7 +32,7 @@ model Entity {
   familyname  String?   @db.VarChar(127) // eg Kennedy
   dob         DateTime? @db.Date
   dod         DateTime? @db.Date
-  published   Boolean   @default(false)
+  approved   Boolean   @default(false)
   Subject     Action[]  @relation("Subject")
   Object      Action[]  @relation("Object")
 

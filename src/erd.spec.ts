@@ -24,7 +24,7 @@ const entityFixture: MockProxy<Entity> = {
   familyname: '',
   dob: null,
   dod: null,
-  published: false,
+  approved: false,
 };
 
 describe('erd', () => {
