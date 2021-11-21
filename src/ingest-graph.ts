@@ -66,76 +66,75 @@ interface IMatch {
 async function _ingestLine(prisma: PrismaClient, inputTextLine: string): Promise<void> {
   console.log(inputTextLine);
 
-  const parsed = XRegExp.match(inputTextLine, RE.entity).matched;
-  const subjectToFind = parsed.subject;
-  const verbToFind = parsed.verb;
-  const objectToFind = parsed.object;
-}
+  const groups = XRegExp.exec(inputTextLine, RE.entity)?.groups;
+  const subjectToFind = groups?.subject;
+  const verbToFind = groups?.verb;
+  const objectToFind = groups?.object;
 
-if (!subjectToFind || !verbToFind || !objectToFind) {
-  throw new GrammarError(`subjectToFind:${subjectToFind} verbToFind:${verbToFind} objectToFind:${objectToFind}`);
-}
-
-let subject = await prisma.entity.findFirst({
-  where: {
-    OR: [
-      { knownas: subjectToFind },
-      { formalname: subjectToFind },
-    ],
-  },
-  select: { id: true },
-});
-
-let object = await prisma.entity.findFirst({
-  where: {
-    OR: [
-      { knownas: objectToFind },
-      { formalname: subjectToFind },
-    ],
-  },
-  select: { id: true },
-});
-
-let verb = await prisma.verb.findFirst({
-  where: { name: verbToFind },
-  select: { id: true },
-});
-
-if (subject === null) {
-  subject = await prisma.entity.create({
-    data: {
-      knownas: subjectToFind,
-      formalname: subjectToFind,
-    },
-    include: { Subject: true }
-  });
-}
-
-if (object === null) {
-  object = await prisma.entity.create({
-    data: {
-      knownas: objectToFind,
-      formalname: objectToFind,
-    },
-    include: { Object: true }
-  });
-}
-
-if (verb === null) {
-  verb = await prisma.verb.create({
-    data: { name: verbToFind }
-  });
-}
-
-if (subject === null || object === null || verb === null) {
-  throw new GrammarError(inputTextLine);
-}
-
-await prisma.action.create({
-  data: {
-    Subject: { connect: { id: subject.id } },
-    Verb: { connect: { id: verb.id } },
-    Object: { connect: { id: object.id } },
+  if (!!subjectToFind || !!verbToFind || !!objectToFind) {
+    throw new GrammarError(`subjectToFind:${subjectToFind} verbToFind:${verbToFind} objectToFind:${objectToFind}`);
   }
-});
+
+  let subject = await prisma.entity.findFirst({
+    where: {
+      OR: [
+        { knownas: subjectToFind },
+        { formalname: subjectToFind },
+      ],
+    },
+    select: { id: true },
+  });
+
+  let object = await prisma.entity.findFirst({
+    where: {
+      OR: [
+        { knownas: objectToFind },
+        { formalname: subjectToFind },
+      ],
+    },
+    select: { id: true },
+  });
+
+  let verb = await prisma.verb.findFirst({
+    where: { name: verbToFind },
+    select: { id: true },
+  });
+
+  if (subject === null) {
+    subject = await prisma.entity.create({
+      data: {
+        knownas: subjectToFind,
+        formalname: subjectToFind,
+      },
+      include: { Subject: true }
+    });
+  }
+
+  if (object === null) {
+    object = await prisma.entity.create({
+      data: {
+        knownas: objectToFind,
+        formalname: objectToFind,
+      },
+      include: { Object: true }
+    });
+  }
+
+  if (verb === null) {
+    verb = await prisma.verb.create({
+      data: { name: verbToFind }
+    });
+  }
+
+  if (subject === null || object === null || verb === null) {
+    throw new GrammarError(inputTextLine);
+  }
+
+  await prisma.action.create({
+    data: {
+      Subject: { connect: { id: subject.id } },
+      Verb: { connect: { id: verb.id } },
+      Object: { connect: { id: object.id } },
+    }
+  });
 }
