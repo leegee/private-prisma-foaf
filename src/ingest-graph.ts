@@ -1,37 +1,47 @@
 import * as fs from 'fs';
 import * as readline from 'readline';
 
-import xre from 'xre';
-import XRegExp from 'xregexp';
-
 import { Prisma, PrismaClient } from '@prisma/client';
 import { logger } from 'src/logger';
-
-xre.configure({ XRegExp });
 
 export interface IRE {
   [key: string]: RegExp
 }
 
 export const RE = {
-  verb: XRegExp(`/^ \w* ([^\(]+) \w+ \( (\d{4}–\d{2}–\d{2]) \w*-\w* (\d{4}–\d{2}–\d{2]) \w* ) $/`),
-  entity: XRegExp(`/^
-    \w*                     # May be whitespace at the start of the line
-    \[                      # Surrounded by square brackets,
-      (?<subject> [^\]]+ )  #   Collect $1 (subject)
-    \]                      # End square bracket surrounding subject
-    \w* --\> \w*            # --> arrow, maybe surrounded by whitespace
-    \|                      # Surrounded by bars
-      (?<verb> [^\|]+ )     #   Collect $2 (verb)
-    \|                      # nd bars surrounding verb
-    \w*                     # May be whitespace
-    \[                      # Surrounded by square brackets
-      (?<object> [^\]]+ )   #   Collect $3 (object)
-    \]                      # End square brackets surrounding object
-    \w*                     # May be whitespace
-    # (?<comment> .+ )?     # May be $4 Free-text comment
-    \w*                     # May be whitespace at the end of the line
-  $/`),
+  verb: new RegExp(`^
+    \w*
+    ( ?<name> [^\(]+ ) \w*
+    \w+
+    \(
+      \w*
+      ( ?<start> \d{4} –? \d{2} –? \d{2] )
+      \w*-\w*
+      ( ?<end>   \d{4} –? \d{2} –? \d{2] )
+      \w*
+    \)
+  $`),
+
+  entity: new RegExp(
+    [
+      '^',
+      '\\w',                         // May be whitespace at the start of the line
+      '\\[',                         // Surrounded by square brackets,
+      '(?<subject>[^\\]]+)',    //   Collect $1(subject)
+      '\\]',                         // End square bracket surrounding subject
+      '\\w*--\\>\\w*',               // --> arrow, maybe surrounded by whitespace
+      '\\|',                         // Surrounded by bars
+      '(?<verb>[^\\|]+)',            //   Collect $2 (verb)
+      '\\|',                         // nd bars surrounding verb
+      '\\w*',                        // May be whitespace
+      '\\[',                         // Surrounded by square brackets
+      '(?<object>[^\\]]+)',          //   Collect $3 (object)
+      '\\]',                         // End square brackets surrounding object
+      '\\w*',                        // May be whitespace
+      '\\#(?<comment>.+)?',          // May be $4 Free-text comment
+      '\\w*$',                       // May be whitespace at the end of the line
+    ].join('')
+  ),
 };
 export class GrammarError extends Error {
   constructor(message: string) {
@@ -48,6 +58,8 @@ export async function parseFile(
   >,
   filepath: string,
 ): Promise<void> {
+
+  logger.info('Enter parseFile for ' + filepath);
 
   const rl = readline.createInterface({
     input: fs.createReadStream(filepath),
@@ -68,7 +80,7 @@ export async function parseFile(
 async function _ingestLine(prisma: PrismaClient, inputTextLine: string): Promise<void> {
   console.log(inputTextLine);
 
-  const groups = XRegExp.exec(inputTextLine, RE.entity)?.groups;
+  const groups = RE.entity.exec(inputTextLine)?.groups;
   const subjectToFind = {
     knownas: groups?.subject,
     formalname: groups?.subject,

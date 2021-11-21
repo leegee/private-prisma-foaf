@@ -82,7 +82,7 @@ Should be easy for non-techies to edit by hand.
       \w*                   # May be whitespace at the end of the line
     $/x
 
-### Examples:
+### Aparigraha Examples:
 
     [Andre Puharich]        -->  ||sponsored|           [Uri Geller]
     [Arthur Young]          -->  ||member-of|           [The Nine]
