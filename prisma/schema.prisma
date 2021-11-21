@@ -32,12 +32,15 @@ model Entity {
   familyname  String?   @db.VarChar(127) // eg Kennedy
   dob         DateTime? @db.Date
   dod         DateTime? @db.Date
-  approved   Boolean   @default(false)
+  approved    Boolean   @default(false)
   Subject     Action[]  @relation("Subject")
   Object      Action[]  @relation("Object")
 
+  @@unique([knownas])
+  @@unique([formalname])
   @@unique([knownas, dob, dod])
   @@unique([givenname, middlenames, familyname, dob, dod])
+  @@index([knownas, formalname])
   @@index([knownas, id])
 }
 
@@ -60,8 +63,8 @@ model Action {
   verbId Int
   Verb   Verb @relation(fields: [verbId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  start DateTime @db.Date
-  end   DateTime @db.Date
+  start DateTime? @db.Date
+  end   DateTime? @db.Date
 
   citations Citation[]
 
