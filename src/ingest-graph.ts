@@ -100,7 +100,7 @@ export class GraphIngester {
   }
 
   async parseFile(): Promise<void> {
-    logger.info('Enter parseFile for ' + this.filepath);
+    logger.debug('Enter parseFile for ' + this.filepath);
 
     const rl = this.readline.createInterface({
       input: this.fs.createReadStream(this.filepath),
@@ -145,7 +145,7 @@ export class GraphIngester {
       where: { knownas: groups.subject },
       select: { id: true },
     });
-    logger.info(`Got subject "${JSON.stringify(subject)}" via "${groups.subject}"`);
+    logger.debug(`Got subject "${JSON.stringify(subject)}" via "${groups.subject}"`);
 
     let verb = await this.prisma.verb.findUnique({
       where: { name: groups.verb },
@@ -163,6 +163,9 @@ export class GraphIngester {
           data: {
             knownas: groups.subject,
             formalname: groups.subject,
+          },
+          select: {
+            id: true
           }
         });
       } catch (e) {
@@ -173,25 +176,53 @@ export class GraphIngester {
           null,
           4)
         );
-        logger.error(`Failed to create subject entity for "${groups.subject}" - ` + (e as Error).message);
+        logger.error(`Failed to create subject entity for subject "${groups.subject}" - ` + (e as Error).message);
         throw e;
       }
     }
 
     if (object === null) {
-      object = await this.prisma.entity.create({
-        data: {
-          formalname: groups.object,
-          knownas: groups.object,
-        },
-        include: { Object: true }
-      });
+      try {
+        object = await this.prisma.entity.create({
+          data: {
+            formalname: groups.object,
+            knownas: groups.object,
+          },
+          select: { id: true }
+        });
+      }
+      catch (e) {
+        logger.error(JSON.stringify(
+          await this.prisma.entity.findUnique({
+            where: { knownas: groups.object }
+          }),
+          null,
+          4)
+        );
+        logger.error(`Failed to create subject entity for object "${groups.object}" - ` + (e as Error).message);
+        throw e;
+      }
     }
 
     if (verb === null) {
-      verb = await this.prisma.verb.create({
-        data: { name: groups.verb }
-      });
+      try {
+        verb = await this.prisma.verb.create({
+          data: { name: groups.verb },
+          select: { id: true }
+        });
+      }
+      catch (e) {
+        logger.error(JSON.stringify(
+          await this.prisma.verb.findUnique({
+            where: { name: groups.verb },
+            select: { id: true }
+          }),
+          null,
+          4)
+        );
+        logger.error(`Failed to create verb from "${groups.verb}" - ` + (e as Error).message);
+        throw e;
+      }
     }
 
     if (subject === null || object === null || verb === null) {
@@ -214,9 +245,9 @@ export class GraphIngester {
           Object: { connect: { id: object.id } },
         }
       });
-      logger.info(`Created: ${groups.subject} ${groups.verb} ${groups.object}`);
+      logger.debug(`Created: ${groups.subject} ${groups.verb} ${groups.object}`);
     } else {
-      logger.info(`Link to: ${groups.subject} ${groups.verb} ${groups.object}`);
+      logger.debug(`Link to: ${groups.subject} ${groups.verb} ${groups.object}`);
     }
   }
 }

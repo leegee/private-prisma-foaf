@@ -30,7 +30,6 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
     super(config);
 
     // Generate a unique schema identifier for this test context
-    // this.schema = `test_${nanoid()}_${process.hrtime.bigint()}`;
     this.schema = `test_${+ new Date()}_${process.hrtime.bigint()}`;
 
     logger.info(`Init new test env with temporary schema: ${this.schema}`);
