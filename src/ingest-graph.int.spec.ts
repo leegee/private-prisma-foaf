@@ -1,0 +1,98 @@
+import { Readable } from "stream";
+
+import { GraphIngester } from './ingest-graph';
+
+import { prisma } from 'testlib/fixtures';
+
+import PrismaTestEnvironment from "testlib/prisma-test-env";
+
+const mocks = {
+  ReadStream: jest.fn().mockImplementation(() => {
+    const readable = new Readable();
+    readable.push('[Oswald] --> |assinated| [JFK]');
+    readable.push('[Arthur Young] --> |hosted| [Oswald]');
+    readable.push(null);
+    return readable;
+  }),
+
+  fs: { createReadStream: () => { } }
+};
+
+mocks.fs.createReadStream = mocks.ReadStream;
+
+jest.setTimeout(1000 * 30);
+
+PrismaTestEnvironment.init();
+
+describe('ingest-graph', () => {
+  it('should match an Action input line without a comment', async () => {
+    const reRv = GraphIngester.RE.entity.exec(
+      '[MOCK-SUBJECT] --> |MOCK-VERB| [MOCK-OBJECT]'
+    );
+    expect(reRv).not.toBeNull();
+    expect(reRv?.groups).not.toBeUndefined();
+    expect(reRv?.groups?.subject).toEqual('MOCK-SUBJECT');
+    expect(reRv?.groups?.verb).toEqual('MOCK-VERB');
+    expect(reRv?.groups?.object).toEqual('MOCK-OBJECT');
+    expect(reRv?.groups?.comment).toBeUndefined();
+  });
+
+  it('should match an Action intput line with a comment', async () => {
+    const reRv = GraphIngester.RE.entity.exec(
+      '[MOCK-SUBJECT] --> |MOCK-VERB| [MOCK-OBJECT] # MOCK-COMMENT'
+    );
+    expect(reRv).not.toBeNull();
+    expect(reRv?.groups).not.toBeUndefined();
+    expect(reRv?.groups?.subject).toEqual('MOCK-SUBJECT');
+    expect(reRv?.groups?.verb).toEqual('MOCK-VERB');
+    expect(reRv?.groups?.object).toEqual('MOCK-OBJECT');
+    expect(reRv?.groups?.comment).toEqual('MOCK-COMMENT');
+  });
+
+  xit('mock prisma', () => { });
+
+  xit('should read a mock file', async () => {
+    const gi = new GraphIngester({
+      prisma,
+      filepath: 'irrelevant-as-file-not-accessed',
+      fs: mocks.fs,
+    });
+    await gi.parseFile();
+    expect(mocks.ReadStream).toHaveBeenCalled();
+  });
+
+  xit('_ingestline', () => { });
+
+  it('_createSubjectObjectVerbAction', async () => {
+    const gi = new GraphIngester({
+      prisma,
+      filepath: 'irrelevant-as-file-not-accessed',
+      fs: mocks.fs,
+    });
+
+    try {
+      gi._createSubjectObjectVerbAction({
+        subject: 's',
+        verb: 'v',
+        object: 'o',
+      });
+      gi._createSubjectObjectVerbAction({
+        subject: 's',
+        verb: 'v',
+        object: 'o',
+      });
+    } catch (e) {
+      throw e;
+    }
+  });
+
+
+  it('should integrate with real fs to read a file', async () => {
+    const gi = new GraphIngester({
+      prisma,
+      filepath: './test/lib/input.graph',
+    });
+
+    expect(gi.parseFile()).resolves.not.toThrow();
+  });
+});
