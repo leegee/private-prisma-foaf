@@ -28,7 +28,7 @@ const mocks = {
 mocks.fs.createReadStream = mocks.ReadStream;
 
 describe('ingest-graph', () => {
-  it('should match an Action intput line without a comment', async () => {
+  it('should match an Action input line without a comment', async () => {
 
     const reRv = GraphIngester.RE.entity.exec(
       '[MOCK-SUBJECT] --> |MOCK-VERB| [MOCK-OBJECT]'
@@ -52,6 +52,8 @@ describe('ingest-graph', () => {
     expect(reRv?.groups?.object).toEqual('MOCK-OBJECT');
     expect(reRv?.groups?.comment).toEqual('MOCK-COMMENT');
   });
+
+  xit('mock prisma');
 
   xit('should read a mock file', async () => {
     const gi = new GraphIngester({
