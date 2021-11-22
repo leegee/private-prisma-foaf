@@ -15,16 +15,37 @@
 A simplistic star scheme that centers on actions, used to describe who did what to whom, when it happened, with citations,
 where the 'who' is an `Entity` (either a person or organisation).
 
+## About the environment
+
+Tests need to look after the environment, to leave things as they were found. Whilst this is always a good habit to maintain,
+it can ben an effort that quickly becomes a chore, and so frequently gets discarded, leading to a build up of unused cruft
+in the database that is never in a known state, leading to false positive test failures, leading to time spent debugging
+tests rather than writing logic.
+
+Thus the test suite aims to make keeping the environment clean as easy as possible, by mocking where possible and practicle,
+and using known-state environment fixetures.
+
 ## Writiing integration tests
 
-Since the tests are `.spec.ts`, and `.int` must be added to the filename to signify an integration test,
-so the default environment is `node`.
-
-Use the "Jest custom environment" by adding the following docblock, to produce a schema per test file:
+Tests which touch any real system, other than the unit under test, are considered integration tests, and
+are be suffixed `.int.spec.ts`.
 
     /**
     * @jest-environment ./test/lib/prisma-test-env.ts
     */
+
+Don't bother with the above "Jest custom environment" docblock, it is both non-blocking and slow, so fails to
+complete execution before it can configure the connection string used in the tests.
+
+Instead, call the custom environment manually, so it can set beforeEach and afterEach hooks to clean the environment.
+
+    import PrismaTestEnvironment from "testlib/prisma-test-env";
+
+    PrismaTestEnvironment.init();
+
+## Writing Unit Tests
+
+See examples.
 
 ## TODO
 

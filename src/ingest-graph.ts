@@ -4,6 +4,13 @@ import * as readlineImport from 'readline';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { logger } from 'src/logger';
 
+export interface ISubjectVerbObjectComment {
+  subject: string;
+  verb: string;
+  object: string;
+  comment?: string;
+}
+
 export interface IRE {
   [key: string]: RegExp
 }
@@ -43,9 +50,10 @@ const RE = {
     ].join('')
   ),
 };
+
 export class GrammarError extends Error {
   constructor(message: string) {
-    super(`No such entity knownas "${message}".`);
+    super(message);
     Object.setPrototypeOf(this, GrammarError.prototype);
   }
 }
@@ -72,6 +80,7 @@ export class GraphIngester {
     never,
     Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
   >;
+  private _inputTextLine: string = '';
 
   constructor({ prisma, filepath, fs, readline }: IGraphIngesterArgs) {
     if (fs) {
@@ -113,66 +122,80 @@ export class GraphIngester {
   async _ingestLine(inputTextLine: string): Promise<void> {
     logger.debug('Enter _ingestLine', inputTextLine);
 
+    this._inputTextLine = inputTextLine;
+
     const reRv = RE.entity.exec(inputTextLine);
 
-    logger.debug('_ingestLine reRv');
-    logger.dir(reRv, { depth: null });
-
-    const groups = reRv?.groups;
-
-    const subjectToFind = {
-      knownas: groups?.subject,
-      formalname: groups?.subject,
-    };
-
-    const verbToFind = { name: groups?.verb };
-
-    const objectToFind = {
-      formalname: groups?.object,
-      knownas: groups?.object,
-    };
-
-    if (!!subjectToFind || !!verbToFind || !!objectToFind) {
-      throw new GrammarError(`subjectToFind:${subjectToFind} verbToFind:${verbToFind} objectToFind:${objectToFind}`);
+    if (reRv === null) {
+      throw new GrammarError(`Regex failed to run on: ${inputTextLine}`);
     }
 
-    let subject = await this.prisma.entity.findFirst({
-      where: { OR: [subjectToFind] },
+    const groups = reRv.groups as ISubjectVerbObjectComment | undefined;
+
+    if (!groups || !groups?.subject || !groups?.verb || !groups?.object) {
+      throw new GrammarError(`subjectToFind:${groups?.subject} verbToFind:${groups?.verb} objectToFind:${groups?.object}`);
+    }
+
+    await this._createSubjectObjectVerbAction(groups);
+  }
+
+  // subject = existing | new (prisma.createOrSelect)
+  async _createSubjectObjectVerbAction(groups: ISubjectVerbObjectComment) {
+    let subject = await this.prisma.entity.findUnique({
+      where: { knownas: groups.subject },
+      select: { id: true },
+    });
+    logger.info(`Got subject "${JSON.stringify(subject)}" via "${groups.subject}"`);
+
+    let verb = await this.prisma.verb.findUnique({
+      where: { name: groups.verb },
       select: { id: true },
     });
 
-    let verb = await this.prisma.verb.findFirst({
-      where: { name: verbToFind },
-      select: { id: true },
-    });
-
-    let object = await this.prisma.entity.findFirst({
-      where: { OR: [objectToFind] },
+    let object = await this.prisma.entity.findUnique({
+      where: { knownas: groups.object },
       select: { id: true },
     });
 
     if (subject === null) {
-      subject = await this.prisma.entity.create({
-        data: subjectToFind,
-        include: { Subject: true }
-      });
+      try {
+        subject = await this.prisma.entity.create({
+          data: {
+            knownas: groups.subject,
+            formalname: groups.subject,
+          }
+        });
+      } catch (e) {
+        logger.error(JSON.stringify(
+          await this.prisma.entity.findUnique({
+            where: { knownas: groups.subject }
+          }),
+          null,
+          4)
+        );
+        logger.error(`Failed to create subject entity for "${groups.subject}" - ` + (e as Error).message);
+        throw e;
+      }
     }
 
     if (object === null) {
       object = await this.prisma.entity.create({
-        data: objectToFind,
+        data: {
+          formalname: groups.object,
+          knownas: groups.object,
+        },
         include: { Object: true }
       });
     }
 
     if (verb === null) {
       verb = await this.prisma.verb.create({
-        data: verbToFind
+        data: { name: groups.verb }
       });
     }
 
     if (subject === null || object === null || verb === null) {
-      throw new GrammarError(inputTextLine);
+      throw new GrammarError(this._inputTextLine);
     }
 
     const actionExists = await this.prisma.action.findFirst({
@@ -191,9 +214,9 @@ export class GraphIngester {
           Object: { connect: { id: object.id } },
         }
       });
-      logger.info(`Created: ${subjectToFind} ${verbToFind} ${objectToFind}`);
+      logger.info(`Created: ${groups.subject} ${groups.verb} ${groups.object}`);
     } else {
-      logger.info(`Link to: ${subjectToFind} ${verbToFind} ${objectToFind}`);
+      logger.info(`Link to: ${groups.subject} ${groups.verb} ${groups.object}`);
     }
   }
 }

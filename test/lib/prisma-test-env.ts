@@ -4,21 +4,36 @@
 // @see https://jestjs.io/docs/configuration#testenvironment-string
 
 require('dotenv').config();
-const { Client } = require("pg");
-const NodeEnvironment = require("jest-environment-node");
-const { nanoid } = require("nanoid");
-const util = require("util");
-const child_process = require("child_process");
+import { Client } from "pg";
+import NodeEnvironment from "jest-environment-node";
+import child_process from "child_process";
+import { logger } from '../../src/logger';
 
 const prismaBinary = 'npx prisma';
 
-class PrismaTestEnvironment extends NodeEnvironment {
+export default class PrismaTestEnvironment extends NodeEnvironment {
+  static init() {
+    let testEnv: PrismaTestEnvironment;
+
+    beforeEach(async () => {
+      testEnv = await new PrismaTestEnvironment({});
+      testEnv.setup();
+    });
+
+    afterEach(async () => testEnv.teardown());
+  }
+
+  schema = '';
+  connectionString = '';
+
   constructor(config: any) {
     super(config);
 
     // Generate a unique schema identifier for this test context
     // this.schema = `test_${nanoid()}_${process.hrtime.bigint()}`;
     this.schema = `test_${+ new Date()}_${process.hrtime.bigint()}`;
+
+    logger.info(`Init new test env with temporary schema: ${this.schema}`);
 
     // Generate the pg connection string for the test schema
     this.connectionString = `postgresql://${process.env.DB_USER}:${process.env.DB_PASS}@localhost:${process.env.DB_PORT}/${process.env.DB_NAME}?schema=${this.schema}`;
@@ -32,6 +47,7 @@ class PrismaTestEnvironment extends NodeEnvironment {
     // Run the migrations to ensure our schema has the required structure
     child_process.execSync(`${prismaBinary} migrate deploy`);
 
+    logger.info('Test env setup almost done');
     return super.setup();
   }
 
@@ -45,5 +61,3 @@ class PrismaTestEnvironment extends NodeEnvironment {
     await client.end();
   }
 }
-
-module.exports = PrismaTestEnvironment;

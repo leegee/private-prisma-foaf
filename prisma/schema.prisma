@@ -25,7 +25,7 @@ model Verb {
 
 model Entity {
   id          Int       @id @default(autoincrement())
-  knownas     String    @db.VarChar(127) //  eg JFK, Bell
+  knownas     String    @db.VarChar(127) // eg JFK, Bell
   formalname  String    @db.VarChar(127) // eg John F Kennedy, Bell Aircraft Corporation
   givenname   String?   @db.VarChar(127) // eg John
   middlenames String?   @db.VarChar(127) // eg Fitzgerald
@@ -40,6 +40,8 @@ model Entity {
   @@unique([formalname])
   @@unique([knownas, dob, dod])
   @@unique([givenname, middlenames, familyname, dob, dod])
+  @@index([knownas])
+  @@index([formalname])
   @@index([knownas, formalname])
   @@index([knownas, id])
 }

@@ -23,6 +23,6 @@ const pinoLogger = pino({
 const consoleLogger = console;
 consoleLogger.debug = consoleLogger.info;
 
-const usePino = false;
+const usePino = true;
 
 export const logger = usePino ? pinoLogger : consoleLogger;
