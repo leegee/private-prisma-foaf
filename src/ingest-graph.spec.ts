@@ -53,7 +53,7 @@ describe('ingest-graph', () => {
     expect(reRv?.groups?.comment).toEqual('MOCK-COMMENT');
   });
 
-  xit('mock prisma');
+  xit('mock prisma', () => { });
 
   xit('should read a mock file', async () => {
     const gi = new GraphIngester({
