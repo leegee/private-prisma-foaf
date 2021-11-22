@@ -9,7 +9,8 @@
 import pino from 'pino';
 // import pinoPretty from 'pino-pretty';
 
-export const logger = pino({
+
+const pinoLogger = pino({
   transport: {
     target: 'pino-pretty',
     // https://github.com/pinojs/pino-pretty#options
@@ -18,3 +19,10 @@ export const logger = pino({
     }
   },
 });
+
+const consoleLogger = console;
+consoleLogger.debug = consoleLogger.info;
+
+const usePino = false;
+
+export const logger = usePino ? pinoLogger : consoleLogger;

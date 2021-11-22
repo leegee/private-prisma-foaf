@@ -2,42 +2,66 @@
  * @jest-environment ./test/lib/prisma-test-env.ts
  */
 
-const fs: jest.MockedFunction<any> = jest.createMockFromModule('fs');
-
 import { IFixtures, prisma, setup, teardown } from 'testlib/fixtures';
 
-import { parseFile } from './ingest-graph';
+import { GraphIngester } from './ingest-graph';
 
 import { logger } from './logger';
 
+const { Readable } = require("stream");
+
+const mocks = {
+  ReadStream: jest.fn().mockImplementation(() => {
+    console.log('Heelo from ReadStream');
+    const readable = new Readable();
+    readable.push('[Oswald] --> |assinated| [JFK]');
+    readable.push('[Arthur Young] --> |hosted| [Oswald]');
+    readable.push(null);
+    return readable;
+  }),
+
+  fs: {
+    createReadStream: () => { }
+  }
+};
+
+mocks.fs.createReadStream = mocks.ReadStream;
+
 describe('ingest-graph', () => {
-  // https://stackoverflow.com/questions/67216891/jest-mock-fs-file-stream
+  it('should match an Action intput line without a comment', async () => {
 
-  it('should read', async () => {
+    const reRv = GraphIngester.RE.entity.exec(
+      '[MOCK-SUBJECT] --> |MOCK-VERB| [MOCK-OBJECT]'
+    );
+    expect(reRv).not.toBeNull();
+    expect(reRv?.groups).not.toBeUndefined();
+    expect(reRv?.groups?.subject).toEqual('MOCK-SUBJECT');
+    expect(reRv?.groups?.verb).toEqual('MOCK-VERB');
+    expect(reRv?.groups?.object).toEqual('MOCK-OBJECT');
+    expect(reRv?.groups?.comment).toBeUndefined();
+  });
 
-    const mReadStream = {
-      pipe: jest.fn().mockReturnThis(),
-      on: jest.fn().mockImplementation(function (event, handler) {
-        logger.debug('hello', event, handler);
-        handler();
-        // @ts-ignore: TSError:2683, shadowed 'this'
-        return this;
-      }),
-    };
+  it('should match an Action intput line with a comment', async () => {
+    const reRv = GraphIngester.RE.entity.exec(
+      '[MOCK-SUBJECT] --> |MOCK-VERB| [MOCK-OBJECT] # MOCK-COMMENT'
+    );
+    expect(reRv).not.toBeNull();
+    expect(reRv?.groups).not.toBeUndefined();
+    expect(reRv?.groups?.subject).toEqual('MOCK-SUBJECT');
+    expect(reRv?.groups?.verb).toEqual('MOCK-VERB');
+    expect(reRv?.groups?.object).toEqual('MOCK-OBJECT');
+    expect(reRv?.groups?.comment).toEqual('MOCK-COMMENT');
+  });
 
-    (fs.createReadStream as jest.MockedFunction<any>).mockReturnValueOnce(mReadStream);
+  xit('should read a mock file', async () => {
+    const gi = new GraphIngester({
+      prisma,
+      filepath: 'irrelevant-as-file-not-accessed',
+      fs: mocks.fs,
+    });
 
-    try {
-      await parseFile(prisma, 'mock-filepath');
-    } catch (e) {
-      logger.error('Caught:');
-      logger.error(e);
-    }
+    await gi.parseFile();
 
-    expect(fs.createReadStream).toBeCalledTimes(1);
-    expect(mReadStream.pipe).toBeCalledTimes(1);
-    expect(mReadStream.on).toBeCalledWith('data', expect.any(Function));
-    expect(mReadStream.on).toBeCalledWith('end', expect.any(Function));
-
+    expect(mocks.ReadStream).toHaveBeenCalled();
   });
 });
