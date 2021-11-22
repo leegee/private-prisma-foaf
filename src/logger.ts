@@ -13,9 +13,9 @@ import pino from 'pino';
 const pinoLogger = pino({
   transport: {
     target: 'pino-pretty',
-    // https://github.com/pinojs/pino-pretty#options
     options: {
-      colorize: false
+      colorize: false,
+      level: process.env.LOG_LEVEL || 'trace',
     }
   },
 });

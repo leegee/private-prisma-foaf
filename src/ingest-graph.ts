@@ -1,5 +1,5 @@
 import * as fsImport from 'fs';
-import * as readlineImport from 'readline';
+import * as readlineImport from 'node:readline';
 
 import { Prisma, PrismaClient } from '@prisma/client';
 import { logger } from 'src/logger';
@@ -99,7 +99,7 @@ export class GraphIngester {
     this.filepath = filepath;
   }
 
-  async parseFile(): Promise<void> {
+  parseFile(): Promise<void> {
     logger.debug('Enter parseFile for ' + this.filepath);
 
     const rl = this.readline.createInterface({
@@ -110,17 +110,19 @@ export class GraphIngester {
 
     return new Promise((resolve, reject) => {
       rl.on('line', (line: string) => {
-        logger.debug('readline on.line');
         this._ingestLine(line);
       });
 
+      rl.on('close', resolve);
+
       rl.on('end', resolve);
+
       rl.on('error', reject);
     });
   }
 
   async _ingestLine(inputTextLine: string): Promise<void> {
-    logger.debug('Enter _ingestLine', inputTextLine);
+    logger.debug('Enter _ingestLine' + inputTextLine);
 
     this._inputTextLine = inputTextLine;
 
@@ -245,9 +247,9 @@ export class GraphIngester {
           Object: { connect: { id: object.id } },
         }
       });
-      logger.debug(`Created: ${groups.subject} ${groups.verb} ${groups.object}`);
+      logger.debug(`Created action: ${groups.subject} ${groups.verb} ${groups.object}`);
     } else {
-      logger.debug(`Link to: ${groups.subject} ${groups.verb} ${groups.object}`);
+      logger.debug(`Linked to action: ${groups.subject} ${groups.verb} ${groups.object}`);
     }
   }
 }
