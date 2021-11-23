@@ -6,6 +6,8 @@
 // `pino-pretty` can be provided as the destination
 // stream:
 
+import util from 'util';
+
 import pino from 'pino';
 // import pinoPretty from 'pino-pretty';
 
@@ -20,8 +22,18 @@ const pinoLogger = pino({
   },
 });
 
-const consoleLogger = console;
-consoleLogger.debug = consoleLogger.info;
+const log = (...args: any[]) => {
+  // process.stderr.write()
+  util.inspect(args, true, null, true);
+};
+
+const consoleLogger = {
+  trace: log,
+  debug: log,
+  warn: log,
+  info: log,
+  error: log
+};
 
 const usePino = true;
 

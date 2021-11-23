@@ -1,10 +1,13 @@
 import { Readable } from "stream";
 
-import { GraphIngester } from './ingest-graph';
+import { GraphIngester, normalise } from './ingest-graph';
 
 import { prisma } from 'testlib/fixtures';
 
 import PrismaTestEnvironment from "testlib/prisma-test-env";
+PrismaTestEnvironment.init();
+
+jest.setTimeout(1000 * 30);
 
 const mocks = {
   ReadStream: jest.fn().mockImplementation(() => {
@@ -20,11 +23,18 @@ const mocks = {
 
 mocks.fs.createReadStream = mocks.ReadStream;
 
-jest.setTimeout(1000 * 30);
-
-PrismaTestEnvironment.init();
 
 describe('ingest-graph', () => {
+  describe('normalise', () => {
+    test.each`
+      input     | expectedResult
+      ${' xxxx '}  | ${'xxxx'}
+      ${' x  x '}   | ${'x x'}
+    `('normalises $input to $expectedResult', ({ input, expectedResult }) => {
+      expect(normalise(input)).toBe(expectedResult)
+    })
+  })
+
   it('should match an Action input line without a comment', async () => {
     const reRv = GraphIngester.RE.entity.exec(
       '[MOCK-SUBJECT] --> |MOCK-VERB| [MOCK-OBJECT]'

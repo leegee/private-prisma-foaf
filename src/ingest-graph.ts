@@ -11,6 +11,26 @@ export interface ISubjectVerbObjectComment {
   comment?: string;
 }
 
+export interface Iknownas2id {
+  [key: string]: string | number,
+}
+
+export interface Iknownas2boolean {
+  [key: string]: boolean,
+}
+
+export interface ICache {
+  Entity: Iknownas2id,
+  Verb: Iknownas2id,
+  Action: Iknownas2boolean,
+}
+
+const CachedIds: ICache = {
+  Entity: {},
+  Verb: {},
+  Action: {},
+};
+
 export interface IRE {
   [key: string]: RegExp
 }
@@ -67,6 +87,11 @@ export interface IGraphIngesterArgs {
   filepath: string;
   fs?: any; // ugh
   readline?: any; // ugh
+}
+
+
+export function normalise(subject: string): string {
+  return subject.toLowerCase().replace(/[^\w\s'-]+/, '').replace(/\s+/gs, ' ').trim();
 }
 
 export class GraphIngester {
@@ -134,8 +159,8 @@ export class GraphIngester {
 
     const groups = reRv.groups as ISubjectVerbObjectComment | undefined;
 
-    if (!groups || !groups?.subject || !groups?.verb || !groups?.object) {
-      throw new GrammarError(`subjectToFind:${groups?.subject} verbToFind:${groups?.verb} objectToFind:${groups?.object}`);
+    if (!groups) {
+      throw new GrammarError(`inputTextline: "${inputTextLine}"`);
     }
 
     await this._createSubjectObjectVerbAction(groups);
@@ -143,113 +168,141 @@ export class GraphIngester {
 
   // subject = existing | new (prisma.createOrSelect)
   async _createSubjectObjectVerbAction(groups: ISubjectVerbObjectComment) {
-    let subject = await this.prisma.entity.findUnique({
-      where: { knownas: groups.subject },
-      select: { id: true },
-    });
-    logger.debug(`Got subject "${JSON.stringify(subject)}" via "${groups.subject}"`);
+    logger.debug('_createSubjectObjectVerbAction for groups: ' + JSON.stringify(groups, null, 4));
 
-    let verb = await this.prisma.verb.findUnique({
-      where: { name: groups.verb },
-      select: { id: true },
-    });
+    if (!groups || !groups?.subject || !groups?.verb || !groups?.object) {
+      throw new GrammarError(`subjectToFind:${groups?.subject} verbToFind:${groups?.verb} objectToFind:${groups?.object}`);
+    }
 
-    let object = await this.prisma.entity.findUnique({
-      where: { knownas: groups.object },
-      select: { id: true },
-    });
+    groups.subject = normalise(groups.subject);
+    groups.verb = normalise(groups.verb);
+    groups.object = normalise(groups.object);
 
-    if (subject === null) {
+    let foundSubject = CachedIds.Entity[groups.subject]
+      ? {
+        knownas: groups.subject,
+        id: CachedIds.Entity[groups.subject]
+      }
+      :
+      await this.prisma.entity.findFirst({
+        where: { knownas: groups.subject },
+        select: { id: true },
+      });
+
+    logger.debug(`Got subject "${JSON.stringify(foundSubject)}" via "${groups.subject}"`);
+
+    if (foundSubject === null) {
       try {
-        subject = await this.prisma.entity.create({
+        foundSubject = await this.prisma.entity.create({
           data: {
             knownas: groups.subject,
             formalname: groups.subject,
           },
-          select: {
-            id: true
-          }
+          select: { id: true }
         });
+        CachedIds.Entity[groups.subject] = foundSubject.id;
       } catch (e) {
-        logger.error(JSON.stringify(
-          await this.prisma.entity.findUnique({
-            where: { knownas: groups.subject }
-          }),
-          null,
-          4)
-        );
-        logger.error(`Failed to create subject entity for subject "${groups.subject}" - ` + (e as Error).message);
-        throw e;
+        throw new Error(`Failed to create subject entity for "${groups.subject}" - ${(e as Error).message}`);
       }
     }
 
-    if (object === null) {
+    let foundVerb = CachedIds.Entity[groups.verb]
+      ? {
+        name: groups.verb,
+        id: CachedIds.Entity[groups.verb]
+      }
+      : await this.prisma.verb.findFirst({ where: { name: groups.verb }, select: { id: true } });
+
+    if (foundVerb === null) {
       try {
-        object = await this.prisma.entity.create({
+        foundVerb = await this.prisma.verb.create({
+          data: { name: groups.verb },
+          select: { id: true }
+        });
+        CachedIds.Verb[groups.verb] = foundVerb.id;
+      }
+      catch (e) {
+        const msg = `Failed to create verb from "${groups.verb}"
+          - ${(e as Error).message}
+        - Then found: ${JSON.stringify(
+          await this.prisma.verb.findFirst({ where: { name: groups.verb }, select: { id: true } }),
+          null, 4
+        )
+          } `;
+        throw new Error(msg);
+      }
+
+    }
+
+    let foundObject = CachedIds.Entity[groups.object] ?
+      {
+        knwonas: groups.object,
+        id: CachedIds.Entity[groups.object]
+      }
+      :
+      await this.prisma.entity.findFirst({
+        where: { knownas: groups.object },
+        select: { id: true },
+      });
+
+    if (foundObject === null) {
+      try {
+        foundObject = await this.prisma.entity.create({
           data: {
             formalname: groups.object,
             knownas: groups.object,
           },
           select: { id: true }
         });
+        CachedIds.Entity[groups.object] = foundObject.id;
       }
       catch (e) {
-        logger.error(JSON.stringify(
-          await this.prisma.entity.findUnique({
-            where: { knownas: groups.object }
-          }),
-          null,
-          4)
-        );
-        logger.error(`Failed to create subject entity for object "${groups.object}" - ` + (e as Error).message);
-        throw e;
+        const msg = `Failed to create object entity for  "${groups.object}" - ` + (e as Error).message;
+        logger.error('333:' + msg);
+        // logger.error(JSON.stringify(
+        //   await this.prisma.entity.findUnique({
+        //     where: { knownas: groups.object }
+        //   }),
+        //   null,
+        //   4)
+        // );
+        throw new Error(msg)
       }
     }
 
-    if (verb === null) {
-      try {
-        verb = await this.prisma.verb.create({
-          data: { name: groups.verb },
-          select: { id: true }
-        });
-      }
-      catch (e) {
-        logger.error(JSON.stringify(
-          await this.prisma.verb.findUnique({
-            where: { name: groups.verb },
-            select: { id: true }
-          }),
-          null,
-          4)
-        );
-        logger.error(`Failed to create verb from "${groups.verb}" - ` + (e as Error).message);
-        throw e;
-      }
+    const actionId = foundSubject.id + '-' + foundVerb.id + '-' + foundObject.id;
+
+    if (CachedIds.Action[actionId]) {
+      logger.debug(`Action found - "${actionId}" for: ${groups.subject} ${groups.verb} ${groups.object} `);
     }
 
-    if (subject === null || object === null || verb === null) {
-      throw new GrammarError(this._inputTextLine);
-    }
-
-    const actionExists = await this.prisma.action.findFirst({
-      where: {
-        subjectId: subject.id,
-        verbId: verb.id,
-        objectId: object.id,
-      }
-    });
-
-    if (!!actionExists) {
-      await this.prisma.action.create({
-        data: {
-          Subject: { connect: { id: subject.id } },
-          Verb: { connect: { id: verb.id } },
-          Object: { connect: { id: object.id } },
+    else {
+      const actionExists = await this.prisma.action.findFirst({
+        where: {
+          subjectId: foundSubject.id as number,
+          verbId: foundVerb.id as number,
+          objectId: foundObject.id as number,
         }
       });
-      logger.debug(`Created action: ${groups.subject} ${groups.verb} ${groups.object}`);
-    } else {
-      logger.debug(`Linked to action: ${groups.subject} ${groups.verb} ${groups.object}`);
+
+      CachedIds.Action[actionId] = true;
+
+      if (!!actionExists) {
+        await this.prisma.action.create({
+          data: {
+            Subject: { connect: { id: foundSubject.id as number } },
+            Verb: { connect: { id: foundVerb.id as number } },
+            Object: { connect: { id: foundObject.id as number } },
+          }
+        });
+        logger.debug(`Created action "${actionId}" for: ${groups.subject} ${groups.verb} ${groups.object} `);
+      }
+
+      else {
+        logger.debug(`Linked to action id "${actionId}" for: ${groups.subject} ${groups.verb} ${groups.object} `);
+      }
     }
+
   }
 }
+

@@ -56,7 +56,9 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
       connectionString: this.connectionString,
     });
     await client.connect();
+    logger.info(`Dropping test env temp schema, ${this.schema}.`);
     await client.query(`DROP SCHEMA IF EXISTS "${this.schema}" CASCADE`);
     await client.end();
+    logger.info(`Dropped test env temp schema, ${this.schema}.`);
   }
 }
