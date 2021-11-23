@@ -27,7 +27,7 @@ describe('erd', () => {
     }
 
     const erd = new Erd({ prisma, knownas, savepath });
-    erd._save(`graph TD; A-->B; A-->C; B-->D; C-->D;`);
+    erd._createSvg(`graph TD; A-->B; A-->C; B-->D; C-->D;`);
 
     expect(fs.existsSync(savepath)).toBeTruthy();
     fs.unlinkSync(savepath);
@@ -36,7 +36,7 @@ describe('erd', () => {
   describe('Lee Harvey Oswald', () => {
     it('gets subject-verb-object', async () => {
       const erd = new Erd({ prisma, knownas, });
-      await erd._getActionsForOne();
+      await erd._populateActionsForKnownAs();
 
       expect(erd.actions).toBeDefined();
 
@@ -52,10 +52,10 @@ describe('erd', () => {
       const erd = new Erd({ prisma, knownas, });
       expect(erd.actions).toHaveLength(0);
 
-      await erd._getActionsForOne();
+      await erd._populateActionsForKnownAs();
       expect(erd.actions.length).toBeGreaterThan(0);
 
-      const graph = await erd._graphActions();
+      const graph = await erd._getGraphActions();
       expect(graph).toBeDefined();
 
       [
@@ -73,7 +73,7 @@ describe('erd', () => {
       }
 
       const erd = new Erd({ prisma, knownas, savepath });
-      await erd.createFileForOne();
+      await erd.getSvg();
 
       const exists = fs.existsSync(savepath);
       expect(exists).toBeTruthy();
@@ -85,7 +85,7 @@ describe('erd', () => {
 
     it('creates <svg>', async () => {
       const erd = new Erd({ prisma, knownas });
-      const svg = await erd.createStringForOne();
+      const svg = await erd.getSvg();
       expect(svg).toMatch(/^<svg/);
     });
   });
@@ -98,7 +98,7 @@ describe('erd', () => {
       }
 
       const erd = new Erd({ prisma, savepath });
-      await erd.createFileForOne();
+      await erd.getSvg();
 
       const exists = fs.existsSync(savepath);
       expect(exists).toBeTruthy();

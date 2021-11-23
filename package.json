@@ -62,6 +62,7 @@
   "jest": {
     "verbose": true,
     "silent": false,
+    "detectOpenHandles": true,
     "moduleFileExtensions": [
       "ts",
       "js"

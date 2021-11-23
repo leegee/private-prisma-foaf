@@ -6,28 +6,36 @@
 // `pino-pretty` can be provided as the destination
 // stream:
 
+import { Console } from 'console';
 import util from 'util';
 
-import pino from 'pino';
+// import pino from 'pino';
 // import pinoPretty from 'pino-pretty';
 
 
-const pinoLogger = pino({
-  transport: {
-    target: 'pino-pretty',
-    options: {
-      colorize: false,
-      level: process.env.LOG_LEVEL || 'trace',
-    }
-  },
-});
+// logger = pino({
+//   transport: {
+//     target: 'pino-pretty',
+//     options: {
+//       colorize: false,
+//       level: process.env.LOG_LEVEL || 'trace',
+//     }
+//   },
+// });
 
-const log = (...args: any[]) => {
-  // process.stderr.write()
-  util.inspect(args, true, null, true);
+export type ILogger = {
+  trace: Function,
+  debug: Function,
+  warn: Function,
+  info: Function,
+  error: Function
 };
 
-const consoleLogger = {
+const log = (...args: any[]) => {
+  process.stdout.write(util.inspect(args, true, null, true) + "\n");
+};
+
+export const logger: ILogger = {
   trace: log,
   debug: log,
   warn: log,
@@ -35,6 +43,13 @@ const consoleLogger = {
   error: log
 };
 
-const usePino = true;
+const noop = () => { };
 
-export const logger = usePino ? pinoLogger : consoleLogger;
+export const nullLogger: ILogger = {
+  trace: noop,
+  debug: noop,
+  warn: noop,
+  info: noop,
+  error: noop
+};
+

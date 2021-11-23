@@ -2,7 +2,8 @@ import * as fsImport from 'fs';
 import * as readlineImport from 'node:readline';
 
 import { Prisma, PrismaClient } from '@prisma/client';
-import { logger } from 'src/logger';
+import * as loggerModule from 'src/logger';
+import { normalise, makeActionId } from './erd';
 
 export interface ISubjectVerbObjectComment {
   subject: string;
@@ -12,7 +13,7 @@ export interface ISubjectVerbObjectComment {
 }
 
 export interface Iknownas2id {
-  [key: string]: string | number,
+  [key: string]: number,
 }
 
 export interface Iknownas2boolean {
@@ -87,17 +88,14 @@ export interface IGraphIngesterArgs {
   filepath: string;
   fs?: any; // ugh
   readline?: any; // ugh
-}
-
-
-export function normalise(subject: string): string {
-  return subject.toLowerCase().replace(/[^\w\s'-]+/, '').replace(/\s+/gs, ' ').trim();
+  logger?: loggerModule.ILogger;
 }
 
 export class GraphIngester {
   public static RE = RE;
 
   fs = fsImport;
+  logger: loggerModule.ILogger;
   readline = readlineImport;
   filepath: string;
   prisma: PrismaClient<
@@ -107,7 +105,7 @@ export class GraphIngester {
   >;
   private _inputTextLine: string = '';
 
-  constructor({ prisma, filepath, fs, readline }: IGraphIngesterArgs) {
+  constructor({ logger, prisma, filepath, fs, readline }: IGraphIngesterArgs) {
     if (fs) {
       this.fs = fs;
     }
@@ -122,32 +120,26 @@ export class GraphIngester {
     }
     this.prisma = prisma;
     this.filepath = filepath;
+    this.logger = logger ? logger as loggerModule.ILogger : loggerModule.logger;
   }
 
-  parseFile(): Promise<void> {
-    logger.debug('Enter parseFile for ' + this.filepath);
+  async parseFile(): Promise<void> {
+    this.logger.debug('Enter parseFile for ' + this.filepath);
+
+    const input = this.fs.createReadStream(this.filepath);
 
     const rl = this.readline.createInterface({
-      input: this.fs.createReadStream(this.filepath),
-      output: process.stdout,
-      terminal: false
+      input,
+      crlfDelay: Infinity,
     });
 
-    return new Promise((resolve, reject) => {
-      rl.on('line', (line: string) => {
-        this._ingestLine(line);
-      });
-
-      rl.on('close', resolve);
-
-      rl.on('end', resolve);
-
-      rl.on('error', reject);
-    });
+    for await (const line of rl) {
+      this._ingestLine(line);
+    }
   }
 
   async _ingestLine(inputTextLine: string): Promise<void> {
-    logger.debug('Enter _ingestLine' + inputTextLine);
+    this.logger.debug('Enter _ingestLine' + inputTextLine);
 
     this._inputTextLine = inputTextLine;
 
@@ -168,7 +160,7 @@ export class GraphIngester {
 
   // subject = existing | new (prisma.createOrSelect)
   async _createSubjectObjectVerbAction(groups: ISubjectVerbObjectComment) {
-    logger.debug('_createSubjectObjectVerbAction for groups: ' + JSON.stringify(groups, null, 4));
+    this.logger.debug('_createSubjectObjectVerbAction for groups: ' + JSON.stringify(groups, null, 4));
 
     if (!groups || !groups?.subject || !groups?.verb || !groups?.object) {
       throw new GrammarError(`subjectToFind:${groups?.subject} verbToFind:${groups?.verb} objectToFind:${groups?.object}`);
@@ -189,7 +181,7 @@ export class GraphIngester {
         select: { id: true },
       });
 
-    logger.debug(`Got subject "${JSON.stringify(foundSubject)}" via "${groups.subject}"`);
+    this.logger.debug(`Got subject "${JSON.stringify(foundSubject)}" via "${groups.subject}"`);
 
     if (foundSubject === null) {
       try {
@@ -222,14 +214,13 @@ export class GraphIngester {
         CachedIds.Verb[groups.verb] = foundVerb.id;
       }
       catch (e) {
-        const msg = `Failed to create verb from "${groups.verb}"
-          - ${(e as Error).message}
-        - Then found: ${JSON.stringify(
+        throw new Error(`
+### Failed to create verb from "${groups.verb}"
+### ${(e as Error).message}
+### Then found: ${JSON.stringify(
           await this.prisma.verb.findFirst({ where: { name: groups.verb }, select: { id: true } }),
           null, 4
-        )
-          } `;
-        throw new Error(msg);
+        )}\n`);
       }
 
     }
@@ -257,23 +248,14 @@ export class GraphIngester {
         CachedIds.Entity[groups.object] = foundObject.id;
       }
       catch (e) {
-        const msg = `Failed to create object entity for  "${groups.object}" - ` + (e as Error).message;
-        logger.error('333:' + msg);
-        // logger.error(JSON.stringify(
-        //   await this.prisma.entity.findUnique({
-        //     where: { knownas: groups.object }
-        //   }),
-        //   null,
-        //   4)
-        // );
-        throw new Error(msg)
+        throw new Error(`Failed to create object entity for  "${groups.object}" - ${(e as Error).message}`);
       }
     }
 
-    const actionId = foundSubject.id + '-' + foundVerb.id + '-' + foundObject.id;
+    const actionId = makeActionId(foundSubject.id, foundVerb.id, foundObject.id);
 
     if (CachedIds.Action[actionId]) {
-      logger.debug(`Action found - "${actionId}" for: ${groups.subject} ${groups.verb} ${groups.object} `);
+      this.logger.debug(`Action found in cache - "${actionId}" for: ${groups.subject} ${groups.verb} ${groups.object} `);
     }
 
     else {
@@ -283,11 +265,13 @@ export class GraphIngester {
           verbId: foundVerb.id as number,
           objectId: foundObject.id as number,
         }
-      });
+      })
+
+      const msg = `actionId "${actionId}" for "${groups.subject} ${groups.verb} ${groups.object}": ${JSON.stringify(actionExists, null, 4)}`;
 
       CachedIds.Action[actionId] = true;
 
-      if (!!actionExists) {
+      if (actionExists === null) {
         await this.prisma.action.create({
           data: {
             Subject: { connect: { id: foundSubject.id as number } },
@@ -295,11 +279,11 @@ export class GraphIngester {
             Object: { connect: { id: foundObject.id as number } },
           }
         });
-        logger.debug(`Created action "${actionId}" for: ${groups.subject} ${groups.verb} ${groups.object} `);
+        this.logger.debug(`Created ${msg}`);
       }
 
       else {
-        logger.debug(`Linked to action id "${actionId}" for: ${groups.subject} ${groups.verb} ${groups.object} `);
+        this.logger.debug(`Linked to ${msg}`);
       }
     }
 
