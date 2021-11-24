@@ -1,10 +1,11 @@
 import { Readable } from "stream";
 
-import { GraphIngester, normalise } from './ingest-graph';
+import { GraphIngester } from './ingest-graph';
 
 import { prisma } from 'testlib/fixtures';
 
 import PrismaTestEnvironment from "testlib/prisma-test-env";
+import { normalise } from "./erd";
 PrismaTestEnvironment.init();
 
 jest.setTimeout(1000 * 30);
@@ -35,29 +36,30 @@ describe('ingest-graph', () => {
     })
   })
 
-  it('should match an Action input line without a comment', async () => {
-    const reRv = GraphIngester.RE.entity.exec(
-      '[MOCK-SUBJECT] --> |MOCK-VERB| [MOCK-OBJECT]'
-    );
-    expect(reRv).not.toBeNull();
-    expect(reRv?.groups).not.toBeUndefined();
-    expect(reRv?.groups?.subject).toEqual('MOCK-SUBJECT');
-    expect(reRv?.groups?.verb).toEqual('MOCK-VERB');
-    expect(reRv?.groups?.object).toEqual('MOCK-OBJECT');
-    expect(reRv?.groups?.comment).toBeUndefined();
-  });
+  // it('should match an Action input line without a comment', async () => {
+  //   const gi = new GraphIngester({
+  //     prisma,
+  //     filepath: 'irrelevant-as-file-not-accessed',
+  //     fs: mocks.fs,
+  //   });
+  //   const reRv = parse('MOCK-SUBJECT,MOCK-VERB,MOCK-OBJECT');
+  //   expect(reRv).not.toBeNull();
+  //   expect(reRv?.groups).not.toBeUndefined();
+  //   expect(reRv?.groups?.subject).toEqual('MOCK-SUBJECT');
+  //   expect(reRv?.groups?.verb).toEqual('MOCK-VERB');
+  //   expect(reRv?.groups?.object).toEqual('MOCK-OBJECT');
+  //   expect(reRv?.groups?.comment).toBeUndefined();
+  // });
 
-  it('should match an Action intput line with a comment', async () => {
-    const reRv = GraphIngester.RE.entity.exec(
-      '[MOCK-SUBJECT] --> |MOCK-VERB| [MOCK-OBJECT] # MOCK-COMMENT'
-    );
-    expect(reRv).not.toBeNull();
-    expect(reRv?.groups).not.toBeUndefined();
-    expect(reRv?.groups?.subject).toEqual('MOCK-SUBJECT');
-    expect(reRv?.groups?.verb).toEqual('MOCK-VERB');
-    expect(reRv?.groups?.object).toEqual('MOCK-OBJECT');
-    expect(reRv?.groups?.comment).toEqual('MOCK-COMMENT');
-  });
+  // it('should match an Action intput line with a comment', async () => {
+  //   const reRv = parse('MOCK-SUBJECT,MOCK-VERB,MOCK-OBJECT,MOCK-COMMENT');
+  //   expect(reRv).not.toBeNull();
+  //   expect(reRv?.groups).not.toBeUndefined();
+  //   expect(reRv?.groups?.subject).toEqual('MOCK-SUBJECT');
+  //   expect(reRv?.groups?.verb).toEqual('MOCK-VERB');
+  //   expect(reRv?.groups?.object).toEqual('MOCK-OBJECT');
+  //   expect(reRv?.groups?.comment).toEqual('MOCK-COMMENT');
+  // });
 
   xit('mock prisma', () => { });
 
@@ -82,14 +84,14 @@ describe('ingest-graph', () => {
 
     try {
       gi._createSubjectObjectVerbAction({
-        subject: 's',
-        verb: 'v',
-        object: 'o',
+        Subject: 's',
+        Verb: 'v',
+        Object: 'o',
       });
       gi._createSubjectObjectVerbAction({
-        subject: 's',
-        verb: 'v',
-        object: 'o',
+        Subject: 's',
+        Verb: 'v',
+        Object: 'o',
       });
     } catch (e) {
       throw e;
@@ -100,7 +102,7 @@ describe('ingest-graph', () => {
   it('should integrate with real fs to read a file', async () => {
     const gi = new GraphIngester({
       prisma,
-      filepath: './test/lib/input.graph',
+      filepath: './test/lib/input.csv',
     });
 
     expect(gi.parseFile()).resolves.not.toThrow();
