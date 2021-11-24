@@ -138,35 +138,7 @@ export class Erd {
   async _populateActionsFromAll() {
     this.logger.debug('Enter _graphActionsForAll');
 
-    // const entities = await this.prisma.entity.findMany({
-    //   select: { id: true }
-    // });
-
-    // this.logger.debug(`_graphActionsForAll found ${entities.length} entities.`);
-
-    // const entityDoneCache = {};
-
-    // for (let entity of entities) {
-    //   let actions: SubjectVerbObject[] = await this.prisma.action.findMany({
-    //     where: {
-    //       OR: [
-    //         { subjectId: entity.id },
-    //         // { objectId: entity.id },
-    //       ],
-    //     },
-    //     include: {
-    //       Subject: true,
-    //       Object: true,
-    //       Verb: true,
-    //     },
-    //   });
-    //
-    // actions = actions.reduce((prev: any, current: any) => {
-    //   const actionId: string = makeActionId(current.Subject.id, current.Verb.id, current.Object.id);
-    //   return this.actions[actionId as any] ? current : [...prev, current];
-    // }, actions);
-
-    let actions: SubjectVerbObject[] = await this.prisma.action.findMany({
+    const actions: SubjectVerbObject[] = await this.prisma.action.findMany({
       include: {
         Subject: true,
         Object: true,
@@ -175,8 +147,6 @@ export class Erd {
     });
 
     this.actions.push(...actions);
-
-    // this.logger.debug(`_graphActionsForAll found ${actions.length} for entity "${entity.id}" - running total ${this.actions.length}.`);
 
     this.logger.debug(`_graphActionsForAll exits having found ${this.actions.length} actions for "${this.knownas || 'all'}"`);
   }

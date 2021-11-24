@@ -33,12 +33,12 @@ describe('file2erd', () => {
       }
     });
 
-    // await new Erd({
-    //   savepath: savepath[0],
-    //   knownas: TARGET,
-    //   prisma,
-    //   logger: nullLogger,
-    // }).createSvg();
+    await new Erd({
+      savepath: savepath[0],
+      knownas: TARGET,
+      prisma,
+      logger: nullLogger,
+    }).createSvg();
 
     await new Erd({
       savepath: savepath[1],
