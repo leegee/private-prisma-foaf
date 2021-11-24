@@ -80,7 +80,7 @@ Should be easy for non-techies to edit by hand.
 ### Examples:
 
     Andre Puharich (1918-02-19 – 1995-01-03)
-    heosophical Society
+    Theosophical Society
     Anthroposophical Society
 
 ## Entity-Verb-Entity
