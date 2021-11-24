@@ -43,20 +43,20 @@ Instead, call the custom environment manually, so it can set beforeEach and afte
 
     PrismaTestEnvironment.init();
 
+Because use of a long-running global transaction apparently not supported by Prisma, the above creates a PG DB schema per test,
+which it destroys after the test.
+
 ## Writing Unit Tests
 
 See examples.
 
 ## TODO
 
-- Real graphviz
 - Deeper mock RVs
 - Playwrite
 - Percy
 
 ## NOTES
-
-Use of a long-running global transaction apparently not supported
 
 ## Links
 
