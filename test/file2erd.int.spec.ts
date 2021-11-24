@@ -14,11 +14,6 @@ const TARGET = 'CIA';
 describe('file2erd', () => {
 
   it('ingests file', async () => {
-    const savepath = [
-      './example.one.out.png',
-      './example.all.out.png',
-    ];
-
     const gi = new GraphIngester({
       prisma,
       logger: nullLogger,
@@ -27,30 +22,23 @@ describe('file2erd', () => {
 
     await gi.parseFile();
 
-    savepath.forEach(path => {
-      if (fs.existsSync(path)) {
-        fs.unlinkSync(path);
+    Object.keys(Erd.layouts).forEach(async (layoutKey) => {
+      const savepath = `./output-${layoutKey}.svg`;
+      if (fs.existsSync(savepath)) {
+        fs.unlinkSync(savepath);
       }
+
+      await new Erd({
+        prisma,
+        savepath: savepath,
+        logger: nullLogger,
+        layout: layoutKey,
+      }).useGraphviz();
+
+      expect(fs.existsSync(savepath)).toBe(true);
+
     });
 
-    await new Erd({
-      savepath: savepath[0],
-      knownas: TARGET,
-      prisma,
-      logger: nullLogger,
-    }).useGraphviz();
-
-    await new Erd({
-      savepath: savepath[1],
-      prisma,
-      logger,
-    }).useGraphviz();
-
-    savepath.forEach(path => {
-      expect(
-        fs.existsSync(path)
-      ).toBe(true);
-    });
   });
 
 });

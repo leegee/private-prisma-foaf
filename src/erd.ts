@@ -37,9 +37,20 @@ export interface IErdArgs {
   knownas?: string;
   savepath?: string;
   logger?: loggerModule.ILogger;
+  format?: string;
+  layout?: string;
+  layouts?: string[];
 }
 
 export class Erd {
+  static layouts: { [key: string]: string } = {
+    circo: "sep = 2 \n esep = 2 \n weight = 20.0 \n fontSize = 28.0 \n penwidth = 20.0 \n",
+    fdp: "sep=2 \n esep=2 \n weight=2 \n penwidth=3",
+    twopi: "",
+    dot: "",
+  };
+  logger: loggerModule.ILogger;
+
   prisma: PrismaClient<
     Prisma.PrismaClientOptions,
     never,
@@ -47,13 +58,13 @@ export class Erd {
   >;
   actions: SubjectVerbObject[] = [];
   knownas: string | undefined = undefined;
-  savepath?: string;
+  savepath: string = 'erd-output.svg';
   knownasEntityId: number | undefined;
   tmpDir = fs.mkdtempSync(os.tmpdir() + path.sep + 'entity-erd-');
-  theme = 'forest';
-  logger: loggerModule.ILogger;
+  format = '';
+  layout = 'fdp';
 
-  constructor({ prisma, knownas, savepath, logger }: IErdArgs) {
+  constructor({ prisma, knownas, savepath, logger, format }: IErdArgs) {
     this.prisma = prisma;
     if (!!knownas) {
       this.knownas = normalise(knownas);
@@ -61,6 +72,10 @@ export class Erd {
     if (!!savepath) {
       this.savepath = savepath;
     }
+    if (this.savepath.length < 5) {
+      throw new TypeError('savepath too short');
+    }
+    this.format = format || this.savepath.substr(this.savepath.length - 3, 3);
     this.logger = logger ? logger : loggerModule.logger;
   }
 
@@ -112,7 +127,7 @@ export class Erd {
       this.knownasEntityId = knownasEntity.id;
     }
 
-    this.logger.debug(`._populateActionsForKnownAs for "${this.knownas}", entityId="${this.knownasEntityId}"`);
+    this.logger.debug(`._populateActionsForKnownAs for "${this.knownas}", entityId = "${this.knownasEntityId}"`);
 
     this.actions.push(
       ...await this.prisma.action.findMany({
@@ -133,6 +148,7 @@ export class Erd {
 
   async useGraphviz(inputGraph?: string) {
     this.logger.info(`Enter useGraphviz`);
+
     if (!this.savepath) {
       throw new Error('savepath was not supplied during construction');
     }
@@ -146,7 +162,7 @@ export class Erd {
     fs.writeFileSync(tempOutputPath, graph);
 
     child_process.execSync(
-      `dot -Tpng ${tempOutputPath} > ${this.savepath}.png`
+      `dot -T${this.format} ${tempOutputPath} > ${this.savepath} `
     );
 
     if (!process.env.CRUFT) {
@@ -155,7 +171,11 @@ export class Erd {
   }
 
   async _actions2graph(): Promise<string> {
-    let graph = 'digraph  G {';
+    let graph = `digraph  G {
+  layout=${this.layout}
+  stylesheet="./styles.css"
+  ${Erd.layouts[this.layout]}
+  `;
 
     await this._populateActions();
     this.logger.debug(`Actions: "${this.actions}"`);
@@ -163,9 +183,9 @@ export class Erd {
     this.actions.forEach((action) => {
       try {
         if (action.Subject.id && action.Verb.id && action.Object.id) {
-          graph += `Entity${action.Subject.id} [label=<${action.Subject.knownas}>]
-             Entity${action.Object.id} [label=<${action.Object.knownas}>]
-             Entity${action.Subject.id} -> Entity${action.Object.id} [label=<${action.Verb.name}>]
+          graph += `Entity${action.Subject.id} [class=entity label=<${action.Subject.formalname}>]
+             Entity${action.Object.id} [class=entity label=<${action.Object.formalname}>]
+             Entity${action.Subject.id} -> Entity${action.Object.id} [class=verb label=<${action.Verb.name}>]
             `;
         }
       } catch (e) {

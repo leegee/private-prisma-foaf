@@ -173,3 +173,21 @@ Should be easy for non-techies to edit by hand.
     [NSDAP]                 --> |member a|              [far right]
 
 Consider PROLOG.
+
+![ERD](./erd.svg)
+
+## DOT
+
+![ERD](./output-dot.svg)
+
+## FDP
+
+![ERD](./output-fdp.svg)
+
+## CIRCO
+
+![ERD](./output-circo.svg)
+
+## TWOPI
+
+![ERD](./output-twopi.svg)

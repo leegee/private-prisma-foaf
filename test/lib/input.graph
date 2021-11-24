@@ -61,5 +61,5 @@
     [Dwight Eisenhower]     --> |is a|                  [POTUS]
     [Hunt Oil]              --> |funded|                [Dwight Eisenhower]
     [Oswald]                --> |worked for|            [Guy Bannister]
-    [Guy Bannister]         --> |member a|              [far right]
-    [NSDAP]                 --> |member a|              [far right]
+    [Guy Bannister]         --> |member of|              [far right]
+    [NSDAP]                 --> |member of|              [far right]
