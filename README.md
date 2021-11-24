@@ -28,7 +28,7 @@ and using known-state environment fixetures.
 ## Writiing integration tests
 
 Tests which touch any real system, other than the unit under test, are considered integration tests, and
-are be suffixed `.int.spec.ts`.
+are suffixed `.int.spec.ts`.
 
     /**
     * @jest-environment ./test/lib/prisma-test-env.ts
