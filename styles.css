@@ -1,3 +1,21 @@
-svg g.entity {
-  background: blue
+svg>* {
+  stroke: black;
+  text-transform: capitalize;
+}
+
+.entity {
+  stroke-width: 4;
+}
+
+.entity text {
+  stroke-width: 0.5;
+}
+
+.verb {
+  stroke-width: 4;
+}
+
+.verb text {
+  stroke-width: 0.5;
+  fill: black;
 }
