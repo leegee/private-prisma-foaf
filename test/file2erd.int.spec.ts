@@ -15,8 +15,8 @@ describe('file2erd', () => {
 
   it('ingests file', async () => {
     const savepath = [
-      './example.one.out.svg',
-      './example.all.out.svg',
+      './example.one.out.png',
+      './example.all.out.png',
     ];
 
     const gi = new GraphIngester({
@@ -38,13 +38,13 @@ describe('file2erd', () => {
       knownas: TARGET,
       prisma,
       logger: nullLogger,
-    }).createSvg();
+    }).useGraphviz();
 
     await new Erd({
       savepath: savepath[1],
       prisma,
       logger,
-    }).createSvg();
+    }).useGraphviz();
 
     savepath.forEach(path => {
       expect(

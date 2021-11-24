@@ -2,6 +2,7 @@
   "name": "script",
   "license": "MIT",
   "devDependencies": {
+    "@types/graphviz": "^0.0.34",
     "@types/jest": "^27.0.2",
     "@types/node": "16.11.7",
     "@types/pg": "^8.6.1",
@@ -46,6 +47,7 @@
     "cross-env": "^7.0.3",
     "dotenv": "^10.0.0",
     "dotenv-cli": "^4.1.0",
+    "graphviz": "^0.0.9",
     "module-alias": "^2.2.2",
     "pino": "^7.3.0",
     "ts-jest": "^27.0.7",
@@ -59,6 +61,7 @@
     "@src": "./src",
     "@test": "./test"
   },
+  "type": "commonjs",
   "jest": {
     "verbose": true,
     "silent": false,

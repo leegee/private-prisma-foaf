@@ -3,8 +3,7 @@ node_modules
 notes.txt
 coverage
 prisma/migrations
-erd.svg
+*.png
 prisma.mmd
-*.svg
 dist/
 

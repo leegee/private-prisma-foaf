@@ -21,13 +21,13 @@ afterAll(async () => {
 
 describe('erd', () => {
   it('_save', async () => {
-    const savepath = './temp-int.svg';
+    const savepath = './temp-int.png';
     if (fs.existsSync(savepath)) {
       fs.unlinkSync(savepath);
     }
 
     const erd = new Erd({ prisma, knownas, savepath });
-    erd._createSvg(`graph TD; A-->B; A-->C; B-->D; C-->D;`);
+    erd.useGraphviz('CIA -> JFK');
 
     expect(fs.existsSync(savepath)).toBeTruthy();
     fs.unlinkSync(savepath);
@@ -55,7 +55,7 @@ describe('erd', () => {
       await erd._populateActionsForKnownAs();
       expect(erd.actions.length).toBeGreaterThan(0);
 
-      const graph = await erd._getGraphActions();
+      const graph = await erd._populateActions();
       expect(graph).toBeDefined();
 
       [
@@ -67,13 +67,13 @@ describe('erd', () => {
     });
 
     it('saves  to file', async () => {
-      const savepath = './temp-oswald.svg';
+      const savepath = './temp-oswald.png';
       if (fs.existsSync(savepath)) {
         fs.unlinkSync(savepath);
       }
 
       const erd = new Erd({ prisma, knownas, savepath });
-      await erd.getSvg();
+      await erd.useGraphviz();
 
       const exists = fs.existsSync(savepath);
       expect(exists).toBeTruthy();
@@ -82,23 +82,17 @@ describe('erd', () => {
         fs.unlinkSync(savepath);
       }
     });
-
-    it('creates <svg>', async () => {
-      const erd = new Erd({ prisma, knownas });
-      const svg = await erd.getSvg();
-      expect(svg).toMatch(/^<svg/);
-    });
   });
 
   describe('All', () => {
     it('saves  to file', async () => {
-      const savepath = './temp-all.svg';
+      const savepath = './temp-all.png';
       if (fs.existsSync(savepath)) {
         fs.unlinkSync(savepath);
       }
 
       const erd = new Erd({ prisma, savepath });
-      await erd.getSvg();
+      await erd.useGraphviz();
 
       const exists = fs.existsSync(savepath);
       expect(exists).toBeTruthy();

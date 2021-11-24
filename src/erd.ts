@@ -2,7 +2,7 @@
 
 import * as path from 'path';
 import * as child_process from 'child_process';
-import fs from 'fs';
+import fs, { unlinkSync } from 'fs';
 import os from 'os';
 import { PrismaClient, Prisma, Entity, Verb } from '@prisma/client';
 import * as loggerModule from './logger';
@@ -64,45 +64,7 @@ export class Erd {
     this.logger = logger ? logger : loggerModule.logger;
   }
 
-  /** uses Mermaid with temp files to create an SVG file, get/returns the contents, and remove all files produced. */
-  async getSvg(): Promise<string> {
-    this.logger.info(`Enter createFile for "${this.knownas || 'all'}" at "${this.savepath}".`);
-
-    let remove = false;
-
-    if (!this.savepath) {
-      remove = true;
-      this.savepath = 'temp.svg';
-    }
-
-    const graph: string = await this.createSvg();
-
-    const svgXml = fs.readFileSync(this.savepath, 'utf8');
-
-    if (remove) {
-      fs.unlinkSync(this.savepath);
-      delete this.savepath;
-    }
-
-    return svgXml;
-  }
-
-
-  async createSvg() {
-    const graphedActions = await this._getGraphActions();
-    this.logger.debug(`.create: graphedActions "${graphedActions}"`);
-
-    const graph = 'graph TD\n' + graphedActions;
-
-    this.logger.debug(`.create: graph "${graph}"`);
-
-    this._createSvg(graph);
-    return graph;
-  }
-
-  async _getGraphActions(): Promise<string> {
-    let mermaid = '';
-
+  async _populateActions() {
     if (this.knownas !== undefined) {
       await this._populateActionsForKnownAs();
     }
@@ -113,26 +75,6 @@ export class Erd {
     if (this.actions.length === 0) {
       throw new Error(`No actions to graph for "${this.knownas || 'all'}"`);
     }
-
-
-    this.actions.forEach((action) => {
-      try {
-        if (action.Subject.id && action.Verb.id && action.Object.id) {
-          mermaid +=
-            'Entity' + action.Subject.id +
-            '[' + action.Subject.knownas + ']-->' +
-            '|' + action.Verb.name + '|' +
-            'Entity' + action.Object.id +
-            '[' + action.Object.knownas + ']' +
-            '\n';
-        }
-      } catch (e) {
-        this.logger.error('Action was:', action);
-        throw e;
-      }
-    });
-
-    return mermaid;
   }
 
   async _populateActionsFromAll() {
@@ -192,38 +134,51 @@ export class Erd {
     this.logger.debug(`._populateActionsForKnownAs for "${this.knownas}", entityId="${this.knownasEntityId}": got "${this.actions.length}"`);
   }
 
-  _createSvg(graph: string): void {
-    this.logger.info(`Enter _save for ${graph}`);
+  async useGraphviz(inputGraph?: string) {
+    this.logger.info(`Enter useGraphviz`);
     if (!this.savepath) {
       throw new Error('savepath was not supplied during construction');
     }
 
-    const tempMermaidInputFile = path.resolve(
-      path.join(this.tmpDir, 'entity-erd.mmd'),
-    );
-    fs.writeFileSync(tempMermaidInputFile, graph);
+    let graph = 'digraph  G {';
 
-    const tempConfigFile = path.resolve(path.join(this.tmpDir, 'config.json'));
-    fs.writeFileSync(
-      tempConfigFile,
-      JSON.stringify({ deterministicIds: true }),
+    await this._populateActions();
+
+    this.actions.forEach((action) => {
+      try {
+        if (action.Subject.id && action.Verb.id && action.Object.id) {
+          graph += `Entity${action.Subject.id} [label=<${action.Subject.knownas}>]
+             Entity${action.Object.id} [label=<${action.Object.knownas}>]
+             Entity${action.Subject.id} -> Entity${action.Object.id} [label=<${action.Verb.name}>]
+            `;
+        }
+      } catch (e) {
+        this.logger.error('Action was:', action);
+        throw e;
+      }
+    });
+
+    graph += "\n}\n"; // EOF
+
+    this.logger.debug(`.create: graphedActions "${this.actions}"`);
+    this.logger.debug(`.create: graph "${graph}"`);
+
+    const tempOutputPath = path.resolve(
+      path.join(this.tmpDir, 'temp.dot'),
     );
 
-    const mermaidCliNodePath = path.resolve(
-      path.join('node_modules', '.bin', 'mmdc'),
+    fs.writeFileSync(tempOutputPath, graph);
+
+    child_process.execSync(
+      `dot -Tpng ${tempOutputPath} > ${this.savepath}.png`
     );
 
-    try {
-      child_process.execSync(
-        `${mermaidCliNodePath} -i ${tempMermaidInputFile} -o ${this.savepath} -t ${this.theme} -c ${tempConfigFile}`
-      );
-    } catch (e) {
-      throw e;
+    if (!process.env.CRUFT) {
+      unlinkSync(tempOutputPath);
     }
-
-    fs.unlinkSync(tempMermaidInputFile);
-    fs.unlinkSync(tempConfigFile);
-
-    // todo: nicer errors
   }
+
 }
+
+
+// dot -Tpng temp.dot > graphviz.png
