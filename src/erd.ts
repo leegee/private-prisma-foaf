@@ -75,22 +75,21 @@ export class Erd {
     if (this.actions.length === 0) {
       throw new Error(`No actions to graph for "${this.knownas || 'all'}"`);
     }
+
+    this.logger.debug(`_populateActions exits with ${this.actions.length} actions.`);
   }
 
   async _populateActionsFromAll() {
     this.logger.debug('Enter _graphActionsForAll');
-
-    const actions: SubjectVerbObject[] = await this.prisma.action.findMany({
-      include: {
-        Subject: true,
-        Object: true,
-        Verb: true,
-      }
-    });
-
-    this.actions.push(...actions);
-
-    this.logger.debug(`_graphActionsForAll exits having found ${this.actions.length} actions for "${this.knownas || 'all'}"`);
+    this.actions.push(
+      ... await this.prisma.action.findMany({
+        include: {
+          Subject: true,
+          Object: true,
+          Verb: true,
+        }
+      })
+    );
   }
 
 
@@ -115,23 +114,21 @@ export class Erd {
 
     this.logger.debug(`._populateActionsForKnownAs for "${this.knownas}", entityId="${this.knownasEntityId}"`);
 
-    const actions: SubjectVerbObject[] = await this.prisma.action.findMany({
-      where: {
-        OR: [
-          { objectId: this.knownasEntityId },
-          { subjectId: this.knownasEntityId },
-        ],
-      },
-      select: {
-        Subject: true,
-        Object: true,
-        Verb: true,
-      },
-    });
-
-    this.logger.debug(`._populateActionsForKnownAs "${this.knownas}" actions=${JSON.stringify(actions)}`);
-    this.actions.push(...actions);
-    this.logger.debug(`._populateActionsForKnownAs for "${this.knownas}", entityId="${this.knownasEntityId}": got "${this.actions.length}"`);
+    this.actions.push(
+      ...await this.prisma.action.findMany({
+        where: {
+          OR: [
+            { objectId: this.knownasEntityId },
+            { subjectId: this.knownasEntityId },
+          ],
+        },
+        select: {
+          Subject: true,
+          Object: true,
+          Verb: true,
+        },
+      })
+    );
   }
 
   async useGraphviz(inputGraph?: string) {
@@ -140,9 +137,28 @@ export class Erd {
       throw new Error('savepath was not supplied during construction');
     }
 
+    const graph = await this._actions2graph();
+
+    const tempOutputPath = path.resolve(
+      path.join(this.tmpDir, 'temp.dot'),
+    );
+
+    fs.writeFileSync(tempOutputPath, graph);
+
+    child_process.execSync(
+      `dot -Tpng ${tempOutputPath} > ${this.savepath}.png`
+    );
+
+    if (!process.env.CRUFT) {
+      unlinkSync(tempOutputPath);
+    }
+  }
+
+  async _actions2graph(): Promise<string> {
     let graph = 'digraph  G {';
 
     await this._populateActions();
+    this.logger.debug(`Actions: "${this.actions}"`);
 
     this.actions.forEach((action) => {
       try {
@@ -160,25 +176,8 @@ export class Erd {
 
     graph += "\n}\n"; // EOF
 
-    this.logger.debug(`.create: graphedActions "${this.actions}"`);
-    this.logger.debug(`.create: graph "${graph}"`);
+    this.logger.debug(`Graph: "${graph}"`);
 
-    const tempOutputPath = path.resolve(
-      path.join(this.tmpDir, 'temp.dot'),
-    );
-
-    fs.writeFileSync(tempOutputPath, graph);
-
-    child_process.execSync(
-      `dot -Tpng ${tempOutputPath} > ${this.savepath}.png`
-    );
-
-    if (!process.env.CRUFT) {
-      unlinkSync(tempOutputPath);
-    }
+    return graph;
   }
-
 }
-
-
-// dot -Tpng temp.dot > graphviz.png
