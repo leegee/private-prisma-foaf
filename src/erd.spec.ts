@@ -1,6 +1,4 @@
-/**
- * @jest-environment ./test/lib/prisma-test-env.ts
- */
+import PrismaTestEnvironment from "testlib/prisma-test-env";
 
 import { Entity, Action } from '@prisma/client';
 import { MockProxy } from 'jest-mock-extended';
@@ -26,6 +24,8 @@ const entityFixture: MockProxy<Entity> = {
   dod: null,
   approved: false,
 };
+
+PrismaTestEnvironment.init();
 
 describe('erd', () => {
   describe('_getActions', () => {

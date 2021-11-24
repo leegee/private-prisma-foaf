@@ -16,8 +16,8 @@ describe('file2erd', () => {
   it('ingests file', async () => {
     const gi = new GraphIngester({
       prisma,
-      logger: nullLogger,
-      filepath: './test/lib/input.graph',
+      logger: logger,
+      filepath: './test/lib/input.csv',
     });
 
     await gi.parseFile();

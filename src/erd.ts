@@ -174,6 +174,7 @@ export class Erd {
     let graph = `digraph  G {
   layout=${this.layout}
   stylesheet="./styles.css"
+  fontsize="32pt"
   ${Erd.layouts[this.layout]}
   `;
 

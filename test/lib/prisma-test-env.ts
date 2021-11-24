@@ -7,6 +7,8 @@ require('dotenv').config();
 import { Client } from "pg";
 import NodeEnvironment from "jest-environment-node";
 import child_process from "child_process";
+
+import { IFixtures, setup, teardown } from 'testlib/fixtures';
 import { logger } from '../../src/logger';
 
 const prismaBinary = 'npx prisma';
@@ -17,11 +19,28 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
 
     beforeEach(async () => {
       testEnv = await new PrismaTestEnvironment({});
-      testEnv.setup();
+      await testEnv.setup();
     });
 
-    afterEach(async () => testEnv.teardown());
+    afterEach(async () => await testEnv.teardown());
   }
+
+  static initFixutres(fixtures: IFixtures, knownas: string) {
+    let testEnv: PrismaTestEnvironment;
+
+    beforeEach(async () => {
+      testEnv = await new PrismaTestEnvironment({});
+      await testEnv.setup();
+      fixtures = await setup();
+      knownas = fixtures.oswald.knownas;
+    });
+
+    afterEach(async () => {
+      await testEnv.teardown();
+      await teardown();
+    });
+  }
+
 
   schema = '';
   connectionString = '';

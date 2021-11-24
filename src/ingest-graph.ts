@@ -1,14 +1,14 @@
 import * as fsImport from 'fs';
-import * as readlineImport from 'node:readline';
-
+// import * as readlineImport from 'node:readline';
+import { parse } from 'csv-parse';
 import { Prisma, PrismaClient } from '@prisma/client';
 import * as loggerModule from 'src/logger';
 import { normalise, makeActionId } from './erd';
 
 export interface ISubjectVerbObjectComment {
-  subject: string;
-  verb: string;
-  object: string;
+  Subject: string;
+  Verb: string;
+  Object: string;
   comment?: string;
 }
 
@@ -32,46 +32,6 @@ const CachedIds: ICache = {
   Action: {},
 };
 
-export interface IRE {
-  [key: string]: RegExp
-}
-
-const RE = {
-  verb: new RegExp(`^
-    \\s*
-    ( ?<name> [^\(]+ ) \\s*
-    \\s+
-    \(
-      \\s*
-      ( ?<start> \d{4} –? \d{2} –? \d{2] )
-      \\s*-\\s*
-      ( ?<end>   \d{4} –? \d{2} –? \d{2] )
-      \\s*
-    \)
-  $`),
-
-  entity: new RegExp(
-    [
-      '^',
-      '\\s*',                             // May be whitespace at the start of the line
-      '\\[',                              // Surrounded by square brackets,
-      '(?<subject>[^\\]]+)',              //   Collect $1(subject)
-      '\\]',                              // End square bracket surrounding subject
-      '\\s*\\-+\\>\\s*',                      //  --> arrow, maybe surrounded by whitespace
-      '\\|',                           // Surrounded by bars
-      '(?<verb>[^\\|]+)',            //   Collect $2 (verb)
-      '\\|',                         // nd bars surrounding verb
-      '\\s*',                        // May be whitespace
-      '\\[',                         // Surrounded by square brackets
-      '(?<object>[^\\]]+)',          //   Collect $3 (object)
-      '\\]',                         // End square brackets surrounding object
-      '\\s*',                        // May be whitespace
-      '(#\\s*(?<comment>.+))?',          // May be $4 Free-text comment
-      '\\s*$',                       // May be whitespace at the end of the line
-    ].join('')
-  ),
-};
-
 export class GrammarError extends Error {
   constructor(message: string) {
     super(message);
@@ -92,11 +52,8 @@ export interface IGraphIngesterArgs {
 }
 
 export class GraphIngester {
-  public static RE = RE;
-
   fs = fsImport;
   logger: loggerModule.ILogger;
-  readline = readlineImport;
   filepath: string;
   prisma: PrismaClient<
     Prisma.PrismaClientOptions,
@@ -108,9 +65,6 @@ export class GraphIngester {
   constructor({ logger, prisma, filepath, fs, readline }: IGraphIngesterArgs) {
     if (fs) {
       this.fs = fs;
-    }
-    if (readline) {
-      this.readline = readline;
     }
     if (!filepath) {
       throw new TypeError('constructor must receive a filepath:string');
@@ -126,33 +80,27 @@ export class GraphIngester {
   async parseFile(): Promise<void> {
     this.logger.debug('Enter parseFile for ' + this.filepath);
 
-    const input = this.fs.createReadStream(this.filepath);
-
-    const rl = this.readline.createInterface({
-      input,
-      crlfDelay: Infinity,
-    });
-
-    for await (const line of rl) {
-      this._ingestLine(line);
-    }
+    const input = this.fs.createReadStream(this.filepath)
+      .on('error', (error: Error) => {
+        console.error(error.message);
+      })
+      .pipe(parse({
+        // expose options?
+        columns: true,
+        trim: true,
+        relax_column_count_less: true,
+        skip_empty_lines: true,
+      }))
+      .on('data', (row) => {
+        this._ingestLine(row);
+      });
   }
 
-  async _ingestLine(inputTextLine: string): Promise<void> {
-    this.logger.debug('Enter _ingestLine' + inputTextLine);
-
-    this._inputTextLine = inputTextLine;
-
-    const reRv = RE.entity.exec(inputTextLine);
-
-    if (reRv === null) {
-      throw new GrammarError(`Regex failed to run on: ${inputTextLine}`);
-    }
-
-    const groups = reRv.groups as ISubjectVerbObjectComment | undefined;
+  async _ingestLine(groups: ISubjectVerbObjectComment): Promise<void> {
+    this.logger.debug('Enter _ingestLine', groups);
 
     if (!groups) {
-      throw new GrammarError(`inputTextline: "${inputTextLine}"`);
+      throw new GrammarError(`inputTextline: "${groups}"`);
     }
 
     await this._createSubjectObjectVerbAction(groups);
@@ -160,79 +108,72 @@ export class GraphIngester {
 
   // subject = existing | new (prisma.createOrSelect)
   async _createSubjectObjectVerbAction(groups: ISubjectVerbObjectComment) {
-    this.logger.debug('_createSubjectObjectVerbAction for groups: ' + JSON.stringify(groups, null, 4));
+    this.logger.debug('_createSubjectObjectVerbAction for groups:', groups);
 
-    if (!groups || !groups?.subject || !groups?.verb || !groups?.object) {
-      throw new GrammarError(`subjectToFind:${groups?.subject} verbToFind:${groups?.verb} objectToFind:${groups?.object}`);
+    if (!groups || !groups?.Subject || !groups?.Verb || !groups?.Object) {
+      throw new GrammarError(`subjectToFind:${groups?.Subject} verbToFind:${groups?.Verb} objectToFind:${groups?.Object}`);
     }
 
-    groups.subject = normalise(groups.subject);
-    groups.verb = normalise(groups.verb);
-    groups.object = normalise(groups.object);
+    groups.Subject = normalise(groups.Subject);
+    groups.Verb = normalise(groups.Verb);
+    groups.Object = normalise(groups.Object);
 
-    let foundSubject = CachedIds.Entity[groups.subject]
+    let foundSubject = CachedIds.Entity[groups.Subject]
       ? {
-        knownas: groups.subject,
-        id: CachedIds.Entity[groups.subject]
+        knownas: groups.Subject,
+        id: CachedIds.Entity[groups.Subject]
       }
       :
       await this.prisma.entity.findFirst({
-        where: { knownas: groups.subject },
+        where: { knownas: groups.Subject },
         select: { id: true },
       });
 
-    this.logger.debug(`Got subject "${JSON.stringify(foundSubject)}" via "${groups.subject}"`);
+    this.logger.debug(`Got subject "${JSON.stringify(foundSubject)}" via "${groups.Subject}"`);
 
     if (foundSubject === null) {
       try {
         foundSubject = await this.prisma.entity.create({
           data: {
-            knownas: groups.subject,
-            formalname: groups.subject,
+            knownas: groups.Subject,
+            formalname: groups.Subject,
           },
           select: { id: true }
         });
-        CachedIds.Entity[groups.subject] = foundSubject.id;
+        CachedIds.Entity[groups.Subject] = foundSubject.id;
       } catch (e) {
-        throw new Error(`Failed to create subject entity for "${groups.subject}" - ${(e as Error).message}`);
+        throw new Error(`Failed to create subject entity for "${groups.Subject}" - ${(e as Error).message}`);
       }
     }
 
-    let foundVerb = CachedIds.Entity[groups.verb]
+    let foundVerb = CachedIds.Entity[groups.Verb]
       ? {
-        name: groups.verb,
-        id: CachedIds.Entity[groups.verb]
+        name: groups.Verb,
+        id: CachedIds.Entity[groups.Verb]
       }
-      : await this.prisma.verb.findFirst({ where: { name: groups.verb }, select: { id: true } });
+      : await this.prisma.verb.findFirst({ where: { name: groups.Verb }, select: { id: true } });
 
     if (foundVerb === null) {
       try {
         foundVerb = await this.prisma.verb.create({
-          data: { name: groups.verb },
+          data: { name: groups.Verb },
           select: { id: true }
         });
-        CachedIds.Verb[groups.verb] = foundVerb.id;
+        CachedIds.Verb[groups.Verb] = foundVerb.id;
       }
       catch (e) {
-        throw new Error(`
-### Failed to create verb from "${groups.verb}"
-### ${(e as Error).message}
-### Then found: ${JSON.stringify(
-          await this.prisma.verb.findFirst({ where: { name: groups.verb }, select: { id: true } }),
-          null, 4
-        )}\n`);
+        throw new Error(`Failed to create verb from "${groups.Verb}" - ${(e as Error).message}`);
       }
-
     }
 
-    let foundObject = CachedIds.Entity[groups.object] ?
+    let foundObject = CachedIds.Entity[groups.Object] ?
       {
-        knwonas: groups.object,
-        id: CachedIds.Entity[groups.object]
+        knwonas: groups.Object,
+        id: CachedIds.Entity[groups.Object]
       }
       :
       await this.prisma.entity.findFirst({
-        where: { knownas: groups.object },
+        where: { knownas: groups.Object },
         select: { id: true },
       });
 
@@ -240,22 +181,22 @@ export class GraphIngester {
       try {
         foundObject = await this.prisma.entity.create({
           data: {
-            formalname: groups.object,
-            knownas: groups.object,
+            formalname: groups.Object,
+            knownas: groups.Object,
           },
           select: { id: true }
         });
-        CachedIds.Entity[groups.object] = foundObject.id;
+        CachedIds.Entity[groups.Object] = foundObject.id;
       }
       catch (e) {
-        throw new Error(`Failed to create object entity for  "${groups.object}" - ${(e as Error).message}`);
+        throw new Error(`Failed to create object entity for  "${groups.Object}" - ${(e as Error).message}`);
       }
     }
 
     const actionId = makeActionId(foundSubject.id, foundVerb.id, foundObject.id);
 
     if (CachedIds.Action[actionId]) {
-      this.logger.debug(`Action found in cache - "${actionId}" for: ${groups.subject} ${groups.verb} ${groups.object} `);
+      this.logger.debug(`Action found in cache - "${actionId}" for: ${groups.Subject} ${groups.Verb} ${groups.Object} `);
     }
 
     else {
@@ -267,7 +208,7 @@ export class GraphIngester {
         }
       })
 
-      const msg = `actionId "${actionId}" for "${groups.subject} ${groups.verb} ${groups.object}": ${JSON.stringify(actionExists, null, 4)}`;
+      const msg = `actionId "${actionId}" for "${groups.Subject} ${groups.Verb} ${groups.Object}": ${actionExists}`;
 
       CachedIds.Action[actionId] = true;
 
