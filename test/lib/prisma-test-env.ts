@@ -4,59 +4,55 @@
 // @see https://jestjs.io/docs/configuration#testenvironment-string
 
 require('dotenv').config();
+import { PrismaClient } from '@prisma/client';
 import { Client } from "pg";
 import NodeEnvironment from "jest-environment-node";
 import child_process from "child_process";
 
 import { IFixtures, setup, teardown } from 'testlib/fixtures';
 import { logger } from '../../src/logger';
+import { CsvIngester } from "src/ingest-graph";
 
 const prismaBinary = 'npx prisma';
 
 jest.setTimeout(1000 * 30);
 
+export const prisma = new PrismaClient({
+  log: ['warn', 'error'], // 'query', 'info', 'warn', 'error'],
+});
+
+
 export default class PrismaTestEnvironment extends NodeEnvironment {
+
+  /** Maybe faster to load public and copy to test schema when needed */
   static init() {
-    logger.debug('SETUP PrismaTestEnvironment.init');
+    logger.debug('PrismaTestEnvironment.init Enter');
     let testEnv: PrismaTestEnvironment;
 
     beforeEach(async () => {
-      logger.debug('SETUP PrismaTestEnvironment.init beforeEach enter');
+      logger.debug('PrismaTestEnvironment beforeEach enter');
       testEnv = new PrismaTestEnvironment({});
       await testEnv.setup();
-      await setup();
-      logger.debug('SETUP PrismaTestEnvironment.init beforeEach leave');
+
+      const gi = new CsvIngester({
+        prisma,
+        logger,
+        filepath: './test/lib/input.csv',
+      });
+
+      await gi.parseFile();
+
+      logger.debug('PrismaTestEnvironment beforeEach leave');
     });
 
     afterEach(async () => {
-      logger.debug('SETUP PrismaTestEnvironment.init afterEach enter');
-      await teardown();
+      logger.debug('PrismaTestEnvironment afterEach enter');
       await testEnv.teardown();
-      logger.debug('SETUP PrismaTestEnvironment.init afterEach Leave');
+      logger.debug('PrismaTestEnvironment after afterEach Leave');
     });
+
+    logger.debug('PrismaTestEnvironment.init Leave');
   }
-
-  static initFixutres(fixtures?: IFixtures, knownas?: string) {
-    let testEnv: PrismaTestEnvironment;
-    logger.debug('SETUP PrismaTestEnvironment.initFixtures enter');
-
-    beforeEach(async () => {
-      logger.debug('SETUP PrismaTestEnvironment.initFixtures beforeEach enter');
-      testEnv = new PrismaTestEnvironment({});
-      await testEnv.setup();
-      fixtures = await setup();
-      knownas = fixtures.oswald.knownas;
-      logger.debug('SETUP PrismaTestEnvironment.initFixtures beforeEach leave');
-    });
-
-    afterEach(async () => {
-      logger.debug('SETUP PrismaTestEnvironment.initFixtures afterEach enter');
-      await teardown();
-      await testEnv.teardown()
-      logger.debug('SETUP PrismaTestEnvironment.initFixtures afterEach leave');
-    });
-  }
-
 
   schema = '';
   connectionString = '';
@@ -87,6 +83,9 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
 
   // Drop the schema after the tests have completed
   async teardown() {
+    await prisma.$disconnect();
+
+    // todo: use prisma.query:-
     const client = new Client({
       connectionString: this.connectionString,
     });

@@ -8,7 +8,7 @@ import { Erd } from './erd';
 let fixtures: IFixtures = {};
 let knownas: string = '';
 
-PrismaTestEnvironment.initFixutres(fixtures, knownas);
+PrismaTestEnvironment.init();
 
 describe('erd', () => {
   it('_save', async () => {

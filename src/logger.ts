@@ -45,13 +45,13 @@ export const nullLogger: ILogger = {
   error: noop
 };
 
-// export const logger: ILogger = nullLogger;
+export const logger: ILogger = nullLogger;
 
-export const logger: ILogger = {
-  trace: log,
-  debug: log,
-  warn: log,
-  info: log,
-  error: log
-};
+// export const logger: ILogger = {
+//   trace: log,
+//   debug: log,
+//   warn: log,
+//   info: log,
+//   error: log
+// };
 

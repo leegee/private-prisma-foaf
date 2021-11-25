@@ -39,7 +39,7 @@ export class GrammarError extends Error {
   }
 }
 
-export interface IGraphIngesterArgs {
+export interface ICsvIngesterArgs {
   prisma: PrismaClient<
     Prisma.PrismaClientOptions,
     never,
@@ -51,7 +51,7 @@ export interface IGraphIngesterArgs {
   logger?: loggerModule.ILogger;
 }
 
-export class GraphIngester {
+export class CsvIngester {
   fs = fsImport;
   logger: loggerModule.ILogger;
   filepath: string;
@@ -62,7 +62,7 @@ export class GraphIngester {
   >;
   private _inputTextLine: string = '';
 
-  constructor({ logger, prisma, filepath, fs, readline }: IGraphIngesterArgs) {
+  constructor({ logger, prisma, filepath, fs, readline }: ICsvIngesterArgs) {
     if (fs) {
       this.fs = fs;
     }

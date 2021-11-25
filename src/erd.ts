@@ -124,14 +124,14 @@ export class Erd {
       this.entityKnownas2Id[knownas] = knownasEntity.id;
     }
 
-    this.logger.debug(`._populateActionsForKnownAs for "${knownas}", entityId = "${this.entityKnownas2Id}"`);
+    this.logger.debug(`._populateActionsForKnownAs for "${knownas}", entityId = "${this.entityKnownas2Id[knownas]}"`);
 
     this.actions.push(
       ...await this.prisma.action.findMany({
         where: {
           OR: [
-            { objectId: this.entityKnownas2Id },
-            { subjectId: this.entityKnownas2Id },
+            { objectId: this.entityKnownas2Id[knownas] },
+            { subjectId: this.entityKnownas2Id[knownas] },
           ],
         },
         select: {
