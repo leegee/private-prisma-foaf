@@ -10,7 +10,7 @@ import pino from 'pino';
 
 const config = {
   transport: undefined,
-  level: process.env.LOG_LEVEL ? process.env.LOG_LEVEL.toLowerCase() : 'trace',
+  level: process.env.LOG_LEVEL ? process.env.LOG_LEVEL.toLowerCase() : 'info',
 };
 
 let devConfig = {

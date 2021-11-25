@@ -9,7 +9,6 @@ import { Client } from "pg";
 import NodeEnvironment from "jest-environment-node";
 import child_process from "child_process";
 
-import { IFixtures, setup, teardown } from 'testlib/fixtures';
 import { logger } from '../../src/logger';
 import { CsvIngester } from "src/csv-ingestor";
 
@@ -37,10 +36,10 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
       const gi = new CsvIngester({
         prisma,
         logger,
-        filepath: './test/lib/input.csv',
+        filepath: './test/lib/subject-verb-object.csv',
       });
 
-      await gi.parseFile();
+      await gi.parseRelationsFile();
 
       logger.debug('PrismaTestEnvironment beforeEach leave');
     });

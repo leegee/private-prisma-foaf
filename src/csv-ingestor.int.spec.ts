@@ -44,7 +44,7 @@ describe('ingest-graph', () => {
       filepath: 'irrelevant-as-file-not-accessed',
       fs: mocks.fs,
     });
-    await gi.parseFile();
+    await gi.parseRelationsFile();
     expect(mocks.ReadStream).toHaveBeenCalled();
   });
 
@@ -77,9 +77,9 @@ describe('ingest-graph', () => {
   it('should integrate with real fs to read a file', async () => {
     const gi = new CsvIngester({
       prisma,
-      filepath: './test/lib/input.csv',
+      filepath: './test/lib/subject-verb-object.csv',
     });
 
-    expect(gi.parseFile()).resolves.not.toThrow();
+    expect(gi.parseRelationsFile()).resolves.not.toThrow();
   });
 });

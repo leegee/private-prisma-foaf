@@ -11,46 +11,45 @@ export interface IFixtures {
 
 export async function setup(): Promise<IFixtures> {
   logger.debug('SETUP fixtures');
-  // await prisma.$queryRaw`BEGIN`;
 
   const fixtures: IFixtures = {};
 
-  fixtures.assassinated = await prisma.verb.create({
-    data: { name: 'assassinated' }
+  fixtures.assassinated = await prisma.verb.findFirst({
+    where: { name: 'assassinated' }
   });
 
-  fixtures.hosted = await prisma.verb.create({
-    data: { name: 'hosted' }
+  fixtures.hosted = await prisma.verb.findFirst({
+    where: { name: 'hosted' }
   });
 
-  fixtures.heads = await prisma.verb.create({
-    data: { name: 'heads' }
+  fixtures.heads = await prisma.verb.findFirst({
+    where: { name: 'heads' }
   });
 
-  fixtures.bell = await prisma.entity.create({
-    data: {
+  fixtures.bell = await prisma.entity.findFirst({
+    where: {
       knownas: 'bell',
       formalname: 'Bell Aereospace'
     }
   });
 
-  fixtures.cia = await prisma.entity.create({
-    data: {
+  fixtures.cia = await prisma.entity.findFirst({
+    where: {
       knownas: 'cia',
       formalname: 'Central Intelligence Agency'
     }
   });
 
-  fixtures.jfk = await prisma.entity.create({
-    data: { knownas: 'JFK', formalname: 'John F Kennedy' },
+  fixtures.jfk = await prisma.entity.findFirst({
+    where: { knownas: 'JFK', formalname: 'John F Kennedy' },
   });
 
-  fixtures.oswald = await prisma.entity.create({
-    data: { knownas: 'Oswald', formalname: 'Lee Harvey Oswald' },
+  fixtures.oswald = await prisma.entity.findFirst({
+    where: { knownas: 'Oswald', formalname: 'Lee Harvey Oswald' },
   });
 
-  fixtures.arthur = await prisma.entity.create({
-    data: {
+  fixtures.arthur = await prisma.entity.findFirst({
+    where: {
       knownas: 'Arthur Young',
       formalname: 'Arthur M Young',
       dob: new Date('1905-11-03'),
@@ -58,8 +57,8 @@ export async function setup(): Promise<IFixtures> {
     }
   });
 
-  fixtures.jfkHeadsCia = await prisma.action.create({
-    data: {
+  fixtures.jfkHeadsCia = await prisma.action.findFirst({
+    where: {
       verbId: fixtures.heads.id,
       subjectId: fixtures.jfk.id,
       objectId: fixtures.cia.id,
@@ -68,8 +67,8 @@ export async function setup(): Promise<IFixtures> {
     },
   });
 
-  fixtures.oswaldassassinatedJfk = await prisma.action.create({
-    data: {
+  fixtures.oswaldassassinatedJfk = await prisma.action.findFirst({
+    where: {
       verbId: fixtures.assassinated.id,
       subjectId: fixtures.oswald.id,
       objectId: fixtures.jfk.id,
@@ -78,8 +77,8 @@ export async function setup(): Promise<IFixtures> {
     },
   });
 
-  fixtures.arthurhostedOswald = await prisma.action.create({
-    data: {
+  fixtures.arthurhostedOswald = await prisma.action.findFirst({
+    where: {
       verbId: fixtures.hosted.id,
       subjectId: fixtures.arthur.id,
       objectId: fixtures.oswald.id,
@@ -91,6 +90,3 @@ export async function setup(): Promise<IFixtures> {
   return fixtures;
 }
 
-export async function teardown() {
-  await prisma.$disconnect();
-}

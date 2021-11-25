@@ -47,7 +47,6 @@ export interface ICsvIngesterArgs {
   >;
   filepath: string;
   fs?: any; // ugh
-  readline?: any; // ugh
   logger?: loggerModule.ILogger;
 }
 
@@ -62,7 +61,7 @@ export class CsvIngester {
   >;
   private _inputTextLine: string = '';
 
-  constructor({ logger, prisma, filepath, fs, readline }: ICsvIngesterArgs) {
+  constructor({ logger, prisma, filepath, fs }: ICsvIngesterArgs) {
     if (fs) {
       this.fs = fs;
     }
@@ -77,12 +76,12 @@ export class CsvIngester {
     this.logger = logger ? logger as loggerModule.ILogger : loggerModule.logger;
   }
 
-  async parseFile(): Promise<void> {
-    this.logger.debug('Enter parseFile for ' + this.filepath);
+  async parseRelationsFile(): Promise<void> {
+    this.logger.debug('Enter loadEntities for ' + this.filepath);
 
-    const input = this.fs.createReadStream(this.filepath)
+    this.fs.createReadStream(this.filepath)
       .on('error', (error: Error) => {
-        console.error(error.message);
+        this.logger.error(error.message);
       })
       .pipe(parse({
         // expose options?
@@ -91,22 +90,14 @@ export class CsvIngester {
         relax_column_count_less: true,
         skip_empty_lines: true,
       }))
-      .on('data', (row) => {
-        this._ingestLine(row);
+      .on('data', async (row) => {
+        if (!row) {
+          throw new GrammarError(`inputTextline: "${row}"`);
+        }
+        await this._createSubjectObjectVerbAction(row);
       });
   }
 
-  async _ingestLine(groups: ISubjectVerbObjectComment): Promise<void> {
-    this.logger.debug('Enter _ingestLine', groups);
-
-    if (!groups) {
-      throw new GrammarError(`inputTextline: "${groups}"`);
-    }
-
-    await this._createSubjectObjectVerbAction(groups);
-  }
-
-  // subject = existing | new (prisma.createOrSelect)
   async _createSubjectObjectVerbAction(groups: ISubjectVerbObjectComment) {
     this.logger.debug('_createSubjectObjectVerbAction for groups:', groups);
 
