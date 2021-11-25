@@ -7,8 +7,12 @@ import os from 'os';
 import { PrismaClient, Prisma, Entity, Verb } from '@prisma/client';
 import * as loggerModule from './logger';
 
+export function normaliseArray(list: string[]): string[] {
+  return list.map(subject => normalise(subject));
+}
+
 export function normalise(subject: string): string {
-  return subject.toLowerCase().replace(/[^\w\s'-]+/, '').replace(/\s+/gs, ' ').trim();
+  return subject.toLowerCase().replace(/[^\w\s'-]+/, '').replace(/\s+/gs, ' ').trim()
 }
 
 export function makeActionId(subjectId: number, verbId: number, objectId: number): string {
@@ -74,11 +78,10 @@ export class Erd {
     this.logger = logger ? logger : loggerModule.logger;
   }
 
-  async _populateActions(knownas?: string) {
+  async _populateActions(knownas?: string | string[]) {
     if (!!knownas) {
-      await this._populateActionsForKnownAs(
-        normalise(knownas)
-      );
+      const subject = knownas instanceof Array ? normaliseArray(knownas) : normalise(knownas);
+      await this._populateActionsForKnownAs(subject);
     }
     else {
       await this._populateActionsFromAll();
@@ -105,52 +108,56 @@ export class Erd {
   }
 
 
-  async _populateActionsForKnownAs(knownas: string) {
-    if (knownas === undefined) {
-      throw new TypeError('._populateActionsForKnownAs called without .knownas');
-    }
-    this.logger.debug(`Enter _populateActionsForKnownAs with "${knownas}"`);
+  async _populateActionsForKnownAs(knownasInput: string | string[]) {
+    const knownasList = knownasInput instanceof Array ? knownasInput : [knownasInput];
 
-    if (!this.entityKnownas2Id[knownas]) {
-      const knownasEntity = await this.prisma.entity.findFirst({
-        where: { knownas: knownas },
-        select: { id: true },
-      });
+    for (let knownasListIndex = 0; knownasListIndex < knownasList.length; knownasListIndex++) {
+      if (knownasList[knownasListIndex] === undefined) {
+        throw new TypeError('._populateActionsForKnownAs called without .knownas');
+      }
+      this.logger.debug(`Enter _populateActionsForKnownAs with "${knownasList[knownasListIndex]}"`);
 
-      if (knownasEntity === null) {
-        throw new EntityNotFoundError(knownas);
+      if (!this.entityKnownas2Id[knownasList[knownasListIndex]]) {
+        const knownasEntity = await this.prisma.entity.findFirst({
+          where: { knownas: knownasList[knownasListIndex] },
+          select: { id: true },
+        });
+
+        if (knownasEntity === null) {
+          throw new EntityNotFoundError(knownasList[knownasListIndex]);
+        }
+
+        this.entityKnownas2Id[knownasList[knownasListIndex]] = knownasEntity.id;
       }
 
-      this.entityKnownas2Id[knownas] = knownasEntity.id;
+      this.logger.debug(`._populateActionsForKnownAs for "${knownasList[knownasListIndex]}", entityId = "${this.entityKnownas2Id[knownasList[knownasListIndex]]}"`);
+
+      this.actions.push(
+        ...await this.prisma.action.findMany({
+          where: {
+            OR: [
+              { objectId: this.entityKnownas2Id[knownasList[knownasListIndex]] },
+              { subjectId: this.entityKnownas2Id[knownasList[knownasListIndex]] },
+            ],
+          },
+          select: {
+            Subject: true,
+            Object: true,
+            Verb: true,
+          },
+        })
+      );
     }
-
-    this.logger.debug(`._populateActionsForKnownAs for "${knownas}", entityId = "${this.entityKnownas2Id[knownas]}"`);
-
-    this.actions.push(
-      ...await this.prisma.action.findMany({
-        where: {
-          OR: [
-            { objectId: this.entityKnownas2Id[knownas] },
-            { subjectId: this.entityKnownas2Id[knownas] },
-          ],
-        },
-        select: {
-          Subject: true,
-          Object: true,
-          Verb: true,
-        },
-      })
-    );
   }
 
-  async graphviz(inputGraph?: string) {
+  async graphviz(knownas?: string | string[]) {
     this.logger.info(`Enter useGraphviz`);
 
     if (!this.savepath) {
       throw new Error('savepath was not supplied during construction');
     }
 
-    await this._populateActions();
+    await this._populateActions(knownas);
 
     const graph = await this._actions2graph();
 

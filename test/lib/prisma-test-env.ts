@@ -16,6 +16,16 @@ const prismaBinary = 'npx prisma';
 
 jest.setTimeout(1000 * 30);
 
+process.on('uncaughtException', (error) => {
+  logger.error(error);
+  process.exit(1);
+})
+
+process.on('unhandledRejection', (error) => {
+  logger.error(error);
+  process.exit(1);
+})
+
 export const prisma = new PrismaClient({
   log: ['warn', 'error'], // 'query', 'info', 'warn', 'error'],
 });

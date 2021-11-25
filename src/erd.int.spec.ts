@@ -39,14 +39,14 @@ describe('erd', () => {
       });
     });
 
-    it('saves  to file', async () => {
+    it('saves to file', async () => {
       const savepath = './temp-oswald.png';
       if (fs.existsSync(savepath)) {
         fs.unlinkSync(savepath);
       }
 
       const erd = new Erd({ prisma, savepath });
-      await erd.graphviz();
+      await erd.graphviz('Oswald');
 
       expect(fs.existsSync(savepath)).toBeTruthy();
 

@@ -98,8 +98,8 @@ export class CsvIngester {
   async _createSubjectObjectVerbAction(groups: ISubjectVerbObjectComment) {
     this.logger.debug('_createSubjectObjectVerbAction for groups:', groups);
 
-    if (!groups || !groups?.Subject || !groups?.Verb || !groups?.Object) {
-      throw new GrammarError(`subjectToFind:${groups?.Subject} verbToFind:${groups?.Verb} objectToFind:${groups?.Object}`);
+    if (!groups || !groups.Subject || !groups.Verb || !groups.Object) {
+      throw new GrammarError(JSON.stringify(groups, null, 2));
     }
 
     groups.Subject = normalise(groups.Subject);
@@ -129,7 +129,8 @@ export class CsvIngester {
           select: { id: true }
         });
         CachedIds.Entity[groups.Subject] = foundSubject.id;
-      } catch (e) {
+      }
+      catch (e) {
         throw new Error(`Failed to create subject entity for "${groups.Subject}" - ${(e as Error).message}`);
       }
     }
