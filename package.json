@@ -21,6 +21,9 @@
   },
   "scripts": {
     "prebuild": "rimraf dist",
+    "start": "npm run db:start",
+    "stop": "npm run db:stop",
+    "restart": "npm run update",
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
