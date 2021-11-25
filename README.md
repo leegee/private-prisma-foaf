@@ -38,16 +38,17 @@ Instead, call the custom environment manually, so it can set beforeEach and afte
 
 Because use of a long-running global transaction apparently not supported by Prisma, the above creates a PG DB schema per test, which it destroys after the test.
 
-## Logging
-
-Logging is via `pino`.
-
 ## Writing Unit Tests
 
 See examples.
 
+## Logging
+
+Logging is via `pino`.
+
 ## TODO
 
+- Neater seeding
 - Deeper mock RVs
 - Playwrite
 - Percy

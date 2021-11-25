@@ -41,10 +41,9 @@ describe('ingest-graph', () => {
   xit('should read a mock file', async () => {
     const gi = new CsvIngester({
       prisma,
-      filepath: 'irrelevant-as-file-not-accessed',
       fs: mocks.fs,
     });
-    await gi.parseRelationsFile();
+    await gi.parseRelationsFile('irrelevant-as-file-not-accessed');
     expect(mocks.ReadStream).toHaveBeenCalled();
   });
 
@@ -53,8 +52,6 @@ describe('ingest-graph', () => {
   it('_createSubjectObjectVerbAction', async () => {
     const gi = new CsvIngester({
       prisma,
-      filepath: 'irrelevant-as-file-not-accessed',
-      fs: mocks.fs,
     });
 
     try {
@@ -77,9 +74,8 @@ describe('ingest-graph', () => {
   it('should integrate with real fs to read a file', async () => {
     const gi = new CsvIngester({
       prisma,
-      filepath: './test/lib/subject-verb-object.csv',
     });
 
-    expect(gi.parseRelationsFile()).resolves.not.toThrow();
+    expect(gi.parseRelationsFile('./test/lib/subject-verb-object.csv')).resolves.not.toThrow();
   });
 });

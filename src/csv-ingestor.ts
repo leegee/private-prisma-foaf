@@ -47,7 +47,6 @@ export interface ICsvIngesterArgs {
     never,
     Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
   >;
-  filepath: string;
   fs?: any; // ugh
   logger?: loggerModule.ILogger;
 }
@@ -55,7 +54,6 @@ export interface ICsvIngesterArgs {
 export class CsvIngester {
   fs = fsImport;
   logger: loggerModule.ILogger;
-  filepath: string;
   prisma: PrismaClient<
     Prisma.PrismaClientOptions,
     never,
@@ -63,25 +61,24 @@ export class CsvIngester {
   >;
   private _inputTextLine: string = '';
 
-  constructor({ logger, prisma, filepath, fs }: ICsvIngesterArgs) {
+  constructor({ logger, prisma, fs }: ICsvIngesterArgs) {
     if (fs) {
       this.fs = fs;
-    }
-    if (!filepath) {
-      throw new TypeError('constructor must receive a filepath:string');
     }
     if (!prisma) {
       throw new TypeError('constructor must receive a prisma:PrismaClient');
     }
     this.prisma = prisma;
-    this.filepath = filepath;
     this.logger = logger ? logger as loggerModule.ILogger : loggerModule.logger;
   }
 
-  async parseRelationsFile(): Promise<void> {
-    this.logger.debug('Enter loadEntities for ' + this.filepath);
+  async parseRelationsFile(filepath: string): Promise<void> {
+    if (!filepath) {
+      throw new TypeError('constructor must receive a filepath:string');
+    }
+    this.logger.debug('Enter loadEntities for ' + filepath);
 
-    this.fs.createReadStream(this.filepath)
+    this.fs.createReadStream(filepath)
       .on('error', (error: Error) => this.logger.error(error))
       .pipe(parse({
         columns: true,

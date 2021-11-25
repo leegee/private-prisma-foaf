@@ -46,10 +46,9 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
       const gi = new CsvIngester({
         prisma,
         logger,
-        filepath: './test/lib/subject-verb-object.csv',
       });
 
-      await gi.parseRelationsFile();
+      await gi.parseRelationsFile('./test/lib/subject-verb-object.csv');
 
       logger.debug('PrismaTestEnvironment beforeEach leave');
     });
