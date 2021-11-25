@@ -35,14 +35,6 @@ const log = (...args: any[]) => {
   process.stdout.write(util.inspect(args, true, null, true) + "\n");
 };
 
-export const logger: ILogger = {
-  trace: log,
-  debug: log,
-  warn: log,
-  info: log,
-  error: log
-};
-
 const noop = () => { };
 
 export const nullLogger: ILogger = {
@@ -51,5 +43,15 @@ export const nullLogger: ILogger = {
   warn: noop,
   info: noop,
   error: noop
+};
+
+// export const logger: ILogger = nullLogger;
+
+export const logger: ILogger = {
+  trace: log,
+  debug: log,
+  warn: log,
+  info: log,
+  error: log
 };
 

@@ -2,7 +2,7 @@ import PrismaTestEnvironment from "testlib/prisma-test-env";
 
 import * as fs from 'fs';
 
-import { IFixtures, prisma, setup, teardown } from 'testlib/fixtures';
+import { IFixtures, prisma } from 'testlib/fixtures';
 import { Erd } from './erd';
 
 let fixtures: IFixtures = {};
@@ -17,8 +17,8 @@ describe('erd', () => {
       fs.unlinkSync(savepath);
     }
 
-    const erd = new Erd({ prisma, knownas, savepath });
-    erd.useGraphviz('CIA -> JFK');
+    const erd = new Erd({ prisma, savepath });
+    await erd.graphviz('CIA -> JFK');
 
     expect(fs.existsSync(savepath)).toBeTruthy();
     fs.unlinkSync(savepath);
@@ -26,8 +26,8 @@ describe('erd', () => {
 
   describe('Lee Harvey Oswald', () => {
     it('gets subject-verb-object', async () => {
-      const erd = new Erd({ prisma, knownas, });
-      await erd._populateActionsForKnownAs();
+      const erd = new Erd({ prisma });
+      await erd._populateActions('Oswald');
 
       expect(erd.actions).toBeDefined();
 
@@ -39,32 +39,14 @@ describe('erd', () => {
       });
     });
 
-    it('creates a valid graph', async () => {
-      const erd = new Erd({ prisma, knownas, });
-      expect(erd.actions).toHaveLength(0);
-
-      await erd._populateActionsForKnownAs();
-      expect(erd.actions.length).toBeGreaterThan(0);
-
-      const graph = await erd._populateActions();
-      expect(graph).toBeDefined();
-
-      // [
-      //   new RegExp('Entity\\d+\\[' + fixtures.oswald.knownas + ']-->\\|' + fixtures.assassinated.name + '\\|Entity\\d+\\[' + fixtures.jfk.knownas + '\\]', 'g'),
-      //   new RegExp('Entity\\d+\\[' + fixtures.arthur.knownas + ']-->\\|' + fixtures.hosted.name + '\\|Entity\\d+\\[' + fixtures.oswald.knownas + '\\]', 'g'),
-      // ].forEach(re => {
-      //   expect(graph).toMatch(re);
-      // });
-    });
-
     it('saves  to file', async () => {
       const savepath = './temp-oswald.png';
       if (fs.existsSync(savepath)) {
         fs.unlinkSync(savepath);
       }
 
-      const erd = new Erd({ prisma, knownas, savepath });
-      await erd.useGraphviz();
+      const erd = new Erd({ prisma, savepath });
+      await erd.graphviz();
 
       expect(fs.existsSync(savepath)).toBeTruthy();
 
@@ -82,7 +64,7 @@ describe('erd', () => {
       }
 
       const erd = new Erd({ prisma, savepath });
-      await erd.useGraphviz();
+      await erd.graphviz();
 
       const exists = fs.existsSync(savepath);
       expect(exists).toBeTruthy();

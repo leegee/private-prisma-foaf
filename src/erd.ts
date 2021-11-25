@@ -34,7 +34,6 @@ export interface IErdArgs {
     never,
     Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
   >;
-  knownas?: string;
   savepath?: string;
   logger?: loggerModule.ILogger;
   format?: string;
@@ -57,18 +56,14 @@ export class Erd {
     Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
   >;
   actions: SubjectVerbObject[] = [];
-  knownas: string | undefined = undefined;
   savepath: string = 'erd-output.svg';
-  knownasEntityId: number | undefined;
+  entityKnownas2Id: { [key: string]: number } = {};
   tmpDir = fs.mkdtempSync(os.tmpdir() + path.sep + 'entity-erd-');
   format = '';
   layout = 'fdp';
 
-  constructor({ prisma, knownas, savepath, logger, format }: IErdArgs) {
+  constructor({ prisma, savepath, logger, format }: IErdArgs) {
     this.prisma = prisma;
-    if (!!knownas) {
-      this.knownas = normalise(knownas);
-    }
     if (!!savepath) {
       this.savepath = savepath;
     }
@@ -79,16 +74,18 @@ export class Erd {
     this.logger = logger ? logger : loggerModule.logger;
   }
 
-  async _populateActions() {
-    if (this.knownas !== undefined) {
-      await this._populateActionsForKnownAs();
+  async _populateActions(knownas?: string) {
+    if (!!knownas) {
+      await this._populateActionsForKnownAs(
+        normalise(knownas)
+      );
     }
     else {
       await this._populateActionsFromAll();
     }
 
     if (this.actions.length === 0) {
-      throw new Error(`No actions to graph for "${this.knownas || 'all'}"`);
+      throw new Error(`No actions to graph for "${knownas || 'all'}"`);
     }
 
     this.logger.debug(`_populateActions exits with ${this.actions.length} actions.`);
@@ -108,33 +105,33 @@ export class Erd {
   }
 
 
-  async _populateActionsForKnownAs() {
-    if (this.knownas === undefined) {
+  async _populateActionsForKnownAs(knownas: string) {
+    if (knownas === undefined) {
       throw new TypeError('._populateActionsForKnownAs called without .knownas');
     }
-    this.logger.debug(`Enter _populateActionsForKnownAs with "${this.knownas}"`);
+    this.logger.debug(`Enter _populateActionsForKnownAs with "${knownas}"`);
 
-    if (!this.knownasEntityId) {
+    if (!this.entityKnownas2Id[knownas]) {
       const knownasEntity = await this.prisma.entity.findFirst({
-        where: { knownas: this.knownas },
+        where: { knownas: knownas },
         select: { id: true },
       });
 
       if (knownasEntity === null) {
-        throw new EntityNotFoundError(this.knownas);
+        throw new EntityNotFoundError(knownas);
       }
 
-      this.knownasEntityId = knownasEntity.id;
+      this.entityKnownas2Id[knownas] = knownasEntity.id;
     }
 
-    this.logger.debug(`._populateActionsForKnownAs for "${this.knownas}", entityId = "${this.knownasEntityId}"`);
+    this.logger.debug(`._populateActionsForKnownAs for "${knownas}", entityId = "${this.entityKnownas2Id}"`);
 
     this.actions.push(
       ...await this.prisma.action.findMany({
         where: {
           OR: [
-            { objectId: this.knownasEntityId },
-            { subjectId: this.knownasEntityId },
+            { objectId: this.entityKnownas2Id },
+            { subjectId: this.entityKnownas2Id },
           ],
         },
         select: {
@@ -146,12 +143,14 @@ export class Erd {
     );
   }
 
-  async useGraphviz(inputGraph?: string) {
+  async graphviz(inputGraph?: string) {
     this.logger.info(`Enter useGraphviz`);
 
     if (!this.savepath) {
       throw new Error('savepath was not supplied during construction');
     }
+
+    await this._populateActions();
 
     const graph = await this._actions2graph();
 
@@ -178,7 +177,6 @@ export class Erd {
   ${Erd.layouts[this.layout]}
   `;
 
-    await this._populateActions();
     this.logger.debug(`Actions: "${this.actions}"`);
 
     this.actions.forEach((action) => {

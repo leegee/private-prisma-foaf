@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { logger } from 'src/logger';
 
 export const prisma = new PrismaClient({
   log: ['warn', 'error'], // 'query', 'info', 'warn', 'error'],
@@ -8,12 +9,11 @@ export interface IFixtures {
   [key: string]: any
 }
 
-let fixtures: IFixtures = {};
-
 export async function setup(): Promise<IFixtures> {
+  logger.debug('SETUP fixtures');
   // await prisma.$queryRaw`BEGIN`;
 
-  fixtures = {};
+  const fixtures: IFixtures = {};
 
   fixtures.assassinated = await prisma.verb.create({
     data: { name: 'assassinated' }

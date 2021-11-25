@@ -13,31 +13,47 @@ import { logger } from '../../src/logger';
 
 const prismaBinary = 'npx prisma';
 
+jest.setTimeout(1000 * 30);
+
 export default class PrismaTestEnvironment extends NodeEnvironment {
   static init() {
+    logger.debug('SETUP PrismaTestEnvironment.init');
     let testEnv: PrismaTestEnvironment;
 
     beforeEach(async () => {
-      testEnv = await new PrismaTestEnvironment({});
+      logger.debug('SETUP PrismaTestEnvironment.init beforeEach enter');
+      testEnv = new PrismaTestEnvironment({});
       await testEnv.setup();
-    });
-
-    afterEach(async () => await testEnv.teardown());
-  }
-
-  static initFixutres(fixtures: IFixtures, knownas: string) {
-    let testEnv: PrismaTestEnvironment;
-
-    beforeEach(async () => {
-      testEnv = await new PrismaTestEnvironment({});
-      await testEnv.setup();
-      fixtures = await setup();
-      knownas = fixtures.oswald.knownas;
+      await setup();
+      logger.debug('SETUP PrismaTestEnvironment.init beforeEach leave');
     });
 
     afterEach(async () => {
-      await testEnv.teardown();
+      logger.debug('SETUP PrismaTestEnvironment.init afterEach enter');
       await teardown();
+      await testEnv.teardown();
+      logger.debug('SETUP PrismaTestEnvironment.init afterEach Leave');
+    });
+  }
+
+  static initFixutres(fixtures?: IFixtures, knownas?: string) {
+    let testEnv: PrismaTestEnvironment;
+    logger.debug('SETUP PrismaTestEnvironment.initFixtures enter');
+
+    beforeEach(async () => {
+      logger.debug('SETUP PrismaTestEnvironment.initFixtures beforeEach enter');
+      testEnv = new PrismaTestEnvironment({});
+      await testEnv.setup();
+      fixtures = await setup();
+      knownas = fixtures.oswald.knownas;
+      logger.debug('SETUP PrismaTestEnvironment.initFixtures beforeEach leave');
+    });
+
+    afterEach(async () => {
+      logger.debug('SETUP PrismaTestEnvironment.initFixtures afterEach enter');
+      await teardown();
+      await testEnv.teardown()
+      logger.debug('SETUP PrismaTestEnvironment.initFixtures afterEach leave');
     });
   }
 
@@ -57,7 +73,7 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
     this.connectionString = `postgresql://${process.env.DB_USER}:${process.env.DB_PASS}@localhost:${process.env.DB_PORT}/${process.env.DB_NAME}?schema=${this.schema}`;
   }
 
-  async setup() {
+  setup() {
     // Set the required environment variable to contain the connection string for the database test schema
     process.env.DATABASE_URL = this.connectionString;
     this.global.process.env.DATABASE_URL = this.connectionString;
