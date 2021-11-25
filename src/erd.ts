@@ -191,14 +191,14 @@ export class Erd {
         if (action.Subject.id && action.Verb.id && action.Object.id) {
           let verbLabel = action.Verb.name;
           if (action.start || action.end) {
+            verbLabel += ' (';
             if (action.start) {
-              verbLabel += action.start;
+              verbLabel += action.start.getUTCFullYear().toString();
             }
             verbLabel += '-';
             if (action.end) {
-              verbLabel += action.end;
+              verbLabel += action.end.getUTCFullYear().toString();
             }
-            verbLabel += ' (';
             verbLabel += ' )';
           }
 
