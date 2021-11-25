@@ -54,7 +54,7 @@ export async function setup(): Promise<IFixtures> {
     }
   });
 
-  fixtures.jfkHeadsCia = await prisma.action.findFirst({
+  fixtures.jfkHeadsCia = await prisma.predicate.findFirst({
     where: {
       verbId: fixtures.heads.id,
       subjectId: fixtures.jfk.id,
@@ -64,7 +64,7 @@ export async function setup(): Promise<IFixtures> {
     },
   });
 
-  fixtures.oswaldassassinatedJfk = await prisma.action.findFirst({
+  fixtures.oswaldassassinatedJfk = await prisma.predicate.findFirst({
     where: {
       verbId: fixtures.assassinated.id,
       subjectId: fixtures.oswald.id,
@@ -74,7 +74,7 @@ export async function setup(): Promise<IFixtures> {
     },
   });
 
-  fixtures.arthurhostedOswald = await prisma.action.findFirst({
+  fixtures.arthurhostedOswald = await prisma.predicate.findFirst({
     where: {
       verbId: fixtures.hosted.id,
       subjectId: fixtures.arthur.id,

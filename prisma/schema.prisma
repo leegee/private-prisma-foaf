@@ -15,26 +15,26 @@ generator erd {
 }
 
 model Verb {
-  id          Int      @id @default(autoincrement())
-  name        String   @db.VarChar(127)
+  id          Int         @id @default(autoincrement())
+  name        String      @db.VarChar(127)
   description String?
-  Action      Action[]
+  Predicate   Predicate[]
 
   @@unique([name])
 }
 
 model Entity {
-  id          Int       @id @default(autoincrement())
-  knownas     String    @db.VarChar(127) // eg JFK, Bell
-  formalname  String    @db.VarChar(127) // eg John F Kennedy, Bell Aircraft Corporation
-  givenname   String?   @db.VarChar(127) // eg John
-  middlenames String?   @db.VarChar(127) // eg Fitzgerald
-  familyname  String?   @db.VarChar(127) // eg Kennedy
-  dob         DateTime? @db.Date
-  dod         DateTime? @db.Date
-  approved    Boolean   @default(false)
-  Subject     Action[]  @relation("Subject")
-  Object      Action[]  @relation("Object")
+  id          Int         @id @default(autoincrement())
+  knownas     String      @db.VarChar(127) // eg JFK, Bell
+  formalname  String      @db.VarChar(127) // eg John F Kennedy, Bell Aircraft Corporation
+  givenname   String?     @db.VarChar(127) // eg John
+  middlenames String?     @db.VarChar(127) // eg Fitzgerald
+  familyname  String?     @db.VarChar(127) // eg Kennedy
+  dob         DateTime?   @db.Date
+  dod         DateTime?   @db.Date
+  approved    Boolean     @default(false)
+  Subject     Predicate[] @relation("Subject")
+  Object      Predicate[] @relation("Object")
 
   @@unique([knownas])
   @@unique([formalname])
@@ -47,15 +47,15 @@ model Entity {
 }
 
 model Citation {
-  id              Int     @id @default(autoincrement())
-  url             String
-  Action          Action? @relation(fields: [actionSubjectId, actionObjectId, actionVerbId], references: [subjectId, objectId, verbId])
-  actionSubjectId Int?
-  actionObjectId  Int?
-  actionVerbId    Int?
+  id                 Int        @id @default(autoincrement())
+  url                String
+  Predicate          Predicate? @relation(fields: [predicateSubjectId, predicateObjectId, predicateVerbId], references: [subjectId, objectId, verbId])
+  predicateSubjectId Int?
+  predicateObjectId  Int?
+  predicateVerbId    Int?
 }
 
-model Action {
+model Predicate {
   subjectId Int
   Subject   Entity @relation("Subject", fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 

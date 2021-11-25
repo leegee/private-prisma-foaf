@@ -2,18 +2,21 @@
 
 ## Synopsis
 
-    npm run start          # Start pg in a Docker container
-    npm run stop
-
-    npm run anew           # Build scheme, populate db, create ERD
+    npm start               # Start pg in a Docker container
+    npm restart             # aka `npm run anew` - Build scheme, populate db, create ERD
+    npm stop
     npm test               # Run all tests
+
     npm run test:unit      # Run unit tests without the database
     npm run test:int       # Run integration tests upon the db and Prisma
+    npm run test:debug --  # following with match pattern
     npm run coverage
 
 ## Scheme
 
-A simplistic star scheme that centers on actions, used to describe who did what to whom, when it happened, with citations, where the 'who' is an `Entity` (either a person or organisation).
+A simplistic star scheme that centers on predicates, used to describe who did what to whom, when it happened, with citations, where the 'who' is an `Entity` (either a person or organisation).
+
+Both predicates and entities have date ranges.
 
 ## About the environment
 
@@ -37,7 +40,7 @@ Instead, call the custom environment manually, so it can set beforeEach and afte
 
     PrismaTestEnvironment.init();
 
-Because use of a long-running global transaction apparently not supported by Prisma, the above creates a PG DB schema per test, which it destroys after the test.
+Because use of a long-running global transpredicate apparently not supported by Prisma, the above creates a PG DB schema per test, which it destroys after the test.
 
 ## Writing Unit Tests
 

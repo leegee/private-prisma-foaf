@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as child_process from 'child_process';
 import fs, { unlinkSync } from 'fs';
 import os from 'os';
-import { PrismaClient, Prisma, Entity, Verb, Action } from '@prisma/client';
+import { PrismaClient, Prisma, Entity, Verb, Predicate } from '@prisma/client';
 import * as loggerModule from './logger';
 
 export function normaliseArray(list: string[]): string[] {
@@ -15,11 +15,11 @@ export function normalise(subject: string): string {
   return subject.toLowerCase().replace(/[^\w\s'-]+/, '').replace(/\s+/gs, ' ').trim()
 }
 
-export function makeActionId(subjectId: number, verbId: number, objectId: number): string {
+export function makePredicateId(subjectId: number, verbId: number, objectId: number): string {
   return [subjectId, verbId, objectId].join('-');
 }
 
-export type SimpleAction = {
+export type SimplePredicate = {
   Subject: Entity,
   Verb: Verb,
   Object: Entity,
@@ -59,7 +59,7 @@ export class Erd {
     never,
     Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
   >;
-  actions: (SimpleAction & Action)[] = []; // TODO types
+  predicates: (SimplePredicate & Predicate)[] = []; // TODO types
   savepath: string = 'erd-output.svg';
   entityKnownas2Id: { [key: string]: number } = {};
   tmpDir = fs.mkdtempSync(os.tmpdir() + path.sep + 'entity-erd-');
@@ -78,26 +78,26 @@ export class Erd {
     this.logger = logger ? logger : loggerModule.logger;
   }
 
-  async _populateActions(knownas?: string | string[]) {
+  async _populatePredicates(knownas?: string | string[]) {
     if (!!knownas) {
       const subject = knownas instanceof Array ? normaliseArray(knownas) : normalise(knownas);
-      await this._populateActionsForKnownAs(subject);
+      await this._populatePredicatesForKnownAs(subject);
     }
     else {
-      await this._populateActionsFromAll();
+      await this._populatePredicatesFromAll();
     }
 
-    if (this.actions.length === 0) {
-      throw new Error(`No actions to graph for "${knownas || 'all'}"`);
+    if (this.predicates.length === 0) {
+      throw new Error(`No predicates to graph for "${knownas || 'all'}"`);
     }
 
-    this.logger.debug(`_populateActions exits with ${this.actions.length} actions.`);
+    this.logger.debug(`_populatePredicates exits with ${this.predicates.length} predicates.`);
   }
 
-  async _populateActionsFromAll() {
-    this.logger.debug('Enter _graphActionsForAll');
-    this.actions.push(
-      ... await this.prisma.action.findMany({
+  async _populatePredicatesFromAll() {
+    this.logger.debug('Enter _graphPredicatesForAll');
+    this.predicates.push(
+      ... await this.prisma.predicate.findMany({
         include: {
           Subject: true,
           Object: true,
@@ -108,14 +108,14 @@ export class Erd {
   }
 
 
-  async _populateActionsForKnownAs(knownasInput: string | string[]) {
+  async _populatePredicatesForKnownAs(knownasInput: string | string[]) {
     const knownasList = knownasInput instanceof Array ? knownasInput : [knownasInput];
 
     for (let knownasListIndex = 0; knownasListIndex < knownasList.length; knownasListIndex++) {
       if (knownasList[knownasListIndex] === undefined) {
-        throw new TypeError('._populateActionsForKnownAs called without .knownas');
+        throw new TypeError('._populatePredicatesForKnownAs called without .knownas');
       }
-      this.logger.debug(`Enter _populateActionsForKnownAs with "${knownasList[knownasListIndex]}"`);
+      this.logger.debug(`Enter _populatePredicatesForKnownAs with "${knownasList[knownasListIndex]}"`);
 
       if (!this.entityKnownas2Id[knownasList[knownasListIndex]]) {
         const knownasEntity = await this.prisma.entity.findFirst({
@@ -130,10 +130,10 @@ export class Erd {
         this.entityKnownas2Id[knownasList[knownasListIndex]] = knownasEntity.id;
       }
 
-      this.logger.debug(`._populateActionsForKnownAs for "${knownasList[knownasListIndex]}", entityId = "${this.entityKnownas2Id[knownasList[knownasListIndex]]}"`);
+      this.logger.debug(`._populatePredicatesForKnownAs for "${knownasList[knownasListIndex]}", entityId = "${this.entityKnownas2Id[knownasList[knownasListIndex]]}"`);
 
-      this.actions.push(
-        ...await this.prisma.action.findMany({
+      this.predicates.push(
+        ...await this.prisma.predicate.findMany({
           where: {
             OR: [
               { objectId: this.entityKnownas2Id[knownasList[knownasListIndex]] },
@@ -157,9 +157,9 @@ export class Erd {
       throw new Error('savepath was not supplied during construction');
     }
 
-    await this._populateActions(knownas);
+    await this._populatePredicates(knownas);
 
-    const graph = await this._actions2graph();
+    const graph = await this._predicates2graph();
 
     const tempOutputPath = path.resolve(
       path.join(this.tmpDir, 'temp.dot'),
@@ -176,7 +176,7 @@ export class Erd {
     }
   }
 
-  async _actions2graph(): Promise<string> {
+  async _predicates2graph(): Promise<string> {
     let graph = `digraph  G {
   layout=${this.layout}
   stylesheet="./styles.css"
@@ -184,32 +184,32 @@ export class Erd {
   ${Erd.layouts[this.layout]}
   `;
 
-    this.logger.debug(`Actions: "${this.actions}"`);
+    this.logger.debug(`Predicates: "${this.predicates}"`);
 
-    this.actions.forEach((action) => {
+    this.predicates.forEach((predicate) => {
       try {
-        if (action.Subject.id && action.Verb.id && action.Object.id) {
+        if (predicate.Subject.id && predicate.Verb.id && predicate.Object.id) {
 
-          let verbLabel = action.Verb.name;
-          if (action.start || action.end) {
+          let verbLabel = predicate.Verb.name;
+          if (predicate.start || predicate.end) {
             verbLabel += " (";
-            if (action.start) {
-              verbLabel += action.start.getUTCFullYear().toString();
+            if (predicate.start) {
+              verbLabel += predicate.start.getUTCFullYear().toString();
             }
             verbLabel += '-';
-            if (action.end) {
-              verbLabel += action.end.getUTCFullYear().toString();
+            if (predicate.end) {
+              verbLabel += predicate.end.getUTCFullYear().toString();
             }
             verbLabel += ')';
           }
 
           graph += `
-Entity${action.Subject.id} [class=entity label=<${action.Subject.formalname}>]
-Entity${action.Object.id} [class=entity label=<${action.Object.formalname}>]
-Entity${action.Subject.id} -> Entity${action.Object.id} [class=verb label=<${verbLabel}>] `;
+Entity${predicate.Subject.id} [class=entity label=<${predicate.Subject.formalname}>]
+Entity${predicate.Object.id} [class=entity label=<${predicate.Object.formalname}>]
+Entity${predicate.Subject.id} -> Entity${predicate.Object.id} [class=verb label=<${verbLabel}>] `;
         }
       } catch (e) {
-        this.logger.error('Action was:', action);
+        this.logger.error('Predicate was:', predicate);
         throw e;
       }
     });

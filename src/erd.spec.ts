@@ -1,11 +1,11 @@
 import PrismaTestEnvironment from "testlib/prisma-test-env";
 
-import { Entity, Action } from '@prisma/client';
+import { Entity, Predicate } from '@prisma/client';
 import { MockProxy } from 'jest-mock-extended';
 import { mockPrisma } from 'testlib/mock-prisma';
 import { Erd, EntityNotFoundError } from './erd';
 
-const actionFixture: MockProxy<Action> = {
+const predicateFixture: MockProxy<Predicate> = {
   start: new Date(),
   end: new Date(),
   subjectId: 1,
@@ -28,27 +28,27 @@ const entityFixture: MockProxy<Entity> = {
 PrismaTestEnvironment.init();
 
 describe('erd', () => {
-  describe('_getActions', () => {
+  describe('_getPredicates', () => {
     it('throws the correct error when entity not found', async () => {
       mockPrisma.entity.findFirst.mockResolvedValue(null);
 
       const erd = new Erd({ prisma: mockPrisma });
 
       await expect(
-        erd._populateActions('mock-value-no-entity')
+        erd._populatePredicates('mock-value-no-entity')
       ).rejects.toBeInstanceOf(EntityNotFoundError);
     });
 
-    it('returns actions', async () => {
-      mockPrisma.action.findMany.mockResolvedValue([actionFixture]);
+    it('returns predicates', async () => {
+      mockPrisma.predicate.findMany.mockResolvedValue([predicateFixture]);
       mockPrisma.entity.findFirst.mockResolvedValue(entityFixture);
 
       const erd = new Erd({ prisma: mockPrisma });
-      await erd._populateActions(entityFixture.knownas);
+      await erd._populatePredicates(entityFixture.knownas);
 
-      expect(erd.actions).toBeDefined();
-      expect(erd.actions).toHaveLength(1);
-      expect(erd.actions[0]).toEqual(actionFixture);
+      expect(erd.predicates).toBeDefined();
+      expect(erd.predicates).toHaveLength(1);
+      expect(erd.predicates[0]).toEqual(predicateFixture);
     });
   });
 });

@@ -3,7 +3,7 @@ import * as fsImport from 'fs';
 import { parse } from 'csv-parse';
 import { Prisma, PrismaClient } from '@prisma/client';
 import * as loggerModule from 'src/logger';
-import { normalise, makeActionId } from './erd';
+import { normalise, makePredicateId } from './erd';
 
 export interface IEntityFileRow {
   knownas: string;
@@ -15,7 +15,7 @@ export interface IEntityFileRow {
   dod: string;
 }
 
-export interface IActionFileRow {
+export interface IPredicateFileRow {
   Subject: string;
   Verb: string;
   Object: string;
@@ -35,13 +35,13 @@ export interface Iknownas2boolean {
 export interface ICache {
   Entity: Iknownas2id,
   Verb: Iknownas2id,
-  Action: Iknownas2boolean,
+  Predicate: Iknownas2boolean,
 }
 
 const CachedIds: ICache = {
   Entity: {},
   Verb: {},
-  Action: {},
+  Predicate: {},
 };
 
 export class GrammarError extends Error {
@@ -121,7 +121,7 @@ export class CsvIngester {
         if (!row) {
           throw new GrammarError(`inputTextline: "${row}"`);
         }
-        await this._createSubjectObjectVerbAction(row);
+        await this._createSubjectObjectVerbPredicate(row);
       });
   }
 
@@ -132,8 +132,8 @@ export class CsvIngester {
     });
   }
 
-  async _createSubjectObjectVerbAction(row: IActionFileRow) {
-    this.logger.debug('_createSubjectObjectVerbAction for row:', row);
+  async _createSubjectObjectVerbPredicate(row: IPredicateFileRow) {
+    this.logger.debug('_createSubjectObjectVerbPredicate for row:', row);
 
     if (!row || !row.Subject || !row.Verb || !row.Object) {
       throw new GrammarError(JSON.stringify(row, null, 2));
@@ -219,17 +219,17 @@ export class CsvIngester {
       }
     }
 
-    const actionId = makeActionId(foundSubject.id, foundVerb.id, foundObject.id);
+    const predicateId = makePredicateId(foundSubject.id, foundVerb.id, foundObject.id);
 
-    if (CachedIds.Action[actionId]) {
-      this.logger.debug(`Action found in cache - "${actionId}" for: ${row.Subject} ${row.Verb} ${row.Object} `);
+    if (CachedIds.Predicate[predicateId]) {
+      this.logger.debug(`Predicate found in cache - "${predicateId}" for: ${row.Subject} ${row.Verb} ${row.Object} `);
     }
 
     else {
       const start = row.start ? new Date(row.start) : null;
       const end = row.end ? new Date(row.end) : null;
 
-      const actionExists = await this.prisma.action.findFirst({
+      const predicateExists = await this.prisma.predicate.findFirst({
         where: {
           subjectId: foundSubject.id as number,
           verbId: foundVerb.id as number,
@@ -239,13 +239,13 @@ export class CsvIngester {
         }
       })
 
-      const msg = `actionId "${actionId}" for "${row.Subject} ${row.Verb} ${row.Object}": ${actionExists}`;
+      const msg = `predicateId "${predicateId}" for "${row.Subject} ${row.Verb} ${row.Object}": ${predicateExists}`;
 
-      CachedIds.Action[actionId] = true;
+      CachedIds.Predicate[predicateId] = true;
 
-      if (actionExists === null) {
+      if (predicateExists === null) {
         try {
-          await this.prisma.action.create({
+          await this.prisma.predicate.create({
             data: {
               Subject: { connect: { id: foundSubject.id as number } },
               Verb: { connect: { id: foundVerb.id as number } },

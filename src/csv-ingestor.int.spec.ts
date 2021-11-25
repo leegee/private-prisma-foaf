@@ -49,18 +49,18 @@ describe('ingest-graph', () => {
   });
 
 
-  it('_createSubjectObjectVerbAction', async () => {
+  it('_createSubjectObjectVerbPredicate', async () => {
     const gi = new CsvIngester({
       prisma,
     });
 
     try {
-      gi._createSubjectObjectVerbAction({
+      gi._createSubjectObjectVerbPredicate({
         Subject: 's',
         Verb: 'v',
         Object: 'o',
       });
-      gi._createSubjectObjectVerbAction({
+      gi._createSubjectObjectVerbPredicate({
         Subject: 's',
         Verb: 'v',
         Object: 'o',

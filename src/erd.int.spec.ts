@@ -24,11 +24,11 @@ describe('erd', () => {
   describe('Lee Harvey Oswald', () => {
     it('gets subject-verb-object', async () => {
       const erd = new Erd({ prisma });
-      await erd._populateActions('Oswald');
+      await erd._populatePredicates('Oswald');
 
-      expect(erd.actions).toBeDefined();
+      expect(erd.predicates).toBeDefined();
 
-      erd.actions.forEach((rv) => {
+      erd.predicates.forEach((rv) => {
         expect(rv).not.toBeNull();
         expect(rv).toHaveProperty('Subject');
         expect(rv).toHaveProperty('Object');
