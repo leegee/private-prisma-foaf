@@ -2,11 +2,8 @@ import PrismaTestEnvironment from "testlib/prisma-test-env";
 
 import * as fs from 'fs';
 
-import { IFixtures, prisma } from 'testlib/fixtures';
+import { prisma } from 'testlib/fixtures';
 import { Erd } from './erd';
-
-let fixtures: IFixtures = {};
-let knownas: string = '';
 
 PrismaTestEnvironment.init();
 
