@@ -6,6 +6,16 @@ import * as loggerModule from 'src/logger';
 import { normalise, makeActionId } from './erd';
 
 export interface IEntityFileRow {
+  knownas: string;
+  formalname: string;
+  givenname: string;
+  middlenames: string;
+  familyname: string;
+  dob: string;
+  dod: string;
+}
+
+export interface IActionFileRow {
   Subject: string;
   Verb: string;
   Object: string;
@@ -59,7 +69,6 @@ export class CsvIngester {
     never,
     Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
   >;
-  private _inputTextLine: string = '';
 
   constructor({ logger, prisma, fs }: ICsvIngesterArgs) {
     if (fs) {
@@ -72,11 +81,33 @@ export class CsvIngester {
     this.logger = logger ? logger as loggerModule.ILogger : loggerModule.logger;
   }
 
+  async parseEntityFile(filepath: string): Promise<void> {
+    if (!filepath) {
+      throw new TypeError('did not receive a filepath:string');
+    }
+    this.logger.debug('Enter parseEntityFile for ' + filepath);
+
+    this.fs.createReadStream(filepath)
+      .on('error', (error: Error) => this.logger.error(error))
+      .pipe(parse({
+        columns: true,
+        trim: true,
+        relax_column_count_less: true,
+        skip_empty_lines: true,
+      }))
+      .on('data', async (row) => {
+        if (!row) {
+          throw new GrammarError(`inputTextline: "${row}"`);
+        }
+        await this._createEntity(row);
+      });
+  }
+
   async parseRelationsFile(filepath: string): Promise<void> {
     if (!filepath) {
-      throw new TypeError('constructor must receive a filepath:string');
+      throw new TypeError('did not receive a filepath:string');
     }
-    this.logger.debug('Enter loadEntities for ' + filepath);
+    this.logger.debug('Enter parseRelationsFile for ' + filepath);
 
     this.fs.createReadStream(filepath)
       .on('error', (error: Error) => this.logger.error(error))
@@ -94,8 +125,15 @@ export class CsvIngester {
       });
   }
 
-  async _createSubjectObjectVerbAction(row: IEntityFileRow) {
-    this.logger.debug('_createSubjectObjectVerbAction for groups:', row);
+  async _createEntity(row: IEntityFileRow) {
+    this.logger.debug('_createEntity for row:', row);
+    await this.prisma.entity.create({
+      data: row
+    });
+  }
+
+  async _createSubjectObjectVerbAction(row: IActionFileRow) {
+    this.logger.debug('_createSubjectObjectVerbAction for row:', row);
 
     if (!row || !row.Subject || !row.Verb || !row.Object) {
       throw new GrammarError(JSON.stringify(row, null, 2));
@@ -206,16 +244,21 @@ export class CsvIngester {
       CachedIds.Action[actionId] = true;
 
       if (actionExists === null) {
-        await this.prisma.action.create({
-          data: {
-            Subject: { connect: { id: foundSubject.id as number } },
-            Verb: { connect: { id: foundVerb.id as number } },
-            Object: { connect: { id: foundObject.id as number } },
-            start,
-            end,
-          }
-        });
-        this.logger.debug(`Created ${msg}`);
+        try {
+          await this.prisma.action.create({
+            data: {
+              Subject: { connect: { id: foundSubject.id as number } },
+              Verb: { connect: { id: foundVerb.id as number } },
+              Object: { connect: { id: foundObject.id as number } },
+              start,
+              end,
+            }
+          });
+          this.logger.debug(`Created ${msg}`);
+        } catch (e) {
+          this.logger.error(`Failed to create ${msg}`);
+          this.logger.error(e);
+        }
       }
 
       else {

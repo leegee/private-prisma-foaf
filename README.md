@@ -2,13 +2,14 @@
 
 ## Synopsis
 
-    npm run db:start       # Start pg in a Docker container
-    npm run db:stop
+    npm run start          # Start pg in a Docker container
+    npm run stop
 
-    npm run anew           # Build scheme, populate db, create ERD, test
+    npm run anew           # Build scheme, populate db, create ERD
     npm test               # Run all tests
     npm run test:unit      # Run unit tests without the database
     npm run test:int       # Run integration tests upon the db and Prisma
+    npm run coverage
 
 ## Scheme
 

@@ -43,7 +43,7 @@
     "db:sql": "docker exec -it postgres psql -U admin -a foaf -c 'SELECT * FROM entity;'",
     "preanew": "rimraf prisma/migrations && docker exec -it postgres psql -U admin -a postgres -c \"DROP DATABASE foaf\" || true",
     "anew": "npx prisma migrate dev --name init",
-    "postanew": "npm run update && npm test"
+    "postanew": "npm run update"
   },
   "dependencies": {
     "@prisma/client": "^3.5.0",

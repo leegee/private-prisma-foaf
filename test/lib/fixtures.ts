@@ -29,7 +29,7 @@ export async function setup(): Promise<IFixtures> {
   fixtures.bell = await prisma.entity.findFirst({
     where: {
       knownas: 'bell',
-      formalname: 'Bell Aereospace'
+      formalname: 'Bell Aircraft'
     }
   });
 
@@ -51,9 +51,6 @@ export async function setup(): Promise<IFixtures> {
   fixtures.arthur = await prisma.entity.findFirst({
     where: {
       knownas: 'Arthur Young',
-      formalname: 'Arthur M Young',
-      dob: new Date('1905-11-03'),
-      dod: new Date('1995-05-30')
     }
   });
 
@@ -86,6 +83,10 @@ export async function setup(): Promise<IFixtures> {
       end: new Date('1963-11-22'),
     },
   });
+
+  for (let fixture in Object.keys(fixtures)) {
+    expect(fixtures[fixture]).not.toBeNull();
+  }
 
   return fixtures;
 }
