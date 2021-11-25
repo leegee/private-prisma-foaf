@@ -51,8 +51,9 @@ Logging is via `pino`.
 
 - Neater seeding
 - Deeper mock RVs
-- Playwrite
-- Percy
+- GUI (Playwrite, Percy)
+- Kohenen projection!
+- Prolog export
 
 ## NOTES
 

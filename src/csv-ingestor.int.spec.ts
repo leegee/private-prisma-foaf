@@ -37,8 +37,9 @@ describe('ingest-graph', () => {
   })
 
   xit('mock prisma', () => { });
+  xit('_ingestline', () => { });
 
-  xit('should read a mock file', async () => {
+  it('should read a mock file', async () => {
     const gi = new CsvIngester({
       prisma,
       fs: mocks.fs,
@@ -47,7 +48,6 @@ describe('ingest-graph', () => {
     expect(mocks.ReadStream).toHaveBeenCalled();
   });
 
-  xit('_ingestline', () => { });
 
   it('_createSubjectObjectVerbAction', async () => {
     const gi = new CsvIngester({
