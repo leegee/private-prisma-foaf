@@ -151,7 +151,7 @@ export class Erd {
   }
 
   async graphviz(knownas?: string | string[]) {
-    this.logger.info(`Enter useGraphviz`);
+    this.logger.debug(`Enter useGraphviz`);
 
     if (!this.savepath) {
       throw new Error('savepath was not supplied during construction');

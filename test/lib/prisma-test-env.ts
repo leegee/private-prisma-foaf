@@ -72,7 +72,7 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
     // Generate a unique schema identifier for this test context
     this.schema = `test_${+ new Date()}_${process.hrtime.bigint()}`;
 
-    logger.info(`Init new test env with temporary schema: ${this.schema}`);
+    logger.debug(`Init new test env with temporary schema: ${this.schema}`);
 
     // Generate the pg connection string for the test schema
     this.connectionString = `postgresql://${process.env.DB_USER}:${process.env.DB_PASS}@localhost:${process.env.DB_PORT}/${process.env.DB_NAME}?schema=${this.schema}`;
@@ -86,7 +86,7 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
     // Run the migrations to ensure our schema has the required structure
     child_process.execSync(`${prismaBinary} migrate deploy`);
 
-    logger.info('Test env setup almost done');
+    logger.debug('Test env setup almost done');
     return super.setup();
   }
 
@@ -99,9 +99,9 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
       connectionString: this.connectionString,
     });
     await client.connect();
-    logger.info(`Dropping test env temp schema, ${this.schema}.`);
+    logger.debug(`Dropping test env temp schema, ${this.schema}.`);
     await client.query(`DROP SCHEMA IF EXISTS "${this.schema}" CASCADE`);
     await client.end();
-    logger.info(`Dropped test env temp schema, ${this.schema}.`);
+    logger.debug(`Dropped test env temp schema, ${this.schema}.`);
   }
 }

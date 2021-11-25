@@ -28,4 +28,7 @@ export const logger = pino({
   ...(process.env.NODE_ENV !== 'production' ? devConfig : [])
 });
 
-logger.info('Init logging');
+if (process.env.NODE_ENV !== 'production') {
+  logger.debug('Init logging');
+}
+
