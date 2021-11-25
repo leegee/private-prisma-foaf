@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { IFixtures, prisma } from 'testlib/fixtures';
 import { Erd } from 'src/erd';
-import { CsvIngester } from 'src/ingest-graph';
+import { CsvIngester } from 'src/csv-ingestor';
 import { nullLogger } from 'src/logger';
 
 import PrismaTestEnvironment from "testlib/prisma-test-env";

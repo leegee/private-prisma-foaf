@@ -11,7 +11,7 @@ import child_process from "child_process";
 
 import { IFixtures, setup, teardown } from 'testlib/fixtures';
 import { logger } from '../../src/logger';
-import { CsvIngester } from "src/ingest-graph";
+import { CsvIngester } from "src/csv-ingestor";
 
 const prismaBinary = 'npx prisma';
 
