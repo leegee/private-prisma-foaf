@@ -80,11 +80,8 @@ export class CsvIngester {
     this.logger.debug('Enter loadEntities for ' + this.filepath);
 
     this.fs.createReadStream(this.filepath)
-      .on('error', (error: Error) => {
-        this.logger.error(error.message);
-      })
+      .on('error', (error: Error) => this.logger.error(error))
       .pipe(parse({
-        // expose options?
         columns: true,
         trim: true,
         relax_column_count_less: true,
