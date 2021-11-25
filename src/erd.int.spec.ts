@@ -18,7 +18,7 @@ describe('erd', () => {
     }
 
     const erd = new Erd({ prisma, savepath });
-    await erd.graphviz('CIA -> JFK');
+    await erd.graphviz(['JFK', 'Donald Trump']);
 
     expect(fs.existsSync(savepath)).toBeTruthy();
     fs.unlinkSync(savepath);

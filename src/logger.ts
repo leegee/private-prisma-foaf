@@ -16,7 +16,9 @@ const config = {
 let devConfig = {
   transport: {
     target: 'pino-pretty',
-    options: { levelFirst: true, },
+    options: {
+      levelFirst: true,
+    },
   }
 };
 

@@ -1,4 +1,4 @@
-Subject, Verb, Object, Comment
+Subject, Verb, Object, Comment,start,end
 Andre Puharich,sponsored, Uri Geller
 Arthur Young,member-of, The Nine
 Arthur Young,created, Bell Aviation
@@ -11,6 +11,7 @@ Jeffrey Mishlove,promoted, Uri Geller
 Harry Truman,member of, Freemasonry
 Harry Truman,isa, POTUS
 JFK,isa, POTUS
+JFK,heads,CIA,,1961-01-20,1963-11-22
 Richard Nixon,isa, POTUS
 Donald Trump,isa, POTUS
 George HW Bush,isa, POTUS

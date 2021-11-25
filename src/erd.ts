@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as child_process from 'child_process';
 import fs, { unlinkSync } from 'fs';
 import os from 'os';
-import { PrismaClient, Prisma, Entity, Verb } from '@prisma/client';
+import { PrismaClient, Prisma, Entity, Verb, Action } from '@prisma/client';
 import * as loggerModule from './logger';
 
 export function normaliseArray(list: string[]): string[] {
@@ -19,7 +19,7 @@ export function makeActionId(subjectId: number, verbId: number, objectId: number
   return [subjectId, verbId, objectId].join('-');
 }
 
-export type SubjectVerbObject = {
+export type SimpleAction = {
   Subject: Entity,
   Verb: Verb,
   Object: Entity,
@@ -59,7 +59,7 @@ export class Erd {
     never,
     Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
   >;
-  actions: SubjectVerbObject[] = [];
+  actions: (SimpleAction & Action)[] = []; // TODO types
   savepath: string = 'erd-output.svg';
   entityKnownas2Id: { [key: string]: number } = {};
   tmpDir = fs.mkdtempSync(os.tmpdir() + path.sep + 'entity-erd-');
@@ -101,7 +101,7 @@ export class Erd {
         include: {
           Subject: true,
           Object: true,
-          Verb: true,
+          Verb: true
         }
       })
     );
@@ -140,7 +140,7 @@ export class Erd {
               { subjectId: this.entityKnownas2Id[knownasList[knownasListIndex]] },
             ],
           },
-          select: {
+          include: {
             Subject: true,
             Object: true,
             Verb: true,
@@ -189,10 +189,23 @@ export class Erd {
     this.actions.forEach((action) => {
       try {
         if (action.Subject.id && action.Verb.id && action.Object.id) {
-          graph += `Entity${action.Subject.id} [class=entity label=<${action.Subject.formalname}>]
-             Entity${action.Object.id} [class=entity label=<${action.Object.formalname}>]
-             Entity${action.Subject.id} -> Entity${action.Object.id} [class=verb label=<${action.Verb.name}>]
-            `;
+          let verbLabel = action.Verb.name;
+          if (action.start || action.end) {
+            if (action.start) {
+              verbLabel += action.start;
+            }
+            verbLabel += '-';
+            if (action.end) {
+              verbLabel += action.end;
+            }
+            verbLabel += ' (';
+            verbLabel += ' )';
+          }
+
+          graph += `
+Entity${action.Subject.id} [class=entity label=<${action.Subject.formalname}>]
+Entity${action.Object.id} [class=entity label=<${action.Object.formalname}>]
+Entity${action.Subject.id} -> Entity${action.Object.id} [class=verb label=<${verbLabel}>] `;
         }
       } catch (e) {
         this.logger.error('Action was:', action);

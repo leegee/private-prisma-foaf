@@ -5,11 +5,13 @@ import { Prisma, PrismaClient } from '@prisma/client';
 import * as loggerModule from 'src/logger';
 import { normalise, makeActionId } from './erd';
 
-export interface ISubjectVerbObjectComment {
+export interface IEntityFileRow {
   Subject: string;
   Verb: string;
   Object: string;
   Comment?: string;
+  start?: string;
+  end?: string;
 }
 
 export interface Iknownas2id {
@@ -95,74 +97,74 @@ export class CsvIngester {
       });
   }
 
-  async _createSubjectObjectVerbAction(groups: ISubjectVerbObjectComment) {
-    this.logger.debug('_createSubjectObjectVerbAction for groups:', groups);
+  async _createSubjectObjectVerbAction(row: IEntityFileRow) {
+    this.logger.debug('_createSubjectObjectVerbAction for groups:', row);
 
-    if (!groups || !groups.Subject || !groups.Verb || !groups.Object) {
-      throw new GrammarError(JSON.stringify(groups, null, 2));
+    if (!row || !row.Subject || !row.Verb || !row.Object) {
+      throw new GrammarError(JSON.stringify(row, null, 2));
     }
 
-    groups.Subject = normalise(groups.Subject);
-    groups.Verb = normalise(groups.Verb);
-    groups.Object = normalise(groups.Object);
+    row.Subject = normalise(row.Subject);
+    row.Verb = normalise(row.Verb);
+    row.Object = normalise(row.Object);
 
-    let foundSubject = CachedIds.Entity[groups.Subject]
+    let foundSubject = CachedIds.Entity[row.Subject]
       ? {
-        knownas: groups.Subject,
-        id: CachedIds.Entity[groups.Subject]
+        knownas: row.Subject,
+        id: CachedIds.Entity[row.Subject]
       }
       :
       await this.prisma.entity.findFirst({
-        where: { knownas: groups.Subject },
+        where: { knownas: row.Subject },
         select: { id: true },
       });
 
-    this.logger.debug(`Got subject "${JSON.stringify(foundSubject)}" via "${groups.Subject}"`);
+    this.logger.debug(`Got subject "${JSON.stringify(foundSubject)}" via "${row.Subject}"`);
 
     if (foundSubject === null) {
       try {
         foundSubject = await this.prisma.entity.create({
           data: {
-            knownas: groups.Subject,
-            formalname: groups.Subject,
+            knownas: row.Subject,
+            formalname: row.Subject,
           },
           select: { id: true }
         });
-        CachedIds.Entity[groups.Subject] = foundSubject.id;
+        CachedIds.Entity[row.Subject] = foundSubject.id;
       }
       catch (e) {
-        throw new Error(`Failed to create subject entity for "${groups.Subject}" - ${(e as Error).message}`);
+        throw new Error(`Failed to create subject entity for "${row.Subject}" - ${(e as Error).message}`);
       }
     }
 
-    let foundVerb = CachedIds.Entity[groups.Verb]
+    let foundVerb = CachedIds.Entity[row.Verb]
       ? {
-        name: groups.Verb,
-        id: CachedIds.Entity[groups.Verb]
+        name: row.Verb,
+        id: CachedIds.Entity[row.Verb]
       }
-      : await this.prisma.verb.findFirst({ where: { name: groups.Verb }, select: { id: true } });
+      : await this.prisma.verb.findFirst({ where: { name: row.Verb }, select: { id: true } });
 
     if (foundVerb === null) {
       try {
         foundVerb = await this.prisma.verb.create({
-          data: { name: groups.Verb },
+          data: { name: row.Verb },
           select: { id: true }
         });
-        CachedIds.Verb[groups.Verb] = foundVerb.id;
+        CachedIds.Verb[row.Verb] = foundVerb.id;
       }
       catch (e) {
-        throw new Error(`Failed to create verb from "${groups.Verb}" - ${(e as Error).message}`);
+        throw new Error(`Failed to create verb from "${row.Verb}" - ${(e as Error).message}`);
       }
     }
 
-    let foundObject = CachedIds.Entity[groups.Object] ?
+    let foundObject = CachedIds.Entity[row.Object] ?
       {
-        knwonas: groups.Object,
-        id: CachedIds.Entity[groups.Object]
+        knwonas: row.Object,
+        id: CachedIds.Entity[row.Object]
       }
       :
       await this.prisma.entity.findFirst({
-        where: { knownas: groups.Object },
+        where: { knownas: row.Object },
         select: { id: true },
       });
 
@@ -170,34 +172,39 @@ export class CsvIngester {
       try {
         foundObject = await this.prisma.entity.create({
           data: {
-            formalname: groups.Object,
-            knownas: groups.Object,
+            formalname: row.Object,
+            knownas: row.Object,
           },
           select: { id: true }
         });
-        CachedIds.Entity[groups.Object] = foundObject.id;
+        CachedIds.Entity[row.Object] = foundObject.id;
       }
       catch (e) {
-        throw new Error(`Failed to create object entity for  "${groups.Object}" - ${(e as Error).message}`);
+        throw new Error(`Failed to create object entity for  "${row.Object}" - ${(e as Error).message}`);
       }
     }
 
     const actionId = makeActionId(foundSubject.id, foundVerb.id, foundObject.id);
 
     if (CachedIds.Action[actionId]) {
-      this.logger.debug(`Action found in cache - "${actionId}" for: ${groups.Subject} ${groups.Verb} ${groups.Object} `);
+      this.logger.debug(`Action found in cache - "${actionId}" for: ${row.Subject} ${row.Verb} ${row.Object} `);
     }
 
     else {
+      const start = row.start ? new Date(row.start) : null;
+      const end = row.end ? new Date(row.end) : null;
+
       const actionExists = await this.prisma.action.findFirst({
         where: {
           subjectId: foundSubject.id as number,
           verbId: foundVerb.id as number,
           objectId: foundObject.id as number,
+          start,
+          end,
         }
       })
 
-      const msg = `actionId "${actionId}" for "${groups.Subject} ${groups.Verb} ${groups.Object}": ${actionExists}`;
+      const msg = `actionId "${actionId}" for "${row.Subject} ${row.Verb} ${row.Object}": ${actionExists}`;
 
       CachedIds.Action[actionId] = true;
 
@@ -207,6 +214,8 @@ export class CsvIngester {
             Subject: { connect: { id: foundSubject.id as number } },
             Verb: { connect: { id: foundVerb.id as number } },
             Object: { connect: { id: foundObject.id as number } },
+            start,
+            end,
           }
         });
         this.logger.debug(`Created ${msg}`);
