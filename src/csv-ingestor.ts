@@ -1,9 +1,9 @@
 import * as fsImport from 'fs';
 import { parse } from 'csv-parse';
 
-import { Baseingestor, GrammarError } from './base-ingestor';
+import { BaseIngestor, GrammarError } from './base-ingestor';
 
-export class CsvIngestor extends Baseingestor {
+export class CsvIngestor extends BaseIngestor {
 
   async parseEntityFile(filepath: string): Promise<void> {
     if (!filepath) {

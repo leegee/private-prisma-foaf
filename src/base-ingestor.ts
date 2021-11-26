@@ -80,7 +80,7 @@ export interface IBaseingestorArgs {
   >;
 }
 
-export class Baseingestor {
+export class BaseIngestor {
   config: ConfigType = {
     spreadsheetId: undefined,
     googlesheetsapikey: undefined,

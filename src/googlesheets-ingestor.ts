@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { Baseingestor, ConfigType, IBaseingestorArgs } from './base-ingestor';
+import { BaseIngestor, ConfigType, IBaseingestorArgs } from './base-ingestor';
 
 export type GooglesheetsConfigType = ConfigType & {
   spreadsheetId: string | undefined,
@@ -11,7 +11,7 @@ export interface IGooglesheetsIngestorArgs extends IBaseingestorArgs {
   config?: GooglesheetsConfigType;
 }
 
-export class GooglesheetsIngestor extends Baseingestor {
+export class GooglesheetsIngestor extends BaseIngestor {
   config: GooglesheetsConfigType = {
     spreadsheetId: undefined,
     googlesheetsapikey: undefined,

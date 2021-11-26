@@ -3,7 +3,7 @@ import PrismaTestEnvironment from "testlib/prisma-test-env";
 import { Entity, Predicate } from '@prisma/client';
 import { MockProxy } from 'jest-mock-extended';
 import { mockPrisma } from 'testlib/mock-prisma';
-import { Erd, EntityNotFoundError } from './erd';
+import { Erd, EntityNotFoundError, normalise } from './erd';
 
 const predicateFixture: MockProxy<Predicate> = {
   start: new Date(),
@@ -28,6 +28,16 @@ const entityFixture: MockProxy<Entity> = {
 PrismaTestEnvironment.init();
 
 describe('erd', () => {
+  describe('normalise', () => {
+    test.each`
+      input     | expectedResult
+      ${' xxxx '}  | ${'xxxx'}
+      ${' x  x '}   | ${'x x'}
+    `('normalises $input to $expectedResult', ({ input, expectedResult }) => {
+      expect(normalise(input)).toBe(expectedResult)
+    })
+  })
+
   describe('_getPredicates', () => {
     it('throws the correct error when entity not found', async () => {
       mockPrisma.entity.findFirst.mockResolvedValue(null);

@@ -21,21 +21,7 @@ const mocks = {
 
 mocks.fs.createReadStream = mocks.ReadStream;
 
-
 describe('ingest-graph', () => {
-  describe('normalise', () => {
-    test.each`
-      input     | expectedResult
-      ${' xxxx '}  | ${'xxxx'}
-      ${' x  x '}   | ${'x x'}
-    `('normalises $input to $expectedResult', ({ input, expectedResult }) => {
-      expect(normalise(input)).toBe(expectedResult)
-    })
-  })
-
-  xit('mock prisma', () => { });
-  xit('_ingestline', () => { });
-
   it('should read a mock relations file', async () => {
     const gi = new CsvIngestor({
       prisma: PrismaTestEnvironment.prisma,
@@ -53,28 +39,6 @@ describe('ingest-graph', () => {
     await gi.parseEntityFile('irrelevant-as-file-not-accessed');
     expect(mocks.ReadStream).toHaveBeenCalled();
   });
-
-  it('_createSubjectObjectVerbPredicate', async () => {
-    const gi = new CsvIngestor({
-      prisma: PrismaTestEnvironment.prisma,
-    });
-
-    try {
-      gi._createSubjectObjectVerbPredicate({
-        Subject: 's',
-        Verb: 'v',
-        Object: 'o',
-      });
-      gi._createSubjectObjectVerbPredicate({
-        Subject: 's',
-        Verb: 'v',
-        Object: 'o',
-      });
-    } catch (e) {
-      throw e;
-    }
-  });
-
 
   it('should integrate with real fs to read a file', async () => {
     const gi = new CsvIngestor({
