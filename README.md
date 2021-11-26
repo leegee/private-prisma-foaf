@@ -52,9 +52,11 @@ Logging is via `pino`.
 
 ## TODO
 
-- Neater seeding
+- Given tiemstamps, map the episode!
+- Neater DB seeding?
 - Deeper mock RVs
 - GUI (Playwrite, Percy)
+  - Entity predictive search
 - Kohenen projection!
 - Prolog export
 

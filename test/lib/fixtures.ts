@@ -1,9 +1,5 @@
-import { PrismaClient } from '@prisma/client';
 import { logger } from 'src/logger';
-
-export const prisma = new PrismaClient({
-  log: ['warn', 'error'], // 'query', 'info', 'warn', 'error'],
-});
+import { prisma } from 'src/prisma-client';
 
 export interface IFixtures {
   [key: string]: any

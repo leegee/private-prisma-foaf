@@ -1,5 +1,4 @@
 import fs from 'fs';
-import { IFixtures, prisma } from 'testlib/fixtures';
 import { Erd } from 'src/erd';
 import { logger } from 'src/logger';
 
@@ -19,7 +18,7 @@ describe('file2erd', () => {
       }
 
       const erd = await new Erd({
-        prisma,
+        prisma: PrismaTestEnvironment.prisma,
         logger,
         savepath: savepath,
         layout: layoutKey,

@@ -22,7 +22,7 @@ describe('erd', () => {
   });
 
   describe('Lee Harvey Oswald', () => {
-    it('gets subject-verb-object', async () => {
+    it('gets predicates', async () => {
       const erd = new Erd({ prisma });
       await erd._populatePredicates('Oswald');
 
