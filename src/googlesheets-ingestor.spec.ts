@@ -1,24 +1,15 @@
 import type { FetchMockStatic } from 'fetch-mock';
 import fetch from 'node-fetch';
-
-// We need this import to get the extra jest assertions
-
 import 'fetch-mock-jest';
 
-// Mock 'node-fetch' with 'fetch-mock-jest'. Note that using
-// require here is important, because jest automatically
-// hoists `jest.mock()` calls to the top of the file (before
-// imports), so if we were to refer to an imported module, we
-// would get a `ReferenceError`
-
+// As jest automatically hoists `jest.mock()` calls to before imports,
+// without `require`, there would be a `ReferenceError`
 jest.mock(
   'node-fetch',
   () => require('fetch-mock-jest').sandbox(),
 );
 
-// Cast node-fetch as fetchMock so we can access the
-// `.mock*()` methods
-
+// Cast node-fetch as fetchMock so `.mock*` methods may be accessed
 const fetchMock = (fetch as unknown) as FetchMockStatic;
 
 describe('code that uses fetch', () => {
@@ -27,9 +18,7 @@ describe('code that uses fetch', () => {
   it('should fetch a simple URL correctly', async () => {
     fetchMock.get('https://example.com', { value: 1234 });
     await fetch('https://example.com');
-    expect(fetchMock).toHaveFetched({
-      url: 'https://example.com'
-    });
+    expect(fetchMock).toHaveFetched('https://example.com');
   });
 
   it('should fetch with complex assertions', async () => {
@@ -45,16 +34,14 @@ describe('code that uses fetch', () => {
         body: JSON.stringify({
           type: 'create',
           details: {
-            username: 'chris',
-            passwordToken: 'abcde12345',
+            username: 'alice and bobette',
+            passwordToken: 'asdfasdf',
           },
         }),
-        headers: { 'content-type', 'application/json' },
+        headers: { 'content-type': 'application/json' },
       },
     );
 
-    // Check we called the right URL, method and
-    // part of the body
     expect(fetchMock).toHaveFetched(
       'https://example.com/submit',
       {
