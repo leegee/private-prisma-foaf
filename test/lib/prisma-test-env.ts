@@ -3,14 +3,18 @@
 // @see https://github.com/ctrlplusb/prisma-pg-jest/blob/master/prisma/prisma-test-environment.js
 // @see https://jestjs.io/docs/configuration#testenvironment-string
 
-require('dotenv').config();
-import { PrismaClient } from '@prisma/client';
+import dotenv from 'dotenv';
+dotenv.config;
+// require('dotenv').config();
+
+import { prisma } from 'src/prisma-client';
+
 import { Client } from "pg";
 import NodeEnvironment from "jest-environment-node";
 import child_process from "child_process";
 
 import { logger } from '../../src/logger';
-import { CsvIngester } from "src/csv-ingestor";
+import { CsvIngestor } from "src/csv-ingestor";
 
 const prismaBinary = 'npx prisma';
 
@@ -26,12 +30,8 @@ process.on('unhandledRejection', (error) => {
   process.exit(1);
 })
 
-export const prisma = new PrismaClient({
-  log: ['warn', 'error'], // 'query', 'info', 'warn', 'error'],
-});
-
-
 export default class PrismaTestEnvironment extends NodeEnvironment {
+  static prisma = prisma;
 
   /** Maybe faster to load public and copy to test schema when needed */
   static init() {
@@ -43,12 +43,12 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
       testEnv = new PrismaTestEnvironment({});
       await testEnv.setup();
 
-      const gi = new CsvIngester({
+      const gi = new CsvIngestor({
         prisma,
         logger,
       });
 
-      await gi.parseRelationsFile('./test/lib/subject-verb-object.csv');
+      await gi.parsePredicateFile('./test/lib/predicates.csv');
 
       logger.debug('PrismaTestEnvironment beforeEach leave');
     });
