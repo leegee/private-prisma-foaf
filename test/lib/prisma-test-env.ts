@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
+// Can remove pg and use prsima's cx
 // @see https://github.com/ctrlplusb/prisma-pg-jest/blob/master/prisma/prisma-test-environment.js
 // @see https://jestjs.io/docs/configuration#testenvironment-string
 
@@ -7,7 +8,7 @@ import dotenv from 'dotenv';
 dotenv.config;
 // require('dotenv').config();
 
-import { prisma } from 'src/prisma-client';
+import { prisma } from 'testlib/fixtures';
 
 import { Client } from "pg";
 import NodeEnvironment from "jest-environment-node";

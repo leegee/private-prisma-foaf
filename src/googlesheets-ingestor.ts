@@ -1,46 +1,60 @@
-import fetch from 'node-fetch';
-import { BaseIngestor, ConfigType, IBaseingestorArgs } from './base-ingestor';
+/**
+ * @see https://sheets.googleapis.com/v4/spreadsheets/SPREADSHEET_ID/values/RANGE?key=apiKey
+ * @see https://developers.google.com/sheets/api/guides/concepts
+ */
+
+import { BaseIngestor, ConfigType, IBaseingestorArgs as IBaseIngestorArgs } from './base-ingestor';
 
 export type GooglesheetsConfigType = ConfigType & {
   spreadsheetId: string | undefined,
-  googlesheetsapikey: string | undefined,
+  googlesheetsApiKey: string | undefined,
   sheetName: string | undefined,
 }
 
-export interface IGooglesheetsIngestorArgs extends IBaseingestorArgs {
-  config?: GooglesheetsConfigType;
+export interface IGooglesheetsIngestorArgs extends IBaseIngestorArgs {
+  config: GooglesheetsConfigType;
 }
 
 export class GooglesheetsIngestor extends BaseIngestor {
   config: GooglesheetsConfigType = {
     spreadsheetId: undefined,
-    googlesheetsapikey: undefined,
+    googlesheetsApiKey: undefined,
     sheetName: undefined,
-  }
+  };
 
-  // https://sheets.googleapis.com/v4/spreadsheets/SPREADSHEET_ID/values/RANGE?key=apiKey
-  // https://developers.google.com/sheets/api/guides/concepts
-  getGoogleSheetsUrlForSheetName(sheetName?: string) {
+  _getGoogleSheetsUrlForSheetName(sheetName?: string) {
+    if ((sheetName || this.config.sheetName)) {
+      throw new TypeError('sheetname not defined');
+    }
+
     return 'https://sheets.googleapis.com/v4/spreadsheets/'
       + this.config.spreadsheetId + '/values/'
       + (sheetName || this.config.sheetName)
-      + '?key=' + this.config.googlesheetsapikeykey;
+      + '?key=' + this.config.googlesheetsApiKey;
   };
 
   async _getResource() {
-    const url = this.getGoogleSheetsUrlForSheetName();
-    console.log('Fetching shop cat data from', url);
+    const url = this._getGoogleSheetsUrlForSheetName();
+    this.logger.debug('_getResource from', url);
 
-    let res, json;
+    let res;
+    let json;
 
     try {
       res = await fetch(url);
-      this.logger.debug(`Fetched "${url}"`);
-      json = await res.json();
+      this.logger.info(`Fetched "${url}" "${res}"`);
     }
-
     catch (e) {
       this.logger.error(e);
+      throw e;
+    }
+
+    try {
+      json = await res.json();
+    }
+    catch (e) {
+      this.logger.error(e);
+      throw (e);
     }
 
     return json;

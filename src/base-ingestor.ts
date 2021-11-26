@@ -18,7 +18,7 @@ import fetch from 'node-fetch';
 export type ConfigType = {
   [key: string]: any
   spreadsheetId: string | undefined,
-  googlesheetsapikey: string | undefined,
+  googlesheetsApiKey: string | undefined,
   sheetName: string | undefined,
 }
 
@@ -83,7 +83,7 @@ export interface IBaseingestorArgs {
 export class BaseIngestor {
   config: ConfigType = {
     spreadsheetId: undefined,
-    googlesheetsapikey: undefined,
+    googlesheetsApiKey: undefined,
     sheetName: undefined,
   }
   fs = fsImport;

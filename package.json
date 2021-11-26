@@ -3,6 +3,7 @@
   "version": "0.0.2",
   "license": "MIT",
   "devDependencies": {
+    "@types/fetch-mock": "^7.3.5",
     "@types/graphviz": "^0.0.34",
     "@types/jest": "^27.0.2",
     "@types/node": "16.11.7",
@@ -12,6 +13,7 @@
     "fetch-mock": "^9.11.0",
     "fetch-mock-jest": "^1.5.1",
     "jest": "^27.3.1",
+    "jest-fetch-mock": "^3.0.3",
     "jest-mock-extended": "^2.0.4",
     "nanoid": "^3.1.30",
     "pg": "^8.7.1",
@@ -57,16 +59,15 @@
     "module-alias": "^2.2.2",
     "node-fetch": "^3.1.0",
     "pino": "^7.3.0",
-    "ts-jest": "^27.0.7",
-    "xre": "^1.0.5",
-    "xregexp": "^5.1.0"
+    "ts-jest": "^27.0.7"
   },
   "engines": {
     "node": ">=16.0.0"
   },
   "_moduleAliases": {
-    "@src": "./src",
-    "@test": "./test"
+    "src": "./src",
+    "test": "./test",
+    "testlib": "./testlib"
   },
   "type": "commonjs",
   "jest": {
@@ -87,7 +88,7 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "src/**/*.(t|j)s"
+      "<rootDir>/src/**/*.(t|j)s"
     ],
     "coverageDirectory": "./coverage",
     "setupFilesAfterEnv": [
@@ -109,13 +110,13 @@
       "sourceType": "module"
     },
     "plugins": [
-      "@typescript-eslint/eslint-plugin",
+      "@typescript-eslint",
       "prettier"
     ],
     "extends": [
-      "plugin:@typescript-eslint/eslint-recommended",
+      "eslint:recommended",
       "plugin:@typescript-eslint/recommended",
-      "plugin:prettier/recommended"
+      "prettier"
     ],
     "root": true,
     "env": {
@@ -127,7 +128,7 @@
       "@typescript-eslint/interface-name-prefix": "off",
       "@typescript-eslint/explicit-function-return-type": "off",
       "@typescript-eslint/explicit-module-boundary-types": "off",
-      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-explicit-any": "on",
       "@typescript-eslint/space-in-parens": [
         1,
         "always"

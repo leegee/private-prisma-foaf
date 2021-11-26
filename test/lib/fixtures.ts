@@ -1,6 +1,8 @@
 import { logger } from 'src/logger';
 import { prisma } from 'src/prisma-client';
 
+export { prisma, logger };
+
 export interface IFixtures {
   [key: string]: any
 }

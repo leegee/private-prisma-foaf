@@ -52,12 +52,14 @@ Logging is via `pino`.
 
 ## TODO
 
+- Kohenen projection!
+- GUI to gather timestamps:
+  - embeds YouTube player
+  - usual YT controls + pausing places the timestamp on the clipboard
+  - Entity predictive search (also via Kohenen projection)
 - Given tiemstamps, map the episode!
 - Neater DB seeding?
-- Deeper mock RVs
-- GUI (Playwrite, Percy)
-  - Entity predictive search
-- Kohenen projection!
+- (Playwrite, Percy)
 - Prolog export
 
 ## NOTES

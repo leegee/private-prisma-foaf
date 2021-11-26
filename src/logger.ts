@@ -14,6 +14,7 @@ const config = {
 };
 
 let devConfig = {
+  ...config,
   transport: {
     target: 'pino-pretty',
     options: {

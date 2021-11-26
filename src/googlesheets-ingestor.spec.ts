@@ -1,54 +1,48 @@
-import type { FetchMockStatic } from 'fetch-mock';
-import fetch from 'node-fetch';
-import 'fetch-mock-jest';
+import fetchMock from "jest-fetch-mock";
 
-// As jest automatically hoists `jest.mock()` calls to before imports,
-// without `require`, there would be a `ReferenceError`
-jest.mock(
-  'node-fetch',
-  () => require('fetch-mock-jest').sandbox(),
-);
+import { prisma, logger } from 'testlib/fixtures';
 
-// Cast node-fetch as fetchMock so `.mock*` methods may be accessed
-const fetchMock = (fetch as unknown) as FetchMockStatic;
+import {
+  GooglesheetsConfigType,
+  GooglesheetsIngestor,
+  IGooglesheetsIngestorArgs,
+} from './googlesheets-ingestor';
+
+fetchMock.enableMocks();
+
+const configMock: GooglesheetsConfigType = {
+  spreadsheetId: 'mock-spreadsheetId',
+  googlesheetsApiKey: 'mock-googlesheetsApiKey',
+  sheetName: 'mock-sheetName',
+};
+
 
 describe('code that uses fetch', () => {
-  beforeEach(() => fetchMock.reset());
-
-  it('should fetch a simple URL correctly', async () => {
-    fetchMock.get('https://example.com', { value: 1234 });
-    await fetch('https://example.com');
-    expect(fetchMock).toHaveFetched('https://example.com');
+  let o: GooglesheetsIngestor;
+  beforeEach(() => {
+    fetchMock.mockClear();
+    o = new GooglesheetsIngestor({
+      fetch: fetchMock,
+      prisma,
+      logger,
+      config: configMock,
+    } as IGooglesheetsIngestorArgs);
   });
 
-  it('should fetch with complex assertions', async () => {
-    fetchMock.post(
-      'https://example.com/submit',
-      { status: 'ok' },
+  it('should init an object', () => {
+    expect(o).toBeInstanceOf(GooglesheetsIngestor);
+  });
+
+  it('should fetch a simple URL correctly', async () => {
+    fetchMock.mockResponse(
+      JSON.stringify({ mockKey: 'mock-value' })
     );
 
-    const result = await fetch(
-      'https://example.com/submit',
-      {
-        method: 'post',
-        body: JSON.stringify({
-          type: 'create',
-          details: {
-            username: 'alice and bobette',
-            passwordToken: 'asdfasdf',
-          },
-        }),
-        headers: { 'content-type': 'application/json' },
-      },
-    );
+    o._getGoogleSheetsUrlForSheetName = jest.fn(() => 'https://example.com');
 
-    expect(fetchMock).toHaveFetched(
-      'https://example.com/submit',
-      {
-        matchPartialBody: true,
-        method: 'post',
-        body: { type: 'create' },
-      }
-    );
+    await o._getResource();
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledWith('https://example.com');
   });
 });
