@@ -5,7 +5,7 @@ import * as child_process from 'child_process';
 import fs, { unlinkSync } from 'fs';
 import os from 'os';
 import { PrismaClient, Prisma, Entity, Verb, Predicate } from '@prisma/client';
-import * as loggerModule from './logger';
+import { logger, ILogger } from 'src/logger';
 
 export function normaliseArray(list: string[]): string[] {
   return list.map(subject => normalise(subject));
@@ -39,7 +39,7 @@ export interface IErdArgs {
     Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
   >;
   savepath?: string;
-  logger?: loggerModule.ILogger;
+  logger?: ILogger;
   format?: string;
   layout?: string;
   layouts?: string[];
@@ -52,7 +52,7 @@ export class Erd {
     twopi: "",
     dot: "",
   };
-  logger: loggerModule.ILogger;
+  logger: ILogger;
 
   prisma: PrismaClient<
     Prisma.PrismaClientOptions,
@@ -66,7 +66,7 @@ export class Erd {
   format = '';
   layout = 'fdp';
 
-  constructor({ prisma, savepath, logger, format }: IErdArgs) {
+  constructor({ prisma, savepath, logger: _logger, format }: IErdArgs) {
     this.prisma = prisma;
     if (!!savepath) {
       this.savepath = savepath;
@@ -75,7 +75,7 @@ export class Erd {
       throw new TypeError('savepath too short');
     }
     this.format = format || this.savepath.substr(this.savepath.length - 3, 3);
-    this.logger = logger ? logger : loggerModule.logger;
+    this.logger = _logger ? _logger : logger;
   }
 
   async _populatePredicates(knownas?: string | string[]) {
@@ -106,7 +106,6 @@ export class Erd {
       })
     );
   }
-
 
   async _populatePredicatesForKnownAs(knownasInput: string | string[]) {
     const knownasList = knownasInput instanceof Array ? knownasInput : [knownasInput];

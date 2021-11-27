@@ -27,6 +27,8 @@ export class GooglesheetsIngestor extends BaseIngestor {
       throw new TypeError('sheetname not defined');
     }
 
+    // `https://docs.google.com/spreadsheets/d/${this.config.spreadsheetId}/gviz/tq?tqx=out:csv&sheet={${this.config.sheetName}}`;
+
     return 'https://sheets.googleapis.com/v4/spreadsheets/'
       + this.config.spreadsheetId + '/values/'
       + (sheetName || this.config.sheetName)

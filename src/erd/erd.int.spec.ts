@@ -55,7 +55,7 @@ describe('erd', () => {
 
   describe('All', () => {
     it('saves  to file', async () => {
-      const savepath = './temp-all.png';
+      const savepath = './temp-all.svg';
       if (fs.existsSync(savepath)) {
         fs.unlinkSync(savepath);
       }
