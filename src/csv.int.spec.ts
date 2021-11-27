@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { Erd } from 'src/erd';
+import { Graphviz as Erd } from 'src/erd/graphviz';
 import { logger } from 'src/logger';
 
 import PrismaTestEnvironment from "testlib/prisma-test-env";

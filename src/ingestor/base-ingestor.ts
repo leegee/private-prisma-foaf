@@ -1,9 +1,7 @@
 import * as fsImport from 'fs';
-import { parse } from 'csv-parse';
 import { Prisma, PrismaClient } from '@prisma/client';
 import * as loggerModule from 'src/logger';
-import { normalise, makePredicateId } from './erd';
-import fetch from 'node-fetch';
+import { normalise, makePredicateId } from 'src/erd/erd';
 
 // prisma.$use(async (params, next) => {
 //   const before = Date.now()

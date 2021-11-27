@@ -2,7 +2,7 @@
  * @see https://sheets.googleapis.com/v4/spreadsheets/SPREADSHEET_ID/values/RANGE?key=apiKey
  * @see https://developers.google.com/sheets/api/guides/concepts
  */
-
+import fetch from 'node-fetch';
 import { BaseIngestor, ConfigType, IBaseingestorArgs as IBaseIngestorArgs } from './base-ingestor';
 
 export type GooglesheetsConfigType = ConfigType & {

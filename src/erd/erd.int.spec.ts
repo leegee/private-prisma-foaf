@@ -3,7 +3,7 @@ import PrismaTestEnvironment from "testlib/prisma-test-env";
 import * as fs from 'fs';
 
 import { prisma } from 'testlib/fixtures';
-import { Erd } from './erd';
+import { Graphviz as Erd } from 'src/erd/graphviz';
 
 PrismaTestEnvironment.init();
 

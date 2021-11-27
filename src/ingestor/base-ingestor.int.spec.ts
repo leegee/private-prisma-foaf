@@ -1,4 +1,4 @@
-import { BaseIngestor } from './base-ingestor';
+import { BaseIngestor } from 'src/ingestor/base-ingestor';
 import { logger } from 'src/logger';
 import PrismaTestEnvironment from "testlib/prisma-test-env";
 PrismaTestEnvironment.init();

@@ -1,7 +1,6 @@
 import { Readable } from "stream";
 import { CsvIngestor } from './csv-ingestor';
 
-import { normalise } from "./erd";
 import PrismaTestEnvironment from "testlib/prisma-test-env";
 PrismaTestEnvironment.init();
 
