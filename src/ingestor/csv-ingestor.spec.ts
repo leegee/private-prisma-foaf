@@ -10,17 +10,15 @@ PrismaTestEnvironment.init();
 const mocks = {
   ReadStream: jest.fn().mockImplementation(() => {
     const readable = new Readable();
-    readable.push('[Oswald] --> |assinated| [JFK]');
-    readable.push('[Arthur Young] --> |hosted| [Oswald]');
+    readable.push('Oswald,assinated,JFK');
+    readable.push('Arthur Young,hosted,Oswald');
     readable.push(null);
     return readable;
   }),
 };
 
-
 jest.mock('fs');
 fs.createReadStream = mocks.ReadStream;
-
 
 describe('file2erd', () => {
   it('ingested file', async () => {
