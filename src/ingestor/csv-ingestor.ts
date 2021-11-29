@@ -1,4 +1,4 @@
-import * as fsImport from 'fs';
+import fs from 'fs';
 import { parse } from 'csv-parse';
 
 import { BaseIngestor, GrammarError } from './base-ingestor';
@@ -11,8 +11,7 @@ export class CsvIngestor extends BaseIngestor {
     }
     this.logger.debug('Enter parseEntityFile for ' + filepath);
 
-    this.fs
-      .createReadStream(filepath)
+    fs.createReadStream(filepath)
       .on('error', (error: Error) => this.logger.error(error))
       .pipe(
         parse({
@@ -36,8 +35,7 @@ export class CsvIngestor extends BaseIngestor {
     }
     this.logger.debug('Enter parsePredicateFile for ' + filepath);
 
-    this.fs
-      .createReadStream(filepath)
+    fs.createReadStream(filepath)
       .on('error', (error: Error) => this.logger.error(error))
       .pipe(
         parse({

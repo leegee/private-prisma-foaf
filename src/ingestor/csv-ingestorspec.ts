@@ -1,9 +1,11 @@
 import { Readable } from 'stream';
+import fs from 'fs';
 
 import { CsvIngestor } from './csv-ingestor';
-
 import PrismaTestEnvironment from "testlib/prisma-test-env";
+
 PrismaTestEnvironment.init();
+
 
 const mocks = {
   ReadStream: jest.fn().mockImplementation(() => {
@@ -13,20 +15,18 @@ const mocks = {
     readable.push(null);
     return readable;
   }),
-
-  fs: { createReadStream: () => { } }
 };
 
-mocks.fs.createReadStream = mocks.ReadStream;
+
+jest.mock('fs');
+fs.createReadStream = mocks.ReadStream;
+
 
 describe('file2erd', () => {
   it('ingested file', async () => {
-    jest.setTimeout(1000 * 30);
-
     it('should read a mock relations file', async () => {
       const gi = new CsvIngestor({
         prisma: PrismaTestEnvironment.prisma,
-        fs: mocks.fs,
       });
       await gi.parsePredicateFile('irrelevant-as-file-not-accessed');
       expect(mocks.ReadStream).toHaveBeenCalled();
@@ -35,7 +35,6 @@ describe('file2erd', () => {
     it('should read a mock entity file', async () => {
       const gi = new CsvIngestor({
         prisma: PrismaTestEnvironment.prisma,
-        fs: mocks.fs,
       });
       await gi.parseEntityFile('irrelevant-as-file-not-accessed');
       expect(mocks.ReadStream).toHaveBeenCalled();

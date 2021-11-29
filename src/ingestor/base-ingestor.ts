@@ -1,4 +1,3 @@
-import * as fsImport from 'fs';
 import { Prisma, PrismaClient } from '@prisma/client';
 import * as loggerModule from 'src/logger';
 import { normalise, makePredicateId } from 'src/erd/erd';
@@ -69,7 +68,6 @@ export class GrammarError extends Error {
 
 export interface IBaseingestorArgs {
   config?: ConfigType;
-  fs?: any; // ugh
   logger?: loggerModule.ILogger;
   prisma: PrismaClient<
     Prisma.PrismaClientOptions,
@@ -84,7 +82,6 @@ export class BaseIngestor {
     googlesheetsApiKey: undefined,
     sheetName: undefined,
   }
-  fs = fsImport;
   logger: loggerModule.ILogger;
   prisma: PrismaClient<
     Prisma.PrismaClientOptions,
@@ -92,10 +89,7 @@ export class BaseIngestor {
     Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
   >;
 
-  constructor({ config, logger, prisma, fs }: IBaseingestorArgs) {
-    if (fs) {
-      this.fs = fs;
-    }
+  constructor({ config, logger, prisma }: IBaseingestorArgs) {
     if (config) {
       this.config = config;
     }
