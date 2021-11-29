@@ -44,7 +44,7 @@ export class GooglesheetsIngestor extends BaseIngestor {
 
     try {
       res = await fetch(url);
-      this.logger.info(`Fetched "${url}" "${res}"`);
+      this.logger.info(`Fetched "${url}" `, res);
     }
     catch (e) {
       this.logger.error(e);

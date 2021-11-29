@@ -4,13 +4,13 @@ import * as loggerModule from 'src/logger';
 import { normalise, makePredicateId } from 'src/erd/erd';
 
 // prisma.$use(async (params, next) => {
-//   const before = Date.now()
-//   const result = await next(params)
-//   const after = Date.now()
-//   console.log(
+// const before = process.hrtime.bigint;
+//   const result = await next(params);
+//   const after =  process.hrtime.bigint;
+//   logger.debug(
 //     `Query ${params.model}.${params.action} took ${after - before}ms`,
-//   )
-//   return result
+//   );
+//   return result;
 // })
 
 export type ConfigType = {
@@ -127,13 +127,18 @@ export class BaseIngestor {
       }
     }
 
-    await this.prisma.entity.upsert({
+    const args = {
       create: subject as IEntityUpsertArgs,
       update: subject as IEntityUpsertArgs,
       where: {
-        knownas: row.knownas,
+        knownas: subject.knownas as string,
       }
-    });
+    };
+    try {
+      await this.prisma.entity.upsert(args);
+    } catch (e) {
+      this.logger.error(e, args);
+    }
   }
 
   async _createSubjectObjectVerbPredicate(row: IPredicateUpsertArgs) {
