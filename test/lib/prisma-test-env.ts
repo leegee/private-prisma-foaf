@@ -6,7 +6,6 @@
 
 import dotenv from 'dotenv';
 dotenv.config;
-// require('dotenv').config();
 
 import { prisma } from 'testlib/fixtures';
 
@@ -18,8 +17,6 @@ import { logger } from 'src/logger';
 import { CsvIngestor } from "src/ingestor/csv-ingestor";
 
 const prismaBinary = 'npx prisma';
-
-jest.setTimeout(1000 * 30);
 
 process.on('uncaughtException', (error) => {
   logger.error(error);

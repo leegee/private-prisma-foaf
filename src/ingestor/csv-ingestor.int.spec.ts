@@ -8,7 +8,6 @@ PrismaTestEnvironment.init();
 
 jest.setTimeout(1000 * 30);
 
-
 describe('ingest-graph', () => {
   it('should integrate with real fs to read a file', async () => {
     const gi = new CsvIngestor({

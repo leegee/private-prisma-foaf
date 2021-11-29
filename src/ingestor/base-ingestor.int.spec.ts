@@ -1,7 +1,9 @@
 import { BaseIngestor } from 'src/ingestor/base-ingestor';
 import { logger } from 'src/logger';
 import PrismaTestEnvironment from "testlib/prisma-test-env";
+
 PrismaTestEnvironment.init();
+jest.setTimeout(1000 * 30);
 
 describe('ingest-graph', () => {
   it('_createSubjectObjectVerbPredicate', async () => {
