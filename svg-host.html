@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>SVG Output</title>
+  <meta name="charset" value="utf-8">
+  <link rel="stylesheet" type="text/css" href="styles.css" media=”screen” />
+  <style>
+    object[type="image/svg+xml"] {
+      display: block;
+      margin-bottom: 1em;
+      border: 3pt double black;
+      box-sizing: border-box;
+    }
+
+    @media screen and (orientation:portrait) {
+      object[type="image/svg+xml"] {
+        height: 100%;
+      }
+    }
+
+    @media screen and (orientation:landscape) {
+      object[type="image/svg+xml"] {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Output</h1>
+  <h2>Circo</h2>
+  <object type="image/svg+xml" data="output-circo.svg"></object>
+
+  <h2>Dot</h2>
+  <object type="image/svg+xml" data="output-dot.svg"></object>
+
+  <h2>FDP</h2>
+  <object type="image/svg+xml" data="output-fdp.svg"></object>
+
+  <h2>TwoPi</h2>
+  <object type="image/svg+xml" data="output-twopi.svg"></object>
+</body>
+
+</html>

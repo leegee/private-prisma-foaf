@@ -1,7 +1,13 @@
 import * as path from 'path';
 import * as child_process from 'child_process';
 import fs, { unlinkSync } from 'fs';
-import { Erd } from 'src/erd/erd';
+import { Erd, IErdArgs } from 'src/erd/erd';
+
+
+export interface IGraphvizArgs extends IErdArgs {
+  layout?: string;
+  layouts?: string[];
+}
 
 export class Graphviz extends Erd {
   static layouts: { [key: string]: string } = {
@@ -10,6 +16,11 @@ export class Graphviz extends Erd {
     twopi: "",
     dot: "",
   };
+  layout = 'fdp';
+
+  constructor(args: IGraphvizArgs) {
+    super(args);
+  }
 
   async graphviz(knownas?: string | string[]) {
     this.logger.debug(`Enter useGraphviz`);
@@ -42,7 +53,7 @@ export class Graphviz extends Erd {
   layout=${this.layout}
   stylesheet="./styles.css"
   fontsize="32pt"
-  ${Erd.layouts[this.layout]}
+  ${Graphviz.layouts[this.layout]}
   `;
 
     this.logger.debug(`Predicates: "${this.predicates}"`);

@@ -41,17 +41,9 @@ export interface IErdArgs {
   savepath?: string;
   logger?: ILogger;
   format?: string;
-  layout?: string;
-  layouts?: string[];
 }
 
 export class Erd {
-  static layouts: { [key: string]: string } = {
-    circo: "sep = 2 \n esep = 2 \n weight = 20.0 \n fontSize = 28.0 \n penwidth = 20.0 \n",
-    fdp: "sep=2 \n esep=2 \n weight=2 \n penwidth=3",
-    twopi: "",
-    dot: "",
-  };
   logger: ILogger;
 
   prisma: PrismaClient<
@@ -64,7 +56,6 @@ export class Erd {
   entityKnownas2Id: { [key: string]: number } = {};
   tmpDir = fs.mkdtempSync(os.tmpdir() + path.sep + 'entity-erd-');
   format = '';
-  layout = 'fdp';
 
   constructor({ prisma, savepath, logger: _logger, format }: IErdArgs) {
     this.prisma = prisma;
