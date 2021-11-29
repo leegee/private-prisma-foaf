@@ -1,4 +1,7 @@
 import * as BaseIngestor from 'src/ingestor/base-ingestor';
+import { prisma } from 'testlib/fixtures';
+
+import each from 'jest-each';
 
 describe('ingest-graph', () => {
   it('exports GrammarError Error', () => {
@@ -8,5 +11,17 @@ describe('ingest-graph', () => {
     expect(e).toBeInstanceOf(Error);
     expect(e).toHaveProperty('message');
     expect(e.message).toBe('mock-message');
+  });
+
+  each([
+    {},
+    { Subject: 1, Object: 2 },
+    { Subject: 1, Verb: 2 },
+    { Verb: 1, Object: 2 }
+  ]).test('throws GrammarError on bad args', async (args) => {
+    const o = new BaseIngestor.BaseIngestor({ prisma });
+    await expect(
+      async () => o._createSubjectObjectVerbPredicate(args as BaseIngestor.IPredicateUpsertArgs)
+    ).rejects.toThrowError(BaseIngestor.GrammarError);
   });
 });
