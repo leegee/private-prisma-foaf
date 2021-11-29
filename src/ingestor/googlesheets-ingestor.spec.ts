@@ -1,14 +1,14 @@
+import { prisma, logger } from 'testlib/fixtures';
+
 import fetchMock from "jest-fetch-mock";
 
-import { prisma, logger } from 'testlib/fixtures';
+fetchMock.enableMocks();
 
 import {
   GooglesheetsConfigType,
   GooglesheetsIngestor,
   IGooglesheetsIngestorArgs,
 } from './googlesheets-ingestor';
-
-fetchMock.enableMocks();
 
 const configMock: GooglesheetsConfigType = {
   spreadsheetId: 'mock-spreadsheetId',
@@ -20,7 +20,8 @@ const configMock: GooglesheetsConfigType = {
 describe('code that uses fetch', () => {
   let o: GooglesheetsIngestor;
   beforeEach(() => {
-    fetchMock.mockClear();
+    fetchMock.resetMocks();
+
     o = new GooglesheetsIngestor({
       fetch: fetchMock,
       prisma,
@@ -34,15 +35,17 @@ describe('code that uses fetch', () => {
   });
 
   it('should fetch a simple URL correctly', async () => {
-    fetchMock.mockResponse(
-      JSON.stringify({ mockKey: 'mock-value' })
+    fetchMock.mockResponseOnce(
+      JSON.stringify({ mockKey: 'mock-value' }),
+      { status: 200 }
     );
 
-    o._getGoogleSheetsUrlForSheetName = jest.fn(() => 'https://example.com');
+    o._getGoogleSheetsUrlForSheetName = jest.fn(() => 'irrelevant-never-called');
 
     await o._getResource();
 
+    expect(o._getGoogleSheetsUrlForSheetName).toHaveBeenCalled();
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fetchMock).toHaveBeenCalledWith('https://example.com');
+    expect(fetchMock).toHaveBeenCalledWith('irrelevant-never-called');
   });
 });
