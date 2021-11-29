@@ -23,7 +23,6 @@ describe('code that uses fetch', () => {
     fetchMock.resetMocks();
 
     o = new GooglesheetsIngestor({
-      fetch: fetchMock,
       prisma,
       logger,
       config: configMock,
@@ -35,17 +34,18 @@ describe('code that uses fetch', () => {
   });
 
   it('should fetch a simple URL correctly', async () => {
+    // fetchMock.mockReject(() => Promise.reject("API failure"));
     fetchMock.mockResponseOnce(
       JSON.stringify({ mockKey: 'mock-value' }),
       { status: 200 }
     );
 
-    o._getGoogleSheetsUrlForSheetName = jest.fn(() => 'irrelevant-never-called');
+    o._getGoogleSheetsUrlForSheetName = jest.fn(() => 'mock-url');
 
     await o._getResource();
 
     expect(o._getGoogleSheetsUrlForSheetName).toHaveBeenCalled();
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fetchMock).toHaveBeenCalledWith('irrelevant-never-called');
+    expect(fetchMock).toHaveBeenCalledWith('mock-url');
   });
 });
