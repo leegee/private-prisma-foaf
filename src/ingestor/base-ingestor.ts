@@ -158,9 +158,7 @@ export class BaseIngestor {
         select: { id: true },
       });
 
-    this.logger.debug(
-      `Got subject "${JSON.stringify(foundSubject)}" via "${row.Subject}"`,
-    );
+    this.logger.debug(`Got subject "${JSON.stringify(foundSubject)}" via "${row.Subject}"`,);
 
     if (foundSubject === null) {
       try {
@@ -173,10 +171,7 @@ export class BaseIngestor {
         });
         CachedIds.Entity[row.Subject] = foundSubject.id;
       } catch (e) {
-        throw new Error(
-          `Failed to create subject entity for "${row.Subject}" - ${(e as Error).message
-          }`,
-        );
+        throw new Error(`Failed to create subject entity for "${row.Subject}" - ${(e as Error).message}`,);
       }
     }
 
@@ -198,9 +193,7 @@ export class BaseIngestor {
         });
         CachedIds.Verb[row.Verb] = foundVerb.id;
       } catch (e) {
-        throw new Error(
-          `Failed to create verb from "${row.Verb}" - ${(e as Error).message}`,
-        );
+        throw new Error(`Failed to create verb from "${row.Verb}" - ${(e as Error).message}`,);
       }
     }
 
@@ -225,10 +218,7 @@ export class BaseIngestor {
         });
         CachedIds.Entity[row.Object] = foundObject.id;
       } catch (e) {
-        throw new Error(
-          `Failed to create object entity for  "${row.Object}" - ${(e as Error).message
-          }`,
-        );
+        throw new Error(`Failed to create object entity for  "${row.Object}" - ${(e as Error).message}`,);
       }
     }
 
@@ -239,9 +229,7 @@ export class BaseIngestor {
     );
 
     if (CachedIds.Predicate[predicateId]) {
-      this.logger.debug(
-        `Predicate found in cache - "${predicateId}" for: ${row.Subject} ${row.Verb} ${row.Object} `,
-      );
+      this.logger.debug(`Predicate found in cache - "${predicateId}" for: ${row.Subject} ${row.Verb} ${row.Object} `,);
     }
 
     else {
@@ -278,7 +266,9 @@ export class BaseIngestor {
           this.logger.error(`Failed to create ${msg}`);
           this.logger.error(e);
         }
-      } else {
+      }
+
+      else {
         this.logger.debug(`Linked to ${msg}`);
       }
     }

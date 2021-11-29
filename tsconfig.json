@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "module": "UMD",
+    "module": "esnext",
     "allowJs": true,
     "sourceMap": true,
     "outDir": "dist",

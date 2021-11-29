@@ -6,7 +6,6 @@ import PrismaTestEnvironment from "testlib/prisma-test-env";
 
 PrismaTestEnvironment.init();
 
-
 const mocks = {
   ReadStream: jest.fn().mockImplementation(() => {
     const readable = new Readable();
@@ -17,11 +16,10 @@ const mocks = {
   }),
 };
 
-jest.mock('fs');
 fs.createReadStream = mocks.ReadStream;
 
-describe('file2erd', () => {
-  it('ingested file', async () => {
+describe('csv-ingestor', () => {
+  describe('ingested file', () => {
     it('should read a mock relations file', async () => {
       const gi = new CsvIngestor({
         prisma: PrismaTestEnvironment.prisma,
