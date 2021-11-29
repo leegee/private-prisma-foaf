@@ -1,8 +1,7 @@
 // Rendering based on node_modules\prisma-erd-generator\src\generate.ts
 
 import * as path from 'path';
-import * as child_process from 'child_process';
-import fs, { unlinkSync } from 'fs';
+import fs from 'fs';
 import os from 'os';
 import { PrismaClient, Prisma, Entity, Verb, Predicate } from '@prisma/client';
 import { logger, ILogger } from 'src/logger';
