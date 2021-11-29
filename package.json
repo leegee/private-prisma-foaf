@@ -92,7 +92,7 @@
     ],
     "coverageDirectory": "./coverage",
     "setupFilesAfterEnv": [
-      "./test/lib/jest-setup.ts"
+      "./test/lib/jest-setup-after-env.ts"
     ],
     "moduleNameMapper": {
       "^src/(.*)$": "<rootDir>/src/$1",
