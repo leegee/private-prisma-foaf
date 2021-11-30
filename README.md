@@ -56,6 +56,9 @@ Verb search is easiest via stems, provided through an insert/update trigger on `
 
 ## TODO
 
+- Middleware to
+  - cast dates to strings?
+  - remove empty fields (since usage dictates no blanking of extant fields, only replacement)
 - Kohenen projection!
 - Link an `aka` table to Postgres Thesaurus configuration (Entity.id references Aka.id)
 - GUI to gather timestamps:

@@ -5,7 +5,7 @@ import PrismaTestEnvironment from "testlib/prisma-test-env";
 PrismaTestEnvironment.init();
 jest.setTimeout(1000 * 30);
 
-describe('ingest-graph', () => {
+describe('base-ingestor (int)', () => {
   it('_createSubjectObjectVerbPredicate', async () => {
     const gi = new BaseIngestor({
       prisma: PrismaTestEnvironment.prisma,

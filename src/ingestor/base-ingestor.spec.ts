@@ -3,7 +3,7 @@ import { prisma } from 'testlib/fixtures';
 
 import each from 'jest-each';
 
-describe('ingest-graph', () => {
+describe('base-ingestor', () => {
   it('exports GrammarError Error', () => {
     expect(BaseIngestor.GrammarError).toBeDefined();
 
@@ -23,5 +23,10 @@ describe('ingest-graph', () => {
     await expect(
       async () => o._createSubjectObjectVerbPredicate(args as BaseIngestor.IPredicateUpsertArgs)
     ).rejects.toThrowError(BaseIngestor.GrammarError);
+  });
+
+
+  it('_createEntity', async () => {
+
   });
 });
