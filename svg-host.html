@@ -6,40 +6,39 @@
   <meta name="charset" value="utf-8">
   <link rel="stylesheet" type="text/css" href="styles.css" media=”screen” />
   <style>
-    object[type="image/svg+xml"] {
+    body {
+      background-color: black;
+      color: white;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
       display: block;
-      margin-bottom: 1em;
-      border: 3pt double black;
+      border: 1em solid white;
       box-sizing: border-box;
     }
-
-    @media screen and (orientation:portrait) {
-      object[type="image/svg+xml"] {
-        height: 100%;
-      }
-    }
-
-    @media screen and (orientation:landscape) {
-      object[type="image/svg+xml"] {
-        width: 100%;
-      }
-    }
   </style>
+
+  <script defer>
+    window.addEventListener("click", (e) => e.target.closest("img") && window.open(e.target.closest("img").src));
+  </script>
 </head>
 
 <body>
   <h1>Output</h1>
+
   <h2>Circo</h2>
-  <object type="image/svg+xml" data="output-circo.svg"></object>
+  <img src="output/circo.svg">
 
   <h2>Dot</h2>
-  <object type="image/svg+xml" data="output-dot.svg"></object>
+  <img src="output/dot.svg">
 
   <h2>FDP</h2>
-  <object type="image/svg+xml" data="output-fdp.svg"></object>
+  <img src="output/fdp.svg">
 
   <h2>TwoPi</h2>
-  <object type="image/svg+xml" data="output-twopi.svg"></object>
+  <img src="output/twopi.svg">
 </body>
 
 </html>
