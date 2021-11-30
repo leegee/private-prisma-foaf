@@ -55,11 +55,14 @@ Logging is via `pino`.
 - Kohenen projection!
 - GUI to gather timestamps:
   - embeds YouTube player
-  - usual YT controls + pausing places the timestamp on the clipboard
-  - Entity predictive search (also via Kohenen projection)
+  - usual YT controls + pausing populates the citaiton field with a YT watch/$id?t=n link
+  - Entity/verb predictive search (also via Kohenen projection)
+    - stem-field for all words in the DB?
+    - stem queries on receipt
+    - is there a Node port of Snowball?
+  - (Playwrite, Percy)
 - Given tiemstamps, map the episode!
-- Neater DB seeding?
-- (Playwrite, Percy)
+- Seed with the CSV?
 - Prolog export
 
 ## NOTES
