@@ -51,8 +51,9 @@ export class Graphviz extends Erd {
   async _predicates2graph(): Promise<string> {
     let graph = `digraph  G {
   layout=${this.layout}
-  stylesheet="./styles.css"
-  fontsize="32pt"
+  title="As of ${new Date().toLocaleDateString()}"
+  stylesheet="../styles.css"
+  fontsize="48pt"
   ${Graphviz.layouts[this.layout]}
   `;
 
