@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
+    "target": "ES2017",
+    "module": "commonjs",
     "allowJs": true,
     "sourceMap": true,
     "outDir": "dist",

@@ -48,11 +48,16 @@ See examples.
 
 ## Logging
 
-Logging is via `pino`.
+Logging is via `pino`. `LOG_LEVEL` environment variable takes a lower-case log level (eg `debug`).
+
+## Queries
+
+Verb search is easiest via stems, provided through an insert/update trigger on `Verb.name` that populates `Verb.stem` the Postgres Snowball lexeme string. (It could contain multiple values, but it's a good enough for now.)
 
 ## TODO
 
 - Kohenen projection!
+- Link an `aka` table to Postgres Thesaurus configuration (Entity.id references Aka.id)
 - GUI to gather timestamps:
   - embeds YouTube player
   - usual YT controls + pausing populates the citaiton field with a YT watch/$id?t=n link

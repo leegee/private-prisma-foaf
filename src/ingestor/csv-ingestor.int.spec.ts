@@ -1,12 +1,14 @@
 import fs from 'fs';
-import { CsvIngestor } from './csv-ingestor';
+import { CsvIngestor } from 'src/ingestor/csv-ingestor';
 import { Graphviz as Erd } from "src/erd/graphviz";
 import { logger } from "src/logger";
 
 import PrismaTestEnvironment from "testlib/prisma-test-env";
-PrismaTestEnvironment.init();
 
 jest.setTimeout(1000 * 30);
+
+PrismaTestEnvironment.init();
+
 
 describe('ingest-graph', () => {
   it('should integrate with real fs to read a file', async () => {

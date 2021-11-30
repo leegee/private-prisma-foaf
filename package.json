@@ -41,14 +41,14 @@
     "test:coverage": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "update": "prisma generate",
     "db:start": "docker-compose up -d --remove-orphans",
     "db:stop": "docker-compose down",
     "db:shell": "docker exec -it postgres psql -U admin -a foaf",
-    "db:sql": "docker exec -it postgres psql -U admin -a foaf -c 'SELECT * FROM entity;'",
+    "db:sql": "docker exec -it postgres psql -U admin -a foaf -c ",
+    "db:add-triggers": "ts-node prisma/add-triggers.ts",
     "preanew": "rimraf prisma/migrations && docker exec -it postgres psql -U admin -a postgres -c \"DROP DATABASE foaf\" || true",
     "anew": "npx prisma migrate dev --name init",
-    "postanew": "npm run update"
+    "postanew": "npm run db:add-triggers"
   },
   "dependencies": {
     "@prisma/client": "^3.5.0",

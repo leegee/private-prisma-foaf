@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { CsvIngestor } from 'src/ingestor/csv-ingestor';
+import { CsvIngestor } from '../../src/ingestor/csv-ingestor';
 
 import PrismaTestEnvironment from "testlib/prisma-test-env";
 PrismaTestEnvironment.init();

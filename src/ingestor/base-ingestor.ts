@@ -146,81 +146,69 @@ export class BaseIngestor {
     row.Verb = normalise(row.Verb);
     row.Object = normalise(row.Object);
 
-    // try upsert without changing anything?
-
-    let foundSubject = CachedIds.Entity[row.Subject]
+    const foundSubject = CachedIds.Entity[row.Subject]
       ? {
-        knownas: row.Subject,
         id: CachedIds.Entity[row.Subject],
+        knownas: row.Subject
       }
-      : await this.prisma.entity.findFirst({
-        where: { knownas: row.Subject },
+      : await this.prisma.entity.upsert({
         select: { id: true },
+        where: { knownas: row.Subject },
+        create: {
+          knownas: row.Subject,
+          formalname: row.Subject,
+        },
+        update: {
+          knownas: row.Subject,
+          formalname: row.Subject,
+        },
       });
+
+    CachedIds.Entity[row.Subject] = foundSubject.id;
 
     this.logger.debug(`Got subject "${JSON.stringify(foundSubject)}" via "${row.Subject}"`,);
 
-    if (foundSubject === null) {
-      try {
-        foundSubject = await this.prisma.entity.create({
-          data: {
-            knownas: row.Subject,
-            formalname: row.Subject,
-          },
-          select: { id: true },
-        });
-        CachedIds.Entity[row.Subject] = foundSubject.id;
-      } catch (e) {
-        throw new Error(`Failed to create subject entity for "${row.Subject}" - ${(e as Error).message}`,);
-      }
-    }
-
-    let foundVerb = CachedIds.Entity[row.Verb]
+    const foundVerb = CachedIds.Verb[row.Verb]
       ? {
-        name: row.Verb,
-        id: CachedIds.Entity[row.Verb],
+        id: CachedIds.Verb[row.Verb],
+        name: row.Verb
       }
-      : await this.prisma.verb.findFirst({
+      : await this.prisma.verb.upsert({
+        select: { id: true },
         where: { name: row.Verb },
-        select: { id: true },
+        create: {
+          name: row.Verb
+        },
+        update: {
+          name: row.Verb
+        },
       });
 
-    if (foundVerb === null) {
-      try {
-        foundVerb = await this.prisma.verb.create({
-          data: { name: row.Verb },
-          select: { id: true },
-        });
-        CachedIds.Verb[row.Verb] = foundVerb.id;
-      } catch (e) {
-        throw new Error(`Failed to create verb from "${row.Verb}" - ${(e as Error).message}`,);
-      }
-    }
+    CachedIds.Verb[row.Verb] = foundVerb.id;
 
-    let foundObject = CachedIds.Entity[row.Object]
+    this.logger.debug(`Got verb "${JSON.stringify(foundVerb)}" via "${row.Verb}"`,);
+
+    const foundObject = CachedIds.Entity[row.Object]
       ? {
-        knwonas: row.Object,
         id: CachedIds.Entity[row.Object],
+        knownas: row.Object
       }
-      : await this.prisma.entity.findFirst({
-        where: { knownas: row.Object },
+      : await this.prisma.entity.upsert({
         select: { id: true },
+        where: { knownas: row.Object },
+        create: {
+          knownas: row.Object,
+          formalname: row.Object,
+        },
+        update: {
+          knownas: row.Object,
+          formalname: row.Object,
+        },
       });
 
-    if (foundObject === null) {
-      try {
-        foundObject = await this.prisma.entity.create({
-          data: {
-            formalname: row.Object,
-            knownas: row.Object,
-          },
-          select: { id: true },
-        });
-        CachedIds.Entity[row.Object] = foundObject.id;
-      } catch (e) {
-        throw new Error(`Failed to create object entity for  "${row.Object}" - ${(e as Error).message}`,);
-      }
-    }
+    CachedIds.Entity[row.Object] = foundObject.id;
+
+    this.logger.debug(`Got object "${JSON.stringify(foundObject)}" via "${row.Object}"`,);
 
     const predicateId = makePredicateId(
       foundSubject.id,
@@ -233,45 +221,51 @@ export class BaseIngestor {
     }
 
     else {
-      const start = row.start ? new Date(row.start) : null;
-      const end = row.end ? new Date(row.end) : null;
+      const msg = `predicateId "${predicateId}" for "${row.Subject} ${row.Verb} ${row.Object}"`;
 
-      const predicateExists = await this.prisma.predicate.findFirst({
-        where: {
-          subjectId: foundSubject.id as number,
-          verbId: foundVerb.id as number,
-          objectId: foundObject.id as number,
-          start,
-          end,
-        },
-      });
+      try {
+        this.logger.debug(`Created ${msg}`);
 
-      const msg = `predicateId "${predicateId}" for "${row.Subject} ${row.Verb} ${row.Object}": ${predicateExists}`;
-
-      CachedIds.Predicate[predicateId] = true;
-
-      if (predicateExists === null) {
-        try {
-          await this.prisma.predicate.create({
-            data: {
-              Subject: { connect: { id: foundSubject.id as number } },
-              Verb: { connect: { id: foundVerb.id as number } },
-              Object: { connect: { id: foundObject.id as number } },
-              start,
-              end,
+        await this.prisma.predicate.upsert({
+          where: {
+            subjectId_objectId_verbId: {
+              subjectId: foundSubject.id as number,
+              verbId: foundVerb.id as number,
+              objectId: foundObject.id as number
+            }
+          },
+          create: {
+            Subject: {
+              connect: { id: foundSubject.id as number }
             },
-          });
-          this.logger.debug(`Created ${msg}`);
-        } catch (e) {
-          this.logger.error(`Failed to create ${msg}`);
-          this.logger.error(e);
-        }
+            Verb: {
+              connect: { id: foundVerb.id as number },
+            },
+            Object: {
+              connect: { id: foundObject.id as number },
+            },
+            start: row.start ? new Date(row.start) : null, // should middleawre handle this?
+            end: row.end ? new Date(row.end) : null,
+          },
+          update: {
+            subjectId: foundSubject.id as number,
+            verbId: foundVerb.id as number,
+            objectId: foundObject.id as number,
+            start: row.start ? new Date(row.start) : null, // should middleawre handle this?
+            end: row.end ? new Date(row.end) : null,
+          },
+        });
+
+        CachedIds.Predicate[predicateId] = true;
+        this.logger.debug(`OK: ${msg}`);
       }
 
-      else {
-        this.logger.debug(`Linked to ${msg}`);
+      catch (e) {
+        this.logger.error(`Failed to create ${msg}`);
+        this.logger.error(e);
       }
     }
+
   }
 
 }
