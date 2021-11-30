@@ -26,6 +26,7 @@ const entityFixture: MockProxy<Entity> = {
 };
 
 PrismaTestEnvironment.init();
+jest.setTimeout(1000 * 40);
 
 describe('erd', () => {
   describe('normalise', () => {
