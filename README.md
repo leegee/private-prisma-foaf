@@ -99,16 +99,16 @@ Consider PROLOG.
 
 ### DOT
 
-![ERD](./output-dot.svg)
+![ERD](./output/dot.svg)
 
 ## FDP
 
-![ERD](./output-fdp.svg)
+![ERD](./output/fdp.svg)
 
 ## CIRCO
 
-![ERD](./output-circo.svg)
+![ERD](./output/circo.svg)
 
 ## TWOPI
 
-![ERD](./output-twopi.svg)
+![ERD](./output/twopi.svg)

@@ -224,8 +224,6 @@ export class BaseIngestor {
       const msg = `predicateId "${predicateId}" for "${row.Subject} ${row.Verb} ${row.Object}"`;
 
       try {
-        this.logger.debug(`Created ${msg}`);
-
         await this.prisma.predicate.upsert({
           where: {
             subjectId_objectId_verbId: {

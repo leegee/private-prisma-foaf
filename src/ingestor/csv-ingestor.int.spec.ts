@@ -22,7 +22,7 @@ describe('ingest-graph', () => {
   });
 
   Object.keys(Erd.layouts).forEach(async (layoutKey) => {
-    const savepath = `./output-${layoutKey}.svg`;
+    const savepath = `./output/${layoutKey}.svg`;
     if (fs.existsSync(savepath)) {
       fs.unlinkSync(savepath);
     }
