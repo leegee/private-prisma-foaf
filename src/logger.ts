@@ -21,6 +21,7 @@ let devConfig = {
     options: {
       levelFirst: true,
       hidePretty: false,
+      destination: 2,
     }
   }
 };

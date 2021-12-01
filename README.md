@@ -74,7 +74,7 @@ Verb search is easiest via stems, provided through an insert/update trigger on `
   - Enter Subject.knownas / Verb / Object.knownas, each with autosuggestion:
     - send $q and $type (Entity/Verb),
     - stem $q
-    - return top n matches in $type table where knownas_stem or formalname_stem matches stemmed $q
+    - return top n matches in $type table where knownas_stem or formalname_stem partial matches, or the verb.stem matches stemmed $q
     - Maybe display editable Entity and Verb details?
 - Submit
   - URL including timestamp
