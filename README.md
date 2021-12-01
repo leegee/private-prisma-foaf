@@ -61,17 +61,25 @@ Verb search is easiest via stems, provided through an insert/update trigger on `
   - remove empty fields (since usage dictates no blanking of extant fields, only replacement)
 - Kohenen projection!
 - Link an `aka` table to Postgres Thesaurus configuration (Entity.id references Aka.id)
-- GUI to gather timestamps:
-  - embeds YouTube player
-  - usual YT controls + pausing populates the citaiton field with a YT watch/$id?t=n link
-  - Entity/verb predictive search (also via Kohenen projection)
-    - stem-field for all words in the DB?
-    - stem queries on receipt
-    - is there a Node port of Snowball?
-  - (Playwrite, Percy)
 - Given tiemstamps, map the episode!
 - Seed with the CSV?
 - Prolog export
+
+### GUI
+
+- Enter YT URI
+  - update video src
+- Video
+  - pause = record the timestamp for adding to Citations
+  - Enter Subject.knownas / Verb / Object.knownas, each with autosuggestion:
+    - send $q and $type (Entity/Verb),
+    - stem $q
+    - return top n matches in $type table where knownas_stem or formalname_stem matches stemmed $q
+    - Maybe display editable Entity and Verb details?
+- Submit
+  - URL including timestamp
+  - Subject / Verb / Object text
+- (Playwrite, Percy)
 
 ## NOTES
 

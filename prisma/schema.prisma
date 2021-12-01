@@ -25,17 +25,19 @@ model Verb {
 }
 
 model Entity {
-  id          Int         @id @default(autoincrement())
-  knownas     String      @db.VarChar(127) // eg JFK, Bell
-  formalname  String      @db.VarChar(127) // eg John F Kennedy, Bell Aircraft Corporation
-  givenname   String?     @db.VarChar(127) // eg John
-  middlenames String?     @db.VarChar(127) // eg Fitzgerald
-  familyname  String?     @db.VarChar(127) // eg Kennedy
-  dob         DateTime?   @db.Date
-  dod         DateTime?   @db.Date
-  approved    Boolean     @default(false)
-  Subject     Predicate[] @relation("Subject")
-  Object      Predicate[] @relation("Object")
+  id              Int         @id @default(autoincrement())
+  knownas         String      @db.VarChar(127) // eg JFK, Bell
+  knownas_stem    String?     @db.VarChar(12)
+  formalname      String      @db.VarChar(127) // eg John F Kennedy, Bell Aircraft Corporation
+  formalname_stem String?     @db.VarChar(12)
+  givenname       String?     @db.VarChar(127) // eg John
+  middlenames     String?     @db.VarChar(127) // eg Fitzgerald
+  familyname      String?     @db.VarChar(127) // eg Kennedy
+  dob             DateTime?   @db.Date
+  dod             DateTime?   @db.Date
+  approved        Boolean     @default(false)
+  Subject         Predicate[] @relation("Subject")
+  Object          Predicate[] @relation("Object")
 
   @@unique([knownas])
   @@unique([formalname])
