@@ -41,7 +41,7 @@ describe('erd', () => {
       mockPrisma.entity.findFirst.mockResolvedValue(null);
 
       await expect(
-        dao._getPredicatesByKnownAs('mock-value-no-entity')
+        dao.getPredicatesByKnownAs('mock-value-no-entity')
       ).rejects.toBeInstanceOf(EntityNotFoundError);
     });
 
@@ -49,7 +49,7 @@ describe('erd', () => {
       mockPrisma.predicate.findMany.mockResolvedValue([predicateFixture]);
       mockPrisma.entity.findFirst.mockResolvedValue(entityFixture);
 
-      const predicates = await dao._getPredicatesByKnownAs(entityFixture.knownas);
+      const predicates = await dao.getPredicatesByKnownAs(entityFixture.knownas);
       expect(predicates).toBeInstanceOf(Array);
       expect(predicates).toHaveLength(1);
       expect(predicates[0]).toEqual(predicateFixture);

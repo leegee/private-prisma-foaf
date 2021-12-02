@@ -73,11 +73,11 @@ export class Erd {
 
     if (!!knownas) {
       const subject = knownas instanceof Array ? normaliseArray(knownas) : normalise(knownas);
-      predicates = await this.dao._getPredicatesByKnownAs(subject);
+      predicates = await this.dao.getPredicatesByKnownAs(subject);
     }
 
     else {
-      predicates = await this.dao._getAllPredicates();
+      predicates = await this.dao.getAllPredicates();
     }
 
     this.predicates.push(...predicates);

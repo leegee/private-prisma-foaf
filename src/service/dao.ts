@@ -40,7 +40,7 @@ export class DAO {
     this.prisma = prisma;
   }
 
-  async _getAllPredicates(): Promise<PredicateResult[]> {
+  async getAllPredicates(): Promise<PredicateResult[]> {
     return await this.prisma.predicate.findMany({
       include: {
         Subject: true,
@@ -50,7 +50,7 @@ export class DAO {
     });
   }
 
-  async _getPredicatesByKnownAs(knownasInput: string | string[]): Promise<PredicateResult[]> {
+  async getPredicatesByKnownAs(knownasInput: string | string[]): Promise<PredicateResult[]> {
     const knownasList = knownasInput instanceof Array ? knownasInput : [knownasInput];
     let predicates: PredicateResult[] = [];
 
