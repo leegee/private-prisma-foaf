@@ -1,5 +1,3 @@
-import PrismaTestEnvironment from "testlib/prisma-test-env";
-
 import { Entity, Predicate } from '@prisma/client';
 import { MockProxy } from 'jest-mock-extended';
 import { mockPrisma } from 'testlib/mock-prisma';
@@ -25,9 +23,6 @@ const entityFixture: MockProxy<Entity> = {
   approved: false,
 };
 
-PrismaTestEnvironment.init();
-jest.setTimeout(1000 * 40);
-
 let dao: DAO;
 
 beforeEach(() => {
@@ -36,10 +31,9 @@ beforeEach(() => {
 
 describe('erd', () => {
 
-  describe('_getPredicates', () => {
+  describe('getPredicatesByKnownAs', () => {
     it('throws the correct error when entity not found', async () => {
       mockPrisma.entity.findFirst.mockResolvedValue(null);
-
       await expect(
         dao.getPredicatesByKnownAs('mock-value-no-entity')
       ).rejects.toBeInstanceOf(EntityNotFoundError);
@@ -51,8 +45,36 @@ describe('erd', () => {
 
       const predicates = await dao.getPredicatesByKnownAs(entityFixture.knownas);
       expect(predicates).toBeInstanceOf(Array);
-      expect(predicates).toHaveLength(1);
+      expect(predicates[0]).toEqual(predicateFixture);
+    });
+
+    it('throws the correct error when entity not found', async () => {
+      mockPrisma.entity.findFirst.mockResolvedValue(null);
+      await expect(
+        dao.getPredicatesByKnownAs('mock-value-no-entity')
+      ).rejects.toBeInstanceOf(EntityNotFoundError);
+    });
+  });
+
+  describe('getAllPredicates', () => {
+    it('returns predicates', async () => {
+      mockPrisma.predicate.findMany.mockResolvedValue([predicateFixture]);
+
+      const predicates = await dao.getAllPredicates();
+      expect(predicates).toBeInstanceOf(Array);
       expect(predicates[0]).toEqual(predicateFixture);
     });
   });
+
+
+  describe('getEntityPredictive', () => {
+    it('returns predicates', async () => {
+      mockPrisma.predicate.findMany.mockResolvedValue([predicateFixture]);
+
+      const predicates = await dao.getEntityPredictive('Osw');
+      expect(predicates).toBeInstanceOf(Array);
+      expect(predicates[0]).toEqual(predicateFixture);
+    });
+  });
+
 });

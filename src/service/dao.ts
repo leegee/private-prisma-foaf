@@ -94,5 +94,17 @@ export class DAO {
     return predicates;
   }
 
+
+  async getEntityPredictive(target: string): Promise<Entity[]> {
+    return await this.prisma.entity.findMany({
+      where: {
+        OR: [
+          { knownas: { contains: target } },
+          { formalname: { contains: target } },
+        ],
+      }
+    });
+  }
+
 }
 
