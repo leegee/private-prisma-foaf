@@ -1,4 +1,6 @@
-// Rendering based on node_modules\prisma-erd-generator\src\generate.ts
+/**
+ * Renders an ERD of the predicates
+ */
 
 import * as path from 'path';
 import fs from 'fs';
@@ -23,6 +25,8 @@ export type SimplePredicate = {
   Verb: Verb,
   Object: Entity,
 }
+
+export type PredicateResult = SimplePredicate & Predicate;
 
 export class EntityNotFoundError extends Error {
   constructor(message: string) {
@@ -50,7 +54,7 @@ export class Erd {
     never,
     Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
   >;
-  predicates: (SimplePredicate & Predicate)[] = []; // TODO types
+  predicates: PredicateResult[] = []; // TODO types
   savepath: string = 'erd-output.svg';
   entityKnownas2Id: { [key: string]: number } = {};
   tmpDir = fs.mkdtempSync(os.tmpdir() + path.sep + 'entity-erd-');
@@ -68,43 +72,49 @@ export class Erd {
     this.logger = _logger ? _logger : logger;
   }
 
-  async _populatePredicates(knownas?: string | string[]) {
+  reset(): void {
+    this.predicates = [];
+  }
+
+  async getPredicates(knownas?: string | string[]) {
+    let predicates: PredicateResult[] = [];
+
     if (!!knownas) {
       const subject = knownas instanceof Array ? normaliseArray(knownas) : normalise(knownas);
-      await this._populatePredicatesForKnownAs(subject);
+      predicates = await this._getPredicatesByKnownAs(subject);
     }
+
     else {
-      await this._populatePredicatesFromAll();
+      predicates = await this._getAllPredicates();
     }
+
+    this.predicates.push(...predicates);
 
     if (this.predicates.length === 0) {
       throw new Error(`No predicates to graph for "${knownas || 'all'}"`);
     }
 
-    this.logger.debug(`_populatePredicates exits with ${this.predicates.length} predicates.`);
+    this.logger.debug(`_getPredicates exits with ${this.predicates.length} predicates.`);
   }
 
-  async _populatePredicatesFromAll() {
-    this.logger.debug('Enter _graphPredicatesForAll');
-    this.predicates.push(
-      ... await this.prisma.predicate.findMany({
-        include: {
-          Subject: true,
-          Object: true,
-          Verb: true
-        }
-      })
-    );
+  async _getAllPredicates(): Promise<PredicateResult[]> {
+    return await this.prisma.predicate.findMany({
+      include: {
+        Subject: true,
+        Object: true,
+        Verb: true
+      }
+    });
   }
 
-  async _populatePredicatesForKnownAs(knownasInput: string | string[]) {
+  async _getPredicatesByKnownAs(knownasInput: string | string[]): Promise<PredicateResult[]> {
     const knownasList = knownasInput instanceof Array ? knownasInput : [knownasInput];
+    let predicates: PredicateResult[] = [];
 
     for (let knownasListIndex = 0; knownasListIndex < knownasList.length; knownasListIndex++) {
       if (knownasList[knownasListIndex] === undefined) {
-        throw new TypeError('._populatePredicatesForKnownAs called without .knownas');
+        throw new TypeError('Called without .knownas');
       }
-      this.logger.debug(`Enter _populatePredicatesForKnownAs with "${knownasList[knownasListIndex]}"`);
 
       if (!this.entityKnownas2Id[knownasList[knownasListIndex]]) {
         const knownasEntity = await this.prisma.entity.findFirst({
@@ -119,24 +129,26 @@ export class Erd {
         this.entityKnownas2Id[knownasList[knownasListIndex]] = knownasEntity.id;
       }
 
-      this.logger.debug(`._populatePredicatesForKnownAs for "${knownasList[knownasListIndex]}", entityId = "${this.entityKnownas2Id[knownasList[knownasListIndex]]}"`);
+      this.logger.debug(`._getPredicatesByKnownAs for "${knownasList[knownasListIndex]}", entityId = "${this.entityKnownas2Id[knownasList[knownasListIndex]]}"`);
 
-      this.predicates.push(
-        ...await this.prisma.predicate.findMany({
-          where: {
-            OR: [
-              { objectId: this.entityKnownas2Id[knownasList[knownasListIndex]] },
-              { subjectId: this.entityKnownas2Id[knownasList[knownasListIndex]] },
-            ],
-          },
-          include: {
-            Subject: true,
-            Object: true,
-            Verb: true,
-          },
-        })
-      );
+      const somePredicates = await this.prisma.predicate.findMany({
+        where: {
+          OR: [
+            { objectId: this.entityKnownas2Id[knownasList[knownasListIndex]] },
+            { subjectId: this.entityKnownas2Id[knownasList[knownasListIndex]] },
+          ],
+        },
+        include: {
+          Subject: true,
+          Object: true,
+          Verb: true,
+        },
+      });
+
+      predicates.push(...somePredicates);
+
     }
+    return predicates;
   }
 
 }

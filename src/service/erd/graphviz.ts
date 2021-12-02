@@ -29,7 +29,7 @@ export class Graphviz extends Erd {
       throw new Error('savepath was not supplied during construction');
     }
 
-    await this._populatePredicates(knownas);
+    await this.getPredicates(knownas);
 
     const graph = await this._predicates2graph();
 

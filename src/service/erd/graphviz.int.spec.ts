@@ -13,7 +13,7 @@ describe('graphviz integration', () => {
   describe('Lee Harvey Oswald', () => {
     it('gets predicates', async () => {
       const erd = new Erd({ prisma });
-      await erd._populatePredicates('Oswald');
+      await erd.getPredicates('Oswald');
 
       expect(erd.predicates).toBeDefined();
 

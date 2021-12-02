@@ -1,8 +1,8 @@
 import Fastify, { FastifyInstance, RouteOptions } from 'fastify';
 
-export const server: FastifyInstance = Fastify({ logger: false });
-
 import { routes as entityRoutes } from './routes/entity';
+
+export const server: FastifyInstance = Fastify({ logger: false });
 
 entityRoutes.forEach((route: RouteOptions) => server.route(route));
 
