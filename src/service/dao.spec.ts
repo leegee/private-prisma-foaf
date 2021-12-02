@@ -29,7 +29,7 @@ beforeEach(() => {
   dao = new DAO({ prisma: mockPrisma });
 });
 
-describe('erd', () => {
+describe('dao', () => {
 
   describe('getPredicatesByKnownAs', () => {
     it('throws the correct error when entity not found', async () => {
@@ -67,14 +67,21 @@ describe('erd', () => {
   });
 
 
-  describe('getEntityPredictive', () => {
-    it('returns predicates', async () => {
+  describe('entitySearch', () => {
+    it('returns entities', async () => {
       mockPrisma.predicate.findMany.mockResolvedValue([predicateFixture]);
-
-      const predicates = await dao.getEntityPredictive('Osw');
-      expect(predicates).toBeInstanceOf(Array);
-      expect(predicates[0]).toEqual(predicateFixture);
+      const entities = await dao.entitySearch('Osw');
+      expect(entities).toBeInstanceOf(Array);
+      expect(entities[0]).toEqual(predicateFixture);
     });
   });
 
+  describe('verbSearch', () => {
+    it('returns verbs', async () => {
+      mockPrisma.predicate.findMany.mockResolvedValue([predicateFixture]);
+      const verbs = await dao.verbSearch('Osw');
+      expect(verbs).toBeInstanceOf(Array);
+      expect(verbs[0]).toEqual(predicateFixture);
+    });
+  });
 });

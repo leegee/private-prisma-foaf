@@ -8,6 +8,10 @@ export class EntityNotFoundError extends Error {
   }
 }
 
+function sanitise(target: string): string {
+  return target
+}
+
 export interface IDaoArgs {
   prisma: PrismaClient<
     Prisma.PrismaClientOptions,
@@ -94,8 +98,8 @@ export class DAO {
     return predicates;
   }
 
-
-  async getEntityPredictive(target: string): Promise<Entity[]> {
+  async entitySearch(target: string): Promise<Entity[]> {
+    target = sanitise(target);
     return await this.prisma.entity.findMany({
       where: {
         OR: [
@@ -106,5 +110,11 @@ export class DAO {
     });
   }
 
+  async verbSearch(target: string): Promise<Verb[]> {
+    target = sanitise(target);
+    return await this.prisma.verb.findMany({
+      where: { name: { contains: target } },
+    });
+  }
 }
 

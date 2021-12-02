@@ -12,22 +12,33 @@ beforeEach(() => {
   dao = new DAO({ prisma });
 });
 
-describe('erd (int)', () => {
+describe('dao (int)', () => {
 
-  describe('getEntityPredictive', () => {
-
+  describe('entity search', () => {
     test.each`
     input     | expectedResult
     ${'osw'}  | ${'oswald'}
     ${'OSw'}  | ${'oswald'}
   `('expect $input to lead to $expectedResult', async ({ input, expectedResult }) => {
-
-      const predicates = await dao.getEntityPredictive(input);
-      expect(predicates).toBeInstanceOf(Array);
-      expect(predicates.length).toBeGreaterThan(0);
-      expect(predicates[0].knownas).toEqual(expectedResult);
+      const entities = await dao.entitySearch(input);
+      expect(entities).toBeInstanceOf(Array);
+      expect(entities.length).toBeGreaterThan(0);
+      expect(entities[0].knownas).toEqual(expectedResult);
     })
-
   });
+
+  describe('verb search', () => {
+    test.each`
+    input     | expectedResult
+    ${'ass'}  | ${'assassinated'}
+    ${'Ass'}  | ${'assassinated'}
+  `('expect $input to lead to $expectedResult', async ({ input, expectedResult }) => {
+      const verbs = await dao.verbSearch(input);
+      expect(verbs).toBeInstanceOf(Array);
+      expect(verbs.length).toBeGreaterThan(0);
+      expect(verbs[0].name).toEqual(expectedResult);
+    })
+  });
+
 
 });
