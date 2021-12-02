@@ -1,35 +1,10 @@
 import Fastify, { FastifyInstance, RouteOptions } from 'fastify';
 
-export const server: FastifyInstance = Fastify({ logger: true });
+export const server: FastifyInstance = Fastify({ logger: false });
 
-server.route({
-  method: 'GET',
-  url: '/entity',
-  // Todo: move to external file, to be shared by e2e tests, etc - autocreate from TS types...?
-  schema: {
-    querystring: {
-      q: { type: 'string' },
-    },
-    response: {
-      200: {
-        type: 'object',
-        properties: {
-          entities: {
-            type: 'array',
-            properties: {
-              knownas: { type: 'string' },
-              formalname: { type: 'string' }
-            }
-          }
-        }
-      }
-    }
-  },
+import { routes as entityRoutes } from './routes/entity';
 
-  handler: function (req, res) {
-    res.send({ entities: [{ knownas: 'foo', formalname: 'bar' }] });
-  }
-} as RouteOptions);
+entityRoutes.forEach((route: RouteOptions) => server.route(route));
 
 export const start = async () => {
   try {
