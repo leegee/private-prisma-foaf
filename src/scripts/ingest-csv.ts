@@ -1,4 +1,4 @@
-import { CsvIngestor } from 'src/ingestor/csv-ingestor';
+import { CsvIngestor } from 'src/service/ingestor/csv-ingestor';
 
 import PrismaTestEnvironment from "testlib/prisma-test-env";
 PrismaTestEnvironment.init();

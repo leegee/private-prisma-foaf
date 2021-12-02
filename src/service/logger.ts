@@ -7,7 +7,7 @@ export type ILogger = {
 };
 
 import pino from 'pino';
-import PinoPretty from 'pino-pretty';
+// import PinoPretty from 'pino-pretty';
 
 const config = {
   transport: undefined,
@@ -17,7 +17,7 @@ const config = {
 let devConfig = {
   ...config,
   transport: {
-    target: '../test/lib/pino-log-message',
+    target: '../../test/lib/pino-log-message',
     options: {
       levelFirst: true,
       hidePretty: false,

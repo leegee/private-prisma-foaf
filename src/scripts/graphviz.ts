@@ -1,6 +1,6 @@
 import fs from 'fs';
-import { Graphviz } from "src/erd/graphviz";
-import { logger } from "src/logger";
+import { Graphviz } from "src/service/erd/graphviz";
+import { logger } from "src/service/logger";
 
 import PrismaTestEnvironment from "testlib/prisma-test-env";
 PrismaTestEnvironment.init();

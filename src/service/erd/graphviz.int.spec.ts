@@ -3,7 +3,7 @@ import PrismaTestEnvironment from "testlib/prisma-test-env";
 import * as fs from 'fs';
 
 import { prisma } from 'testlib/fixtures';
-import { Graphviz as Erd } from 'src/erd/graphviz';
+import { Graphviz as Erd } from 'src/service/erd/graphviz';
 
 PrismaTestEnvironment.init();
 jest.setTimeout(1000 * 30);

@@ -1,4 +1,4 @@
-import { logger } from 'src/logger';
+import { logger } from 'src/service/logger';
 import { prisma } from 'src/prisma-client';
 
 export { prisma, logger };

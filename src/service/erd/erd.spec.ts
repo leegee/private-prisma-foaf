@@ -3,7 +3,7 @@ import PrismaTestEnvironment from "testlib/prisma-test-env";
 import { Entity, Predicate } from '@prisma/client';
 import { MockProxy } from 'jest-mock-extended';
 import { mockPrisma } from 'testlib/mock-prisma';
-import { Erd, EntityNotFoundError, normalise } from 'src/erd/erd';
+import { Erd, EntityNotFoundError, normalise } from 'src/service/erd/erd';
 
 const predicateFixture: MockProxy<Predicate> = {
   start: new Date(),

@@ -1,6 +1,6 @@
 import { Prisma, PrismaClient } from '@prisma/client';
-import * as loggerModule from 'src/logger';
-import { normalise, makePredicateId } from 'src/erd/erd';
+import * as loggerModule from 'src/service/logger';
+import { normalise, makePredicateId } from 'src/service/erd/erd';
 
 // prisma.$use(async (params, next) => {
 // const before = process.hrtime.bigint;

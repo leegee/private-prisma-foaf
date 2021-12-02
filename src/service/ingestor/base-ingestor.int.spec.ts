@@ -1,5 +1,5 @@
-import { BaseIngestor } from 'src/ingestor/base-ingestor';
-import { logger } from 'src/logger';
+import { BaseIngestor } from 'src/service/ingestor/base-ingestor';
+import { logger } from 'src/service/logger';
 import PrismaTestEnvironment from "testlib/prisma-test-env";
 
 PrismaTestEnvironment.init();

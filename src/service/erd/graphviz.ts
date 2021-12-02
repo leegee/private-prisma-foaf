@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as child_process from 'child_process';
 import fs, { unlinkSync } from 'fs';
-import { Erd, IErdArgs } from 'src/erd/erd';
+import { Erd, IErdArgs } from 'src/service/erd/erd';
 
 
 export interface IGraphvizArgs extends IErdArgs {

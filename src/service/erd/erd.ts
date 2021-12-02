@@ -4,7 +4,7 @@ import * as path from 'path';
 import fs from 'fs';
 import os from 'os';
 import { PrismaClient, Prisma, Entity, Verb, Predicate } from '@prisma/client';
-import { logger, ILogger } from 'src/logger';
+import { logger, ILogger } from 'src/service/logger';
 
 export function normaliseArray(list: string[]): string[] {
   return list.map(subject => normalise(subject));

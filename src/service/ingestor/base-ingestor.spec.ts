@@ -1,4 +1,4 @@
-import * as BaseIngestor from 'src/ingestor/base-ingestor';
+import * as BaseIngestor from 'src/service/ingestor/base-ingestor';
 import { prisma } from 'testlib/fixtures';
 
 import each from 'jest-each';

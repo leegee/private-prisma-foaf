@@ -13,8 +13,8 @@ import { Client } from "pg";
 import NodeEnvironment from "jest-environment-node";
 import child_process from "child_process";
 
-import { logger } from 'src/logger';
-import { CsvIngestor } from "src/ingestor/csv-ingestor";
+import { logger } from 'src/service/logger';
+import { CsvIngestor } from "src/service/ingestor/csv-ingestor";
 
 const prismaBinary = 'npx prisma';
 
