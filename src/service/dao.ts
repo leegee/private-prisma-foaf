@@ -72,7 +72,7 @@ export class DAO {
         this.entityKnownas2Id[knownasList[knownasListIndex]] = knownasEntity.id;
       }
 
-      this.logger.debug(`._getPredicatesByKnownAs for "${knownasList[knownasListIndex]}", entityId = "${this.entityKnownas2Id[knownasList[knownasListIndex]]}"`);
+      this.logger.debug(`getPredicatesByKnownAs for "${knownasList[knownasListIndex]}", entityId = "${this.entityKnownas2Id[knownasList[knownasListIndex]]}"`);
 
       const somePredicates = await this.prisma.predicate.findMany({
         where: {
