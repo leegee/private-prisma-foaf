@@ -13,7 +13,8 @@ PrismaTestEnvironment.init();
 describe('ingest-graph', () => {
   it('should integrate with real fs to read a file', async () => {
     const gi = new CsvIngestor({
-      prisma: PrismaTestEnvironment.prisma,
+      dao: PrismaTestEnvironment.dao,
+      logger,
     });
 
     await gi.parseEntityFile('./test/lib/entities.csv')
@@ -28,7 +29,7 @@ describe('ingest-graph', () => {
     }
 
     const erd = await new Erd({
-      prisma: PrismaTestEnvironment.prisma,
+      dao: PrismaTestEnvironment.dao,
       logger,
       savepath: savepath,
       layout: layoutKey,

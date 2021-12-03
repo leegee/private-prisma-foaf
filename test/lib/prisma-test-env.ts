@@ -4,16 +4,15 @@
 // @see https://github.com/ctrlplusb/prisma-pg-jest/blob/master/prisma/prisma-test-environment.js
 // @see https://jestjs.io/docs/configuration#testenvironment-string
 
+import { Client } from "pg";
 import dotenv from 'dotenv';
 dotenv.config;
 
-import { prisma } from 'testlib/fixtures';
+import { prisma, dao, logger } from 'testlib/fixtures';
 
-import { Client } from "pg";
 import NodeEnvironment from "jest-environment-node";
 import child_process from "child_process";
 
-import { logger } from 'src/service/logger';
 import { CsvIngestor } from "src/service/ingestor/csv-ingestor";
 
 const prismaBinary = 'npx prisma';
@@ -30,6 +29,7 @@ process.on('unhandledRejection', (error) => {
 
 export default class PrismaTestEnvironment extends NodeEnvironment {
   static prisma = prisma;
+  static dao = dao;
 
   /** Maybe faster to load public and copy to test schema when needed */
   static init() {
@@ -42,7 +42,7 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
       await testEnv.setup();
 
       const gi = new CsvIngestor({
-        prisma,
+        dao,
         logger,
       });
 

@@ -3,13 +3,19 @@
  * @see https://developers.google.com/sheets/api/guides/concepts
  */
 import fetch from 'node-fetch';
-import { BaseIngestor, ConfigType, IBaseingestorArgs as IBaseIngestorArgs } from './base-ingestor';
+import { BaseIngestor, ConfigType as IngestorConfigType, IBaseingestorArgs, IBaseingestorArgs as IBaseIngestorArgs } from './base-ingestor';
 
-export type GooglesheetsConfigType = ConfigType & {
+export type GooglesheetsConfigType = IngestorConfigType & {
   spreadsheetId: string | undefined,
   googlesheetsApiKey: string | undefined,
   sheetName: string | undefined,
 }
+
+
+export interface IGoogleIngestorArgs extends IBaseingestorArgs {
+  config: GooglesheetsConfigType;
+}
+
 
 export interface IGooglesheetsIngestorArgs extends IBaseIngestorArgs {
   config: GooglesheetsConfigType;
@@ -21,6 +27,13 @@ export class GooglesheetsIngestor extends BaseIngestor {
     googlesheetsApiKey: undefined,
     sheetName: undefined,
   };
+
+  constructor({ config, logger, dao }: IGoogleIngestorArgs) {
+    super({ logger, dao });
+    if (config) {
+      this.config = config;
+    }
+  }
 
   _getGoogleSheetsUrlForSheetName(sheetName?: string) {
     if ((sheetName || this.config.sheetName)) {

@@ -1,7 +1,6 @@
 import PrismaTestEnvironment from "testlib/prisma-test-env";
-import { Entity, Predicate } from '@prisma/client';
 import { prisma } from 'testlib/fixtures';
-import { DAO, EntityNotFoundError } from 'src/service/dao';
+import { DAO } from 'src/service/dao';
 
 PrismaTestEnvironment.init();
 jest.setTimeout(1000 * 40);

@@ -8,7 +8,7 @@ main();
 /** @throws */
 async function main() {
   const gi = new CsvIngestor({
-    prisma: PrismaTestEnvironment.prisma,
+    dao: PrismaTestEnvironment.dao
   });
 
   await gi.parseEntityFile('./test/lib/entities.csv');

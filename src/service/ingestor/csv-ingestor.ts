@@ -1,13 +1,14 @@
 import fs from 'fs';
 import { parse } from 'csv-parse';
 
-import { BaseIngestor, GrammarError } from './base-ingestor';
+import { BaseIngestor } from './base-ingestor';
+import { GrammarError } from 'src/service/dao';
 
 export class CsvIngestor extends BaseIngestor {
 
   async parseEntityFile(filepath: string): Promise<void> {
     if (!filepath) {
-      throw new TypeError('did not receive a filepath:string');
+      throw new TypeError('Did not receive a filepath:string');
     }
     this.logger.debug('Enter parseEntityFile for ' + filepath);
 

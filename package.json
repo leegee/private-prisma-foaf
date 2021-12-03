@@ -59,6 +59,7 @@
     "dotenv": "^10.0.0",
     "dotenv-cli": "^4.1.0",
     "fastify": "^3.24.1",
+    "fastify-openapi-glue": "^2.6.5",
     "graphviz": "^0.0.9",
     "module-alias": "^2.2.2",
     "node-fetch": "^2.0.0",

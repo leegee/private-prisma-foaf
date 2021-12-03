@@ -1,0 +1,119 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "0.0.1",
+    "title": "",
+    "description": ""
+  },
+  "basePath": "/",
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/healthcheck": {
+      "get": {
+        "description": "Get API status",
+        "summary": "getAPIStatus",
+        "tags": [
+          "HealthCheck"
+        ],
+        "operationId": "getAPIStatus",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful Operation."
+          },
+          "401": {
+            "description": "Access token is missing or invalid"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/entity": {
+      "get": {
+        "description": "Search entities",
+        "summary": "searchEntities",
+        "tags": [
+          "HealthCheck"
+        ],
+        "operationId": "searchEntities",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "description": "The text for which to search",
+            "minLength": 3,
+            "maxLength": 12
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Operation.",
+            "schema": {
+              "$ref": "#/definitions/EntitySearchResults"
+            }
+          },
+          "422": {
+            "description": "Scheme Valiation Error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Entity": {
+      "title": "Entity",
+      "type": "object",
+      "properties": {
+        "knownas": "string",
+        "formalname": "string",
+        "dob": "string",
+        "dod": "string"
+      }
+    },
+    "Error": {
+      "title": "Error",
+      "type": "object",
+      "properties": {
+        "message": "string"
+      }
+    },
+    "EntitySearchResults": {
+      "title": "EntitySearchResults",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "entities": {
+            "scheme": "#/definitions/Entity"
+          }
+        }
+      }
+    }
+  }
+}

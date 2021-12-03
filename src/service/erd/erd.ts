@@ -5,7 +5,6 @@
 import * as path from 'path';
 import fs from 'fs';
 import os from 'os';
-import { PrismaClient, Prisma, Entity, Verb, Predicate } from '@prisma/client';
 import { logger, ILogger } from 'src/service/logger';
 import { DAO, PredicateResult } from 'src/service/dao';
 
@@ -23,11 +22,6 @@ export function makePredicateId(subjectId: number, verbId: number, objectId: num
 
 
 export interface IErdArgs {
-  prisma: PrismaClient<
-    Prisma.PrismaClientOptions,
-    never,
-    Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
-  >;
   savepath?: string;
   logger?: ILogger;
   format?: string;
@@ -37,23 +31,13 @@ export interface IErdArgs {
 export class Erd {
   logger: ILogger;
   dao: DAO;
-  prisma: PrismaClient<
-    Prisma.PrismaClientOptions,
-    never,
-    Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
-  >;
   predicates: PredicateResult[] = []; // TODO types
   savepath: string = 'erd-output.svg';
   tmpDir = fs.mkdtempSync(os.tmpdir() + path.sep + 'entity-erd-');
   format = '';
 
-  constructor({ prisma, savepath, logger: _logger, format, dao }: IErdArgs) {
-    this.prisma = prisma;
-    if (!!dao) {
-      this.dao = dao;
-    } else {
-      this.dao = new DAO({ prisma, logger });
-    }
+  constructor({ savepath, logger: _logger, format, dao }: IErdArgs) {
+    this.dao = dao!;
     if (!!savepath) {
       this.savepath = savepath;
     }

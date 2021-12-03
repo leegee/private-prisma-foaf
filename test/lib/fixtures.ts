@@ -1,7 +1,10 @@
 import { logger } from 'src/service/logger';
-import { prisma } from 'src/prisma-client';
+import { prisma } from 'src/service/prisma-client';
+import { DAO } from 'src/service/dao';
 
-export { prisma, logger };
+const dao = new DAO({ logger, prisma });
+
+export { prisma, logger, dao };
 
 export interface IFixtures {
   [key: string]: any

@@ -1,4 +1,4 @@
-import { prisma } from '../src/prisma-client';
+import { prisma } from '../src/service/prisma-client';
 
 main();
 
