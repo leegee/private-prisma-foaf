@@ -4,9 +4,9 @@ import openapiGlue from 'fastify-openapi-glue';
 import { routes as entityRoutes } from './routes/entity';
 import { routes as verbRoutes } from './routes/verb';
 import { routes as predicateRoutes } from './routes/predicate';
-import { prisma } from 'src/service/prisma-client';
-import { logger } from 'src/service/logger';
-import { DAO } from 'src/service/dao';
+import { prisma } from '@src/service/prisma-client';
+import { logger } from '@src/service/logger';
+import { DAO } from '@src/service/dao';
 
 export type FastifyRequestX = FastifyRequest & {
   dao: DAO

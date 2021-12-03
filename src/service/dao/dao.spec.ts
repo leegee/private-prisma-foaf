@@ -1,8 +1,8 @@
 import { Entity, Predicate, Verb } from '@prisma/client';
 import { MockProxy } from 'jest-mock-extended';
-import { mockPrisma } from 'testlib/mock-prisma';
-import { DAO, EntityNotFoundError } from 'src/service/dao';
-import PrismaTestEnvironment from 'testlib/prisma-test-env';
+import { mockPrisma } from '@testlib/mock-prisma';
+import { DAO, EntityNotFoundError } from '@src/service/dao';
+import PrismaTestEnvironment from '@testlib/prisma-test-env';
 
 PrismaTestEnvironment.init();
 

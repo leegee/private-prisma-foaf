@@ -1,6 +1,6 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 import { Value } from '@prisma/client/runtime';
-import * as loggerModule from 'src/service/logger';
+import * as loggerModule from '@src/service/logger';
 import { DAO, IEntityUpsertArgs, IPredicateUpsertArgs } from '../dao';
 
 // prisma.$use(async (params, next) => {

@@ -1,7 +1,9 @@
 import { RouteOptions } from 'fastify';
+import { SimplePredicate } from '@src/service/dao';
+import { FastifyRequestX } from '@src/server';
 
 export const routes: RouteOptions[] = [{
-  method: 'GET',
+  method: 'PUT',
   url: '/predicate',
   // Todo: move to external file, to be shared by e2e tests, etc - autocreate from TS types...?
   schema: {
@@ -18,8 +20,13 @@ export const routes: RouteOptions[] = [{
   },
 
   handler: async function (req, res) {
-    // @ts-expect-error
-    await req.dao.createPredicate(req.body);
+    console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+    console.dir(req.body);
+    console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+
+    await (req as FastifyRequestX).dao.createPredicate(
+      (req as FastifyRequestX).body as SimplePredicate
+    );
     res.send(201);
   }
 

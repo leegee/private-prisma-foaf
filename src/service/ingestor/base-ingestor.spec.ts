@@ -1,5 +1,5 @@
-import * as BaseIngestor from 'src/service/ingestor/base-ingestor';
-import { dao } from 'testlib/fixtures';
+import * as BaseIngestor from '@src/service/ingestor/base-ingestor';
+import { dao } from '@testlib/fixtures';
 
 import each from 'jest-each';
 import { GrammarError, IPredicateUpsertArgs } from '../dao';

@@ -1,6 +1,6 @@
-import { Entity, Predicate, Prisma, PrismaClient, Verb } from "@prisma/client";
-import { logger, ILogger } from 'src/service/logger';
-import { normalise as sanitise, makePredicateId } from "src/service/erd";
+import { Entity, Predicate, Prisma, PrismaClient, Verb } from '@prisma/client';
+import { logger, ILogger } from '@src/service/logger';
+import { normalise as sanitise, makePredicateId } from '@src/service/erd';
 
 export interface Iknownas2id {
   [key: string]: number;
@@ -51,7 +51,7 @@ export class GrammarError extends Error {
 
 export class EntityNotFoundError extends Error {
   constructor(message: string) {
-    super(`No such entity knownas "${message}".`);
+    super(`No such entity knownas '${message}'.`);
     Object.setPrototypeOf(this, EntityNotFoundError.prototype);
   }
 }
@@ -123,7 +123,7 @@ export class DAO {
         this.entityKnownas2Id[knownasList[knownasListIndex]] = knownasEntity.id;
       }
 
-      this.logger.debug(`getPredicatesByKnownAs for "${knownasList[knownasListIndex]}", entityId = "${this.entityKnownas2Id[knownasList[knownasListIndex]]}"`);
+      this.logger.debug(`getPredicatesByKnownAs for '${knownasList[knownasListIndex]}', entityId = '${this.entityKnownas2Id[knownasList[knownasListIndex]]}'`);
 
       const somePredicates = await this.prisma.predicate.findMany({
         where: {
@@ -147,7 +147,7 @@ export class DAO {
 
   async entitySearch(target: string): Promise<Entity[]> {
     target = sanitise(target);
-    this.logger.debug(`entitySearch for "${target}"`);
+    this.logger.debug(`entitySearch for '${target}'`);
     return await this.prisma.entity.findMany({
       where: {
         OR: [
@@ -160,7 +160,7 @@ export class DAO {
 
   async verbSearch(target: string): Promise<Verb[]> {
     target = sanitise(target).toLowerCase()
-    this.logger.debug(`verbSearch for "${target}"`);
+    this.logger.debug(`verbSearch for '${target}'`);
     return await this.prisma.verb.findMany({
       where: { name: { contains: target } },
     });
@@ -241,7 +241,7 @@ export class DAO {
 
     CachedIds.Entity[row.Subject] = foundSubject.id;
 
-    this.logger.debug(`Got subject "${JSON.stringify(foundSubject)}" via "${row.Subject}"`,);
+    this.logger.debug(`Got subject '${JSON.stringify(foundSubject)}' via '${row.Subject}'`,);
 
     const foundVerb = CachedIds.Verb[row.Verb]
       ? {
@@ -261,7 +261,7 @@ export class DAO {
 
     CachedIds.Verb[row.Verb] = foundVerb.id;
 
-    this.logger.debug(`Got verb "${JSON.stringify(foundVerb)}" via "${row.Verb}"`,);
+    this.logger.debug(`Got verb '${JSON.stringify(foundVerb)}' via '${row.Verb}'`,);
 
     const foundObject = CachedIds.Entity[row.Object]
       ? {
@@ -283,7 +283,7 @@ export class DAO {
 
     CachedIds.Entity[row.Object] = foundObject.id;
 
-    this.logger.debug(`Got object "${JSON.stringify(foundObject)}" via "${row.Object}"`,);
+    this.logger.debug(`Got object '${JSON.stringify(foundObject)}' via '${row.Object}'`,);
 
     const predicateId = makePredicateId(
       foundSubject.id,
@@ -292,11 +292,11 @@ export class DAO {
     );
 
     if (CachedIds.Predicate[predicateId]) {
-      this.logger.debug(`Predicate found in cache - "${predicateId}" for: ${row.Subject} ${row.Verb} ${row.Object} `,);
+      this.logger.debug(`Predicate found in cache - '${predicateId}' for: ${row.Subject} ${row.Verb} ${row.Object} `,);
     }
 
     else {
-      const msg = `predicateId "${predicateId}" for "${row.Subject} ${row.Verb} ${row.Object}"`;
+      const msg = `predicateId '${predicateId}' for '${row.Subject} ${row.Verb} ${row.Object}'`;
 
       try {
         await this.prisma.predicate.upsert({

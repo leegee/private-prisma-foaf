@@ -4,16 +4,16 @@
 // @see https://github.com/ctrlplusb/prisma-pg-jest/blob/master/prisma/prisma-test-environment.js
 // @see https://jestjs.io/docs/configuration#testenvironment-string
 
-import { Client } from "pg";
+import { Client } from 'pg';
 import dotenv from 'dotenv';
 dotenv.config;
 
-import { prisma, dao, logger } from 'testlib/fixtures';
+import { prisma, dao, logger } from '@testlib/fixtures';
 
-import NodeEnvironment from "jest-environment-node";
-import child_process from "child_process";
+import NodeEnvironment from 'jest-environment-node';
+import child_process from 'child_process';
 
-import { CsvIngestor } from "src/service/ingestor/csv-ingestor";
+import { CsvIngestor } from '@src/service/ingestor/csv-ingestor';
 
 const prismaBinary = 'npx prisma';
 
@@ -97,7 +97,7 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
     });
     await client.connect();
     logger.debug(`Dropping test env temp schema, ${this.schema}.`);
-    await client.query(`DROP SCHEMA IF EXISTS "${this.schema}" CASCADE`);
+    await client.query(`DROP SCHEMA IF EXISTS '${this.schema}' CASCADE`);
     await client.end();
     logger.debug(`Dropped test env temp schema, ${this.schema}.`);
   }

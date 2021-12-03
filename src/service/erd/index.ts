@@ -5,8 +5,8 @@
 import * as path from 'path';
 import fs from 'fs';
 import os from 'os';
-import { logger, ILogger } from 'src/service/logger';
-import { DAO, PredicateResult } from 'src/service/dao';
+import { logger, ILogger } from '@src/service/logger';
+import { DAO, PredicateResult } from '@src/service/dao';
 
 export function normaliseArray(list: string[]): string[] {
   return list.map(subject => normalise(subject));

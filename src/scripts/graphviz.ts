@@ -1,8 +1,10 @@
 import fs from 'fs';
-import { Graphviz } from "src/service/erd/graphviz";
-import { logger } from "src/service/logger";
+import { DAO } from '@src/service/dao';
+import { Graphviz } from '@src/service/erd/graphviz';
+import { logger } from '@src/service/logger';
+import { prisma } from '@src/service/prisma-client';
 
-import PrismaTestEnvironment from "testlib/prisma-test-env";
+import PrismaTestEnvironment from '@testlib/prisma-test-env';
 PrismaTestEnvironment.init();
 
 main();
@@ -15,7 +17,7 @@ async function main() {
     }
 
     await new Graphviz({
-      prisma: PrismaTestEnvironment.prisma,
+      dao: new DAO({ logger, prisma }),
       logger,
       savepath: savepath,
       layout: layoutKey,

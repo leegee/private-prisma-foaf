@@ -1,6 +1,6 @@
 import PrismaTestEnvironment from "testlib/prisma-test-env";
-import { prisma } from 'testlib/fixtures';
-import { DAO } from 'src/service/dao';
+import { prisma } from '@testlib/fixtures';
+import { DAO } from '@src/service/dao';
 
 PrismaTestEnvironment.init();
 jest.setTimeout(1000 * 40);

@@ -1,4 +1,4 @@
-import { pactum } from 'testlib/pactum';
+import { pactum } from '@testlib/pactum';
 
 
 describe('PUT /predicate', () => {

@@ -1,6 +1,7 @@
 {
-  "name": "foaf-erd-maps",
-  "version": "0.0.2",
+  "name": "predicate-erd",
+  "description": "Predicate ERD",
+  "version": "0.1.0",
   "license": "MIT",
   "devDependencies": {
     "@types/fetch-mock": "^7.3.5",
@@ -70,9 +71,9 @@
     "node": ">=16.0.0"
   },
   "_moduleAliases": {
-    "src": "./src",
-    "test": "./test",
-    "testlib": "./testlib"
+    "@src": "./src",
+    "@test": "./test",
+    "@testlib": "./test/lib"
   },
   "type": "commonjs",
   "jest": {

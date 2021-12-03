@@ -1,6 +1,6 @@
-import { logger } from 'src/service/logger';
-import { prisma } from 'src/service/prisma-client';
-import { DAO } from 'src/service/dao';
+import { logger } from '@src/service/logger';
+import { prisma } from '@src/service/prisma-client';
+import { DAO } from '@src/service/dao';
 
 const dao = new DAO({ logger, prisma });
 

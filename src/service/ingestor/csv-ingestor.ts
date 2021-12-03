@@ -2,7 +2,7 @@ import fs from 'fs';
 import { parse } from 'csv-parse';
 
 import { BaseIngestor } from './base-ingestor';
-import { GrammarError } from 'src/service/dao';
+import { GrammarError } from '@src/service/dao';
 
 export class CsvIngestor extends BaseIngestor {
 
