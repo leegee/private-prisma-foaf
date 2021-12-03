@@ -1,6 +1,6 @@
 import { Entity, Predicate, Prisma, PrismaClient, Verb } from "@prisma/client";
 import { logger, ILogger } from 'src/service/logger';
-import { normalise, makePredicateId } from "src/service/erd/erd";
+import { normalise as sanitise, makePredicateId } from "src/service/erd/erd";
 
 export interface Iknownas2id {
   [key: string]: number;
@@ -56,9 +56,6 @@ export class EntityNotFoundError extends Error {
   }
 }
 
-function sanitise(target: string): string {
-  return target
-}
 
 export interface IDaoArgs {
   prisma: PrismaClient<
@@ -109,6 +106,8 @@ export class DAO {
     for (let knownasListIndex = 0; knownasListIndex < knownasList.length; knownasListIndex++) {
       if (knownasList[knownasListIndex] === undefined) {
         throw new TypeError('Called without .knownas');
+      } else {
+        knownasList[knownasListIndex] = sanitise(knownasList[knownasListIndex]).toLowerCase();
       }
 
       if (!this.entityKnownas2Id[knownasList[knownasListIndex]]) {
@@ -159,13 +158,14 @@ export class DAO {
   }
 
   async verbSearch(target: string): Promise<Verb[]> {
-    target = sanitise(target);
+    target = sanitise(target).toLowerCase()
     return await this.prisma.verb.findMany({
       where: { name: { contains: target } },
     });
   }
 
   async createPredicate(userInput: SimplePredicate) {
+    // userInput = normalise(userInput);
     const rv = await this.prisma.predicate.create({
       data: userInput
     });
@@ -187,7 +187,7 @@ export class DAO {
         if (row[key]!.match(/^\d{4}-\d{2}-\d{2}/)) {
           subject[key] = new Date(subject[key]);
         } else {
-          subject[key] = normalise(row[key]!);
+          subject[key] = sanitise(row[key]!);
           if (subject[key].toString().length === 0) {
             delete subject[key];
           }
@@ -216,9 +216,9 @@ export class DAO {
       throw new GrammarError(JSON.stringify(row, null, 2));
     }
 
-    row.Subject = normalise(row.Subject);
-    row.Verb = normalise(row.Verb);
-    row.Object = normalise(row.Object);
+    row.Subject = sanitise(row.Subject);
+    row.Verb = sanitise(row.Verb);
+    row.Object = sanitise(row.Object);
 
     const foundSubject = CachedIds.Entity[row.Subject]
       ? {

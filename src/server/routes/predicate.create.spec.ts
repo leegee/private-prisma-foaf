@@ -23,7 +23,7 @@ afterAll(async () => {
 
 describe('PUT /predicate', () => {
 
-  describe('should put "Oswald assassinated JFK"', async () => {
+  describe('should put "Oswald assassinated JFK"', () => {
     it('JFK exists', async () => {
       await pactum.spec()
         .get('/entity')

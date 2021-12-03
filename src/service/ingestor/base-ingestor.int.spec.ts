@@ -8,7 +8,7 @@ jest.setTimeout(1000 * 30);
 describe('base-ingestor (int)', () => {
   it('_createSubjectObjectVerbPredicate', async () => {
     const gi = new BaseIngestor({
-      prisma: PrismaTestEnvironment.prisma,
+      dao: PrismaTestEnvironment.dao,
     });
 
     let errorFree: boolean;

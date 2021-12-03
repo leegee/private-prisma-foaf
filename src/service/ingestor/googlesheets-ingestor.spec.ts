@@ -1,4 +1,4 @@
-import { prisma, logger } from 'testlib/fixtures';
+import { dao, logger } from 'testlib/fixtures';
 
 import fetchMock from "jest-fetch-mock";
 
@@ -23,7 +23,7 @@ describe('code that uses fetch', () => {
     fetchMock.resetMocks();
 
     o = new GooglesheetsIngestor({
-      prisma,
+      dao,
       logger,
       config: configMock,
     } as IGooglesheetsIngestorArgs);

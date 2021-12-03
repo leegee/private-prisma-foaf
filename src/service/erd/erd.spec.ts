@@ -2,8 +2,9 @@ import PrismaTestEnvironment from "testlib/prisma-test-env";
 
 import { Entity, Predicate } from '@prisma/client';
 import { MockProxy } from 'jest-mock-extended';
-import { mockPrisma } from 'testlib/mock-prisma';
-import { Erd, EntityNotFoundError, normalise } from 'src/service/erd/erd';
+import { mockDao, mockPrisma } from 'testlib/mock-prisma';
+import { Erd, normalise } from 'src/service/erd/erd';
+import { EntityNotFoundError } from "../dao";
 
 const predicateFixture: MockProxy<Predicate> = {
   start: new Date(),
@@ -43,7 +44,7 @@ describe('erd', () => {
     it('throws the correct error when entity not found', async () => {
       mockPrisma.entity.findFirst.mockResolvedValue(null);
 
-      const erd = new Erd({ prisma: mockPrisma });
+      const erd = new Erd({ dao: mockDao });
 
       await expect(
         erd.getPredicates('mock-value-no-entity')
@@ -54,7 +55,7 @@ describe('erd', () => {
       mockPrisma.predicate.findMany.mockResolvedValue([predicateFixture]);
       mockPrisma.entity.findFirst.mockResolvedValue(entityFixture);
 
-      const erd = new Erd({ prisma: mockPrisma });
+      const erd = new Erd({ dao: mockDao });
       await erd.getPredicates(entityFixture.knownas);
 
       expect(erd.predicates).toBeDefined();

@@ -1,13 +1,14 @@
 import * as BaseIngestor from 'src/service/ingestor/base-ingestor';
-import { prisma } from 'testlib/fixtures';
+import { dao } from 'testlib/fixtures';
 
 import each from 'jest-each';
+import { GrammarError, IPredicateUpsertArgs } from '../dao';
 
 describe('base-ingestor', () => {
   it('exports GrammarError Error', () => {
-    expect(BaseIngestor.GrammarError).toBeDefined();
+    expect(GrammarError).toBeDefined();
 
-    const e = new BaseIngestor.GrammarError('mock-message');
+    const e = new GrammarError('mock-message');
     expect(e).toBeInstanceOf(Error);
     expect(e).toHaveProperty('message');
     expect(e.message).toBe('mock-message');
@@ -19,10 +20,10 @@ describe('base-ingestor', () => {
     { Subject: 1, Verb: 2 },
     { Verb: 1, Object: 2 }
   ]).test('throws GrammarError on bad args', async (args) => {
-    const o = new BaseIngestor.BaseIngestor({ prisma });
+    const o = new BaseIngestor.BaseIngestor({ dao });
     await expect(
-      async () => o._createSubjectObjectVerbPredicate(args as BaseIngestor.IPredicateUpsertArgs)
-    ).rejects.toThrowError(BaseIngestor.GrammarError);
+      async () => o._createSubjectObjectVerbPredicate(args as IPredicateUpsertArgs)
+    ).rejects.toThrowError(GrammarError);
   });
 
 

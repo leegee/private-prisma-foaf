@@ -57,6 +57,7 @@ Verb search is easiest via stems, provided through an insert/update trigger on `
 ## TODO
 
 - DAO
+- High-level synonyms via wordnet?
 - Middleware to
   - cast dates to strings?
   - remove empty fields (since usage dictates no blanking of extant fields, only replacement)

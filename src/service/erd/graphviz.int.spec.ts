@@ -2,7 +2,7 @@ import PrismaTestEnvironment from "testlib/prisma-test-env";
 
 import * as fs from 'fs';
 
-import { prisma } from 'testlib/fixtures';
+import { dao } from 'testlib/fixtures';
 import { Graphviz as Erd } from 'src/service/erd/graphviz';
 
 PrismaTestEnvironment.init();
@@ -12,7 +12,7 @@ describe('graphviz integration', () => {
 
   describe('Lee Harvey Oswald', () => {
     it('gets predicates', async () => {
-      const erd = new Erd({ prisma });
+      const erd = new Erd({ dao });
       await erd.getPredicates('Oswald');
 
       expect(erd.predicates).toBeDefined();
@@ -33,7 +33,7 @@ describe('graphviz integration', () => {
       fs.unlinkSync(savepath);
     }
 
-    const erd = new Erd({ prisma, savepath });
+    const erd = new Erd({ dao, savepath });
     await erd.graphviz('Oswald');
 
     expect(fs.existsSync(savepath)).toBeTruthy();
@@ -51,7 +51,7 @@ describe('All', () => {
       fs.unlinkSync(savepath);
     }
 
-    const erd = new Erd({ prisma, savepath });
+    const erd = new Erd({ dao, savepath });
     await erd.graphviz();
 
     const exists = fs.existsSync(savepath);

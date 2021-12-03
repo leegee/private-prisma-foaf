@@ -23,7 +23,7 @@ describe('csv-ingestor', () => {
   describe('ingest file', () => {
     it('should read a mock relations file', async () => {
       const gi = new CsvIngestor({
-        prisma: PrismaTestEnvironment.prisma,
+        dao: PrismaTestEnvironment.dao,
       });
       await gi.parsePredicateFile('irrelevant-as-file-not-accessed');
       expect(mocks.ReadStream).toHaveBeenCalled();
@@ -31,7 +31,7 @@ describe('csv-ingestor', () => {
 
     it('should read a mock entity file', async () => {
       const gi = new CsvIngestor({
-        prisma: PrismaTestEnvironment.prisma,
+        dao: PrismaTestEnvironment.dao,
       });
       await gi.parseEntityFile('irrelevant-as-file-not-accessed');
       expect(mocks.ReadStream).toHaveBeenCalled();

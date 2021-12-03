@@ -1,7 +1,14 @@
-import { Entity, Predicate } from '@prisma/client';
+import { Entity, Predicate, Verb } from '@prisma/client';
 import { MockProxy } from 'jest-mock-extended';
 import { mockPrisma } from 'testlib/mock-prisma';
 import { DAO, EntityNotFoundError } from 'src/service/dao';
+
+const verbFixture: MockProxy<Verb> = {
+  name: 'mock-name',
+  description: 'mock description',
+  id: 1,
+  stem: '{mock-stem}'
+};
 
 const predicateFixture: MockProxy<Predicate> = {
   start: new Date(),
@@ -41,7 +48,6 @@ describe('dao', () => {
 
     it('returns predicates', async () => {
       mockPrisma.predicate.findMany.mockResolvedValue([predicateFixture]);
-      mockPrisma.entity.findFirst.mockResolvedValue(entityFixture);
 
       const predicates = await dao.getPredicatesByKnownAs(entityFixture.knownas);
       expect(predicates).toBeInstanceOf(Array);
@@ -49,7 +55,7 @@ describe('dao', () => {
     });
 
     it('throws the correct error when entity not found', async () => {
-      mockPrisma.entity.findFirst.mockResolvedValue(null);
+      mockPrisma.predicate.findFirst.mockResolvedValue(null);
       await expect(
         dao.getPredicatesByKnownAs('mock-value-no-entity')
       ).rejects.toBeInstanceOf(EntityNotFoundError);
@@ -69,19 +75,19 @@ describe('dao', () => {
 
   describe('entitySearch', () => {
     it('returns entities', async () => {
-      mockPrisma.predicate.findMany.mockResolvedValue([predicateFixture]);
+      mockPrisma.entity.findMany.mockResolvedValue([entityFixture]);
       const entities = await dao.entitySearch('Osw');
       expect(entities).toBeInstanceOf(Array);
-      expect(entities[0]).toEqual(predicateFixture);
+      expect(entities[0]).toEqual(entityFixture);
     });
   });
 
   describe('verbSearch', () => {
     it('returns verbs', async () => {
-      mockPrisma.predicate.findMany.mockResolvedValue([predicateFixture]);
+      mockPrisma.verb.findMany.mockResolvedValue([verbFixture]);
       const verbs = await dao.verbSearch('Osw');
       expect(verbs).toBeInstanceOf(Array);
-      expect(verbs[0]).toEqual(predicateFixture);
+      expect(verbs[0]).toEqual(verbFixture);
     });
   });
 });
