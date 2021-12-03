@@ -1,6 +1,6 @@
 import { Entity, Predicate, Prisma, PrismaClient, Verb } from "@prisma/client";
 import { logger, ILogger } from 'src/service/logger';
-import { normalise as sanitise, makePredicateId } from "src/service/erd/erd";
+import { normalise as sanitise, makePredicateId } from "src/service/erd";
 
 export interface Iknownas2id {
   [key: string]: number;

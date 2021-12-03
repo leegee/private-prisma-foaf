@@ -3,7 +3,7 @@ import PrismaTestEnvironment from "testlib/prisma-test-env";
 import { Entity, Predicate } from '@prisma/client';
 import { MockProxy } from 'jest-mock-extended';
 import { mockDao, mockPrisma } from 'testlib/mock-prisma';
-import { Erd, normalise } from 'src/service/erd/erd';
+import { Erd, normalise } from 'src/service/erd';
 import { EntityNotFoundError } from "../dao";
 
 const predicateFixture: MockProxy<Predicate> = {

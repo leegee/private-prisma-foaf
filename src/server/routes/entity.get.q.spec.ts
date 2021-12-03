@@ -1,6 +1,10 @@
 import { FastifyInstance } from 'fastify';
 import pactum from 'pactum';
-import { start as startServer } from '../server';
+
+import { start as startServer } from 'src/server';
+import PrismaTestEnvironment from 'testlib/prisma-test-env';
+
+PrismaTestEnvironment.init();
 
 let server: FastifyInstance;
 

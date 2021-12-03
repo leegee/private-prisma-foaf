@@ -2,7 +2,7 @@ import PrismaTestEnvironment from "testlib/prisma-test-env";
 
 import { FastifyInstance } from 'fastify';
 import pactum from 'pactum';
-import { start as startServer } from '../server';
+import { start as startServer } from 'src/server';
 
 PrismaTestEnvironment.init();
 jest.setTimeout(1000 * 30);
