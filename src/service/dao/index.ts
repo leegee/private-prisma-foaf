@@ -147,6 +147,7 @@ export class DAO {
 
   async entitySearch(target: string): Promise<Entity[]> {
     target = sanitise(target);
+    this.logger.debug(`entitySearch for "${target}"`);
     return await this.prisma.entity.findMany({
       where: {
         OR: [
@@ -159,6 +160,7 @@ export class DAO {
 
   async verbSearch(target: string): Promise<Verb[]> {
     target = sanitise(target).toLowerCase()
+    this.logger.debug(`verbSearch for "${target}"`);
     return await this.prisma.verb.findMany({
       where: { name: { contains: target } },
     });
@@ -166,14 +168,13 @@ export class DAO {
 
   async createPredicate(userInput: SimplePredicate) {
     // userInput = normalise(userInput);
+    this.logger.debug(`Enter createPredicate`);
     const rv = await this.prisma.predicate.create({
       data: userInput
     });
     this.logger.debug('XXXXXXXXXXXXXXXX', rv);
     return rv;
   }
-
-
 
 
   async _createEntity(row: IEntityUpsertArgs) {

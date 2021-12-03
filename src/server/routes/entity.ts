@@ -1,5 +1,12 @@
-import { RouteOptions } from 'fastify';
-import { DAO } from 'src/service/dao';
+import { RouteOptions, RequestGenericInterface } from 'fastify';
+import { FastifyRequestX } from '..';
+
+interface FastifyRequestEntity extends FastifyRequestX {
+  query: {
+    q: string
+  },
+  dao: any
+};
 
 export const routes: RouteOptions[] = [{
   method: 'GET',
@@ -25,9 +32,10 @@ export const routes: RouteOptions[] = [{
     }
   },
 
-  handler: function (req, res) {
-    // @ts-expect-error because req is intentinoally extended
-    const entities = req.dao.entitySearch(req.params.q);
+  handler: async (req, res) => {
+    const entities = await (req as FastifyRequestX).dao.entitySearch(
+      (req as FastifyRequestEntity).query.q
+    );
     res.send({ entities });
   }
 }];

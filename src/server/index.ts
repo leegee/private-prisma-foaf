@@ -1,4 +1,4 @@
-import Fastify, { FastifyInstance, FastifyLoggerInstance, RouteOptions } from 'fastify';
+import Fastify, { FastifyInstance, FastifyRequest, RouteOptions } from 'fastify';
 import openapiGlue from 'fastify-openapi-glue';
 
 import { routes as entityRoutes } from './routes/entity';
@@ -8,17 +8,26 @@ import { prisma } from 'src/service/prisma-client';
 import { logger } from 'src/service/logger';
 import { DAO } from 'src/service/dao';
 
-const specification = `${__dirname}/../openapi.json`;
+export type FastifyRequestX = FastifyRequest & {
+  dao: DAO
+};
+
+// export type CustomRequest = FastifyRequest<{
+//   Body: { test: boolean };
+// }>
 
 export const server: FastifyInstance = Fastify({
   logger: false,
   pluginTimeout: 10000,
 });
 
-server.decorateRequest('dao', () => new DAO({ prisma, logger }));
-server.decorateRequest('prisma', () => prisma);
+const dao = new DAO({ prisma, logger });
+// Not shared but made per request:
+server.addHook("onRequest", async (req) => (req as FastifyRequestX).dao = dao);
+
 
 /*
+// const specification = `${__dirname}/../openapi.json`;
 server.register(openapiGlue, {
   specification,
   noAdditional: true,

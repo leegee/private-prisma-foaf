@@ -10,13 +10,13 @@ jest.setTimeout(1000 * 30);
 let server: FastifyInstance;
 
 beforeAll(async () => {
-  await pactum.mock.start(4000);
+  // await pactum.mock.start(4000);
   server = await startServer();
   pactum.request.setBaseUrl(`http://localhost:${process.env.ERD_PORT || 3000}`);
 });
 
 afterAll(async () => {
-  await pactum.mock.stop();
+  // await pactum.mock.stop();
   server.close();
 });
 
