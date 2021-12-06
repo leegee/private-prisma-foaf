@@ -42,11 +42,11 @@ beforeEach(() => {
 describe('dao', () => {
 
   describe('getPredicatesByKnownAs', () => {
-    it.skip('throws the correct error when entity not found', async () => {
+    it('throws the correct error when entity not found', () => {
       mockPrisma.entity.findFirst.mockResolvedValue(null);
       expect(
-        async () => await dao.getPredicatesByKnownAs('mock-value-no-entity')
-      ).toThrow(EntityNotFoundError);
+        dao.getPredicatesByKnownAs('mock-value-no-entity')
+      ).rejects.toThrow(EntityNotFoundError);
     });
 
     it('returns predicates', async () => {
@@ -58,12 +58,6 @@ describe('dao', () => {
       expect(predicates[0]).toEqual(predicateFixture);
     });
 
-    it('throws the correct error when entity not found', async () => {
-      mockPrisma.predicate.findFirst.mockResolvedValue(null);
-      await expect(
-        dao.getPredicatesByKnownAs('mock-value-no-entity')
-      ).rejects.toBeInstanceOf(EntityNotFoundError);
-    });
   });
 
   describe('getAllPredicates', () => {
