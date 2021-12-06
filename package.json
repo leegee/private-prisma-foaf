@@ -18,6 +18,7 @@
     "http-server": "^14.0.0",
     "jest": "^27.3.1",
     "jest-fetch-mock": "^3.0.3",
+    "jest-html-reporter": "^3.4.2",
     "jest-mock-extended": "^2.0.4",
     "pactum": "^3.1.0",
     "pg": "^8.7.1",
@@ -71,9 +72,9 @@
     "node": ">=16.0.0"
   },
   "_moduleAliases": {
-    "@src": "./src",
+    "src": "./src",
     "@test": "./test",
-    "@testlib": "./test/lib"
+    "testlib": "./test/lib"
   },
   "type": "commonjs",
   "jest": {
@@ -96,14 +97,27 @@
     "collectCoverageFrom": [
       "<rootDir>/src/**/*.(t|j)s"
     ],
-    "coverageDirectory": "./coverage",
+    "coverageDirectory": "./output/coverage",
     "setupFilesAfterEnv": [
       "./test/lib/jest-setup-after-env.ts"
     ],
     "moduleNameMapper": {
       "^src/(.*)$": "<rootDir>/src/$1",
       "^testlib/(.*)$": "<rootDir>/test/lib/$1"
-    }
+    },
+    "reporters": [
+      "default",
+      [
+        "./node_modules/jest-html-reporter",
+        {
+          "pageTitle": "Test Report",
+          "outputPath": "./output/test-report.html",
+          "includeConsoleLog": true,
+          "includeFailureMsg": true,
+          "includeSuiteFailure": true
+        }
+      ]
+    ]
   },
   "prettier": {
     "singleQuote": true,

@@ -2,7 +2,7 @@ import fs from 'fs';
 import { parse } from 'csv-parse';
 
 import { BaseIngestor } from './base-ingestor';
-import { GrammarError } from '@src/service/dao';
+import { GrammarError } from 'src/service/dao';
 
 export class CsvIngestor extends BaseIngestor {
 
@@ -12,22 +12,33 @@ export class CsvIngestor extends BaseIngestor {
     }
     this.logger.debug('Enter parseEntityFile for ' + filepath);
 
-    fs.createReadStream(filepath)
-      .on('error', (error: Error) => this.logger.error(error))
-      .pipe(
-        parse({
-          columns: true,
-          trim: true,
-          relax_column_count_less: true,
-          skip_empty_lines: true,
-        }),
-      )
-      .on('data', async (row) => {
-        if (!row) {
-          throw new GrammarError(`inputTextline: "${row}"`);
-        }
-        await this._createEntity(row);
-      });
+    return new Promise((resolve, reject) => {
+
+      fs.createReadStream(filepath)
+        .on('error', (error: Error) => {
+          this.logger.error(error);
+          reject(error);
+        })
+        .pipe(
+          parse({
+            columns: true,
+            trim: true,
+            relax_column_count_less: true,
+            skip_empty_lines: true,
+          }),
+        )
+        .on('data', async (row) => {
+          if (!row) {
+            throw new GrammarError(`inputTextline: "${row}"`);
+          }
+          await this._createEntity(row);
+        })
+        .on('end', () => {
+          this.logger.debug(`Completed ingestion of ${filepath}`);
+          resolve();
+        });
+
+    });
   }
 
   async parsePredicateFile(filepath: string): Promise<void> {
@@ -36,8 +47,15 @@ export class CsvIngestor extends BaseIngestor {
     }
     this.logger.debug('Enter parsePredicateFile for ' + filepath);
 
-    fs.createReadStream(filepath)
-      .on('error', (error: Error) => this.logger.error(error))
+    let reastream;
+    try {
+      reastream = fs.createReadStream(filepath);
+    } catch (e) {
+      throw e;
+    }
+
+    reastream
+      .on('error', (error: Error) => { throw (error) })
       .pipe(
         parse({
           columns: true,
@@ -50,7 +68,7 @@ export class CsvIngestor extends BaseIngestor {
         if (!row) {
           throw new GrammarError(`inputTextline: "${row}"`);
         }
-        await this._createSubjectObjectVerbPredicate(row);
+        await this._createPredicate(row);
       });
   }
 

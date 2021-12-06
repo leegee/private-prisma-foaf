@@ -1,6 +1,6 @@
 import { Entity, Predicate, Prisma, PrismaClient, Verb } from '@prisma/client';
-import { logger, ILogger } from '@src/service/logger';
-import { normalise as sanitise, makePredicateId } from '@src/service/erd';
+import { logger, ILogger } from 'src/service/logger';
+import { normalise, makePredicateId } from 'src/service/erd';
 
 export interface Iknownas2id {
   [key: string]: number;
@@ -107,7 +107,7 @@ export class DAO {
       if (knownasList[knownasListIndex] === undefined) {
         throw new TypeError('Called without .knownas');
       } else {
-        knownasList[knownasListIndex] = sanitise(knownasList[knownasListIndex]).toLowerCase();
+        knownasList[knownasListIndex] = normalise(knownasList[knownasListIndex]).toLowerCase();
       }
 
       if (!this.entityKnownas2Id[knownasList[knownasListIndex]]) {
@@ -146,7 +146,7 @@ export class DAO {
   }
 
   async entitySearch(target: string): Promise<Entity[]> {
-    target = sanitise(target);
+    target = normalise(target);
     this.logger.debug(`entitySearch for '${target}'`);
     return await this.prisma.entity.findMany({
       where: {
@@ -159,7 +159,7 @@ export class DAO {
   }
 
   async verbSearch(target: string): Promise<Verb[]> {
-    target = sanitise(target).toLowerCase()
+    target = normalise(target);
     this.logger.debug(`verbSearch for '${target}'`);
     return await this.prisma.verb.findMany({
       where: { name: { contains: target } },
@@ -180,46 +180,49 @@ export class DAO {
   async _createEntity(row: IEntityUpsertArgs) {
     this.logger.debug('_createEntity for row:', row);
 
-    const subject: { [key: string]: string | Date } = {};
+    const entity: { [key: string]: string | Date } = {};
 
     for (const key in row) {
       if (typeof row[key] !== 'undefined' && row[key]!.length) {
         // TODO Middleare
         if (row[key]!.match(/^\d{4}-\d{2}-\d{2}/)) {
-          subject[key] = new Date(subject[key]);
+          entity[key] = new Date(entity[key]);
         } else {
-          subject[key] = sanitise(row[key]!);
-          if (subject[key].toString().length === 0) {
-            delete subject[key];
+          entity[key] = normalise(row[key]!);
+          if (entity[key].toString().length === 0) {
+            delete entity[key];
           }
         }
       }
     }
 
-    const args = {
-      create: subject as IEntityUpsertArgs,
-      update: subject as IEntityUpsertArgs,
-      where: {
-        knownas: subject.knownas as string,
-      }
-    };
     try {
-      await this.prisma.entity.upsert(args);
+      await this.prisma.entity.upsert({
+        create: entity as IEntityUpsertArgs,
+        update: entity as IEntityUpsertArgs,
+        where: {
+          knownas: entity.knownas as string,
+        }
+      });
     } catch (e) {
-      this.logger.error(e, args);
+      this.logger.debug({ subject: entity });
+      this.logger.error(e);
     }
   }
 
-  async _createSubjectObjectVerbPredicate(row: IPredicateUpsertArgs) {
+  /**
+   * Enties and verbs may not yet exist.
+   */
+  async _createPredicate(row: IPredicateUpsertArgs) {
     this.logger.debug('_createSubjectObjectVerbPredicate for row:', row);
 
     if (!row || !row.Subject || !row.Verb || !row.Object) {
       throw new GrammarError(JSON.stringify(row, null, 2));
     }
 
-    row.Subject = sanitise(row.Subject);
-    row.Verb = sanitise(row.Verb);
-    row.Object = sanitise(row.Object);
+    row.Subject = normalise(row.Subject);
+    row.Verb = normalise(row.Verb);
+    row.Object = normalise(row.Object);
 
     const foundSubject = CachedIds.Entity[row.Subject]
       ? {
@@ -234,8 +237,8 @@ export class DAO {
           formalname: row.Subject,
         },
         update: {
-          knownas: row.Subject,
-          formalname: row.Subject,
+          // knownas: row.Subject,
+          // formalname: row.Subject,
         },
       });
 
@@ -255,7 +258,7 @@ export class DAO {
           name: row.Verb
         },
         update: {
-          name: row.Verb
+          // name: row.Verb
         },
       });
 
@@ -276,8 +279,8 @@ export class DAO {
           formalname: row.Object,
         },
         update: {
-          knownas: row.Object,
-          formalname: row.Object,
+          // knownas: row.Object,
+          // formalname: row.Object,
         },
       });
 

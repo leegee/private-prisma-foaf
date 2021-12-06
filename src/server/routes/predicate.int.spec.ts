@@ -1,18 +1,26 @@
-import { pactum } from '@testlib/pactum';
+import { pactum } from 'testlib/pactum';
 
 
 describe('PUT /predicate', () => {
 
   describe('should put "Oswald assassinated JFK"', () => {
     it('JFK exists', async () => {
+
       await pactum.spec()
         .get('/entity')
         .withQueryParams({ q: 'jfk' })
         .expectStatus(200)
-        .expectJson({
+        .expectJsonLike({
           entities: [{
             knownas: 'jfk',
             formalname: 'John Fitzgerald Kennedy',
+            "approved": false,
+            "dob": null,
+            "dod": null,
+            "familyname": null,
+            "givenname": null,
+            id: '#type:number',
+            "middlenames": null,
           }]
         })
     });
@@ -26,18 +34,26 @@ describe('PUT /predicate', () => {
           entities: [{
             knownas: 'oswald',
             formalname: 'Lee Harvey Oswald',
+            "approved": false,
+            "dob": null,
+            "dod": null,
+            "familyname": null,
+            "givenname": null,
+            id: '#type:number',
+            "middlenames": null,
           }]
         })
     });
 
-    it('Verb "assinates" exists', async () => {
+    it('Verb "assassinates" exists', async () => {
       await pactum.spec()
         .get('/verb')
-        .withQueryParams({ q: 'assinates' })
+        .withQueryParams({ q: 'assassinates' })
         .expectStatus(200)
-        .expectJson({
+        .expectJsonLike({
           verbs: [{
-            name: 'assinates',
+            name: 'assassinates',
+            id: '#type:number',
           }]
         })
     });
@@ -47,7 +63,7 @@ describe('PUT /predicate', () => {
         .put('/predicate')
         .withJson({
           Subject: { knownas: 'oswald' },
-          Verb: { name: 'assinates' },
+          Verb: { name: 'assassinates' },
           Object: { knownas: 'jfk' },
         })
         .expectStatus(201);

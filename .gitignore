@@ -7,4 +7,6 @@ prisma/migrations
 prisma.mmd
 dist
 output/*.svg
+output/coverage
+output/*.html
 *copy.csv

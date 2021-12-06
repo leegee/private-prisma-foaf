@@ -19,10 +19,10 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@testlib/*": [
+      "testlib/*": [
         "./test/lib/*"
       ],
-      "@src/*": [
+      "src/*": [
         "./src/*"
       ]
     }

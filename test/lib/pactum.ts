@@ -2,7 +2,7 @@ import pactum from 'pactum';
 import { FastifyInstance } from 'fastify';
 
 import PrismaTestEnvironment from "testlib/prisma-test-env";
-import { start as startServer } from '@src/server';
+import { start as startServer } from 'src/server';
 
 type assertionHandlerCtx = {
   [key: string]: any;

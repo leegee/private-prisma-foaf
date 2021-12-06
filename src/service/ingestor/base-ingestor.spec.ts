@@ -1,5 +1,5 @@
-import * as BaseIngestor from '@src/service/ingestor/base-ingestor';
-import { dao } from '@testlib/fixtures';
+import * as BaseIngestor from 'src/service/ingestor/base-ingestor';
+import { dao } from 'testlib/fixtures';
 
 import each from 'jest-each';
 import { GrammarError, IPredicateUpsertArgs } from '../dao';
@@ -22,7 +22,7 @@ describe('base-ingestor', () => {
   ]).test('throws GrammarError on bad args', async (args) => {
     const o = new BaseIngestor.BaseIngestor({ dao });
     await expect(
-      async () => o._createSubjectObjectVerbPredicate(args as IPredicateUpsertArgs)
+      async () => o._createPredicate(args as IPredicateUpsertArgs)
     ).rejects.toThrowError(GrammarError);
   });
 

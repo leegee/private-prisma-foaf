@@ -62,9 +62,9 @@ Verb search is easiest via stems, provided through an insert/update trigger on `
   - cast dates to strings?
   - remove empty fields (since usage dictates no blanking of extant fields, only replacement)
 - Kohenen projection!
-- Link an `aka` table to Postgres Thesaurus configuration (Entity.id references Aka.id)
+- Link an `aka` table to Postgres Thesaurus configuration (Entity.id references Aka.id) and synonym table
 - Given tiemstamps, map the episode!
-- Seed with the CSV?
+- [Github Actions with custom docker](https://stackoverflow.com/questions/64033686/how-can-i-use-private-docker-image-in-github-actions)
 - Prolog export
 
 ### GUI
@@ -94,7 +94,7 @@ Verb search is easiest via stems, provided through an insert/update trigger on `
     https://www.prisma.io/docs/guides/testing/unit-testing
     https://www.youtube.com/watch?v=E-FHalzAOFs
 
-## Proposed Ingestion Format
+## Ingestion Format
 
 ### Entities
 
@@ -106,22 +106,23 @@ Consider PROLOG.
 
 ## ERD
 
-![ERD](./erd.svg)
+[![ERD](./erd.svg)](./erd.svg)
 
 ## SVGs output from db seed
 
 ### DOT
 
-![ERD](./output/dot.svg)
+[![DOT](./output/dot.svg)](./output/dot.svg)
 
 ## FDP
 
-![ERD](./output/fdp.svg)
+[![FDP](./output/fdp.svg)](./output/fdp.svg)
 
 ## CIRCO
 
-![ERD](./output/circo.svg)
+[![Circo](./output/circo.svg)](./output/circo.svg)
 
 ## TWOPI
 
 ![ERD](./output/twopi.svg)
+[![Twopie](./output/twopi.svg)](./output/twopi.svg)

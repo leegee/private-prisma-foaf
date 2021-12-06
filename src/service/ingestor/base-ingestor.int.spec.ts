@@ -1,5 +1,5 @@
-import { BaseIngestor } from '@src/service/ingestor/base-ingestor';
-import { logger } from '@src/service/logger';
+import { BaseIngestor } from 'src/service/ingestor/base-ingestor';
+import { logger } from 'src/service/logger';
 import PrismaTestEnvironment from "testlib/prisma-test-env";
 
 PrismaTestEnvironment.init();
@@ -14,12 +14,12 @@ describe('base-ingestor (int)', () => {
     let errorFree: boolean;
 
     try {
-      gi._createSubjectObjectVerbPredicate({
+      gi._createPredicate({
         Subject: 's',
         Verb: 'v',
         Object: 'o',
       });
-      gi._createSubjectObjectVerbPredicate({
+      gi._createPredicate({
         Subject: 's',
         Verb: 'v',
         Object: 'o',

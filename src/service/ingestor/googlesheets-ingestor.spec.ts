@@ -1,4 +1,4 @@
-import { dao, logger } from '@testlib/fixtures';
+import { dao, logger } from 'testlib/fixtures';
 
 import fetchMock from "jest-fetch-mock";
 

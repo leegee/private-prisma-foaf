@@ -1,10 +1,10 @@
 import fs from 'fs';
-import { DAO } from '@src/service/dao';
-import { Graphviz } from '@src/service/erd/graphviz';
-import { logger } from '@src/service/logger';
-import { prisma } from '@src/service/prisma-client';
+import { DAO } from 'src/service/dao';
+import { Graphviz } from 'src/service/erd/graphviz';
+import { logger } from 'src/service/logger';
+import { prisma } from 'src/service/prisma-client';
 
-import PrismaTestEnvironment from '@testlib/prisma-test-env';
+import PrismaTestEnvironment from 'testlib/prisma-test-env';
 PrismaTestEnvironment.init();
 
 main();

@@ -1,8 +1,8 @@
 import { Entity, Predicate, Verb } from '@prisma/client';
 import { MockProxy } from 'jest-mock-extended';
-import { mockPrisma } from '@testlib/mock-prisma';
-import { DAO, EntityNotFoundError } from '@src/service/dao';
-import PrismaTestEnvironment from '@testlib/prisma-test-env';
+import { mockPrisma } from 'testlib/mock-prisma';
+import { DAO, EntityNotFoundError } from 'src/service/dao';
+import PrismaTestEnvironment from 'testlib/prisma-test-env';
 
 PrismaTestEnvironment.init();
 
@@ -21,9 +21,9 @@ const predicateFixture: MockProxy<Predicate> = {
   verbId: 1
 };
 
-const entityFixture: MockProxy<Entity> = {
+const oswaldEntityFixture: MockProxy<Entity> = {
   id: 1,
-  knownas: 'Oswald',
+  knownas: 'oswald',
   formalname: 'Lee Harvey Oswald',
   givenname: '',
   middlenames: null,
@@ -51,8 +51,9 @@ describe('dao', () => {
 
     it('returns predicates', async () => {
       mockPrisma.predicate.findMany.mockResolvedValue([predicateFixture]);
+      mockPrisma.entity.findMany.mockResolvedValueOnce([oswaldEntityFixture]);
 
-      const predicates = await dao.getPredicatesByKnownAs(entityFixture.knownas);
+      const predicates = await dao.getPredicatesByKnownAs(oswaldEntityFixture.knownas);
       expect(predicates).toBeInstanceOf(Array);
       expect(predicates[0]).toEqual(predicateFixture);
     });
@@ -78,10 +79,10 @@ describe('dao', () => {
 
   describe('entitySearch', () => {
     it('returns entities', async () => {
-      mockPrisma.entity.findMany.mockResolvedValue([entityFixture]);
+      mockPrisma.entity.findMany.mockResolvedValue([oswaldEntityFixture]);
       const entities = await dao.entitySearch('Osw');
       expect(entities).toBeInstanceOf(Array);
-      expect(entities[0]).toEqual(entityFixture);
+      expect(entities[0]).toEqual(oswaldEntityFixture);
     });
   });
 

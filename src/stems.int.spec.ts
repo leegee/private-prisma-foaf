@@ -1,6 +1,6 @@
-import { prisma } from "testlib/fixtures";
+import { prisma } from 'testlib/fixtures';
 
-import PrismaTestEnvironment from "testlib/prisma-test-env";
+import PrismaTestEnvironment from 'testlib/prisma-test-env';
 PrismaTestEnvironment.init();
 
 

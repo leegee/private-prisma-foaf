@@ -5,15 +5,15 @@
 import * as path from 'path';
 import fs from 'fs';
 import os from 'os';
-import { logger, ILogger } from '@src/service/logger';
-import { DAO, PredicateResult } from '@src/service/dao';
+import { logger, ILogger } from 'src/service/logger';
+import { DAO, PredicateResult } from 'src/service/dao';
 
 export function normaliseArray(list: string[]): string[] {
   return list.map(subject => normalise(subject));
 }
 
 export function normalise(subject: string): string {
-  return subject.toLowerCase().replace(/[^\w\s'-]+/, '').replace(/\s+/gs, ' ').trim()
+  return typeof subject === 'undefined' ? subject : subject.toLowerCase().replace(/[^\w\s'-]+/, '').replace(/\s+/gs, ' ').trim()
 }
 
 export function makePredicateId(subjectId: number, verbId: number, objectId: number): string {

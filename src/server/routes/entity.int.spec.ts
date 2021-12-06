@@ -1,5 +1,4 @@
-import { FastifyInstance } from 'fastify';
-import { pactum } from '@testlib/pactum';
+import { pactum } from 'testlib/pactum';
 
 
 describe('GET /entity?q=', () => {

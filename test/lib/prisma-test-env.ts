@@ -8,12 +8,12 @@ import { Client } from 'pg';
 import dotenv from 'dotenv';
 dotenv.config;
 
-import { prisma, dao, logger } from '@testlib/fixtures';
+import { prisma, dao, logger } from 'testlib/fixtures';
 
 import NodeEnvironment from 'jest-environment-node';
 import child_process from 'child_process';
 
-import { CsvIngestor } from '@src/service/ingestor/csv-ingestor';
+import { CsvIngestor } from 'src/service/ingestor/csv-ingestor';
 
 const prismaBinary = 'npx prisma';
 
@@ -67,7 +67,7 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
     super(config);
 
     // Generate a unique schema identifier for this test context
-    this.schema = `test_${+ new Date()}_${process.hrtime.bigint()}`;
+    this.schema = `erdtest_${+ new Date()}_${process.hrtime.bigint()}`;
 
     logger.debug(`Init new test env with temporary schema: ${this.schema}`);
 
@@ -97,7 +97,7 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
     });
     await client.connect();
     logger.debug(`Dropping test env temp schema, ${this.schema}.`);
-    await client.query(`DROP SCHEMA IF EXISTS '${this.schema}' CASCADE`);
+    await client.query(`DROP SCHEMA IF EXISTS "${this.schema}" CASCADE`);
     await client.end();
     logger.debug(`Dropped test env temp schema, ${this.schema}.`);
   }

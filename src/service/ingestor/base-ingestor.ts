@@ -1,6 +1,5 @@
-import { Prisma, PrismaClient } from '@prisma/client';
 import { Value } from '@prisma/client/runtime';
-import * as loggerModule from '@src/service/logger';
+import * as loggerModule from 'src/service/logger';
 import { DAO, IEntityUpsertArgs, IPredicateUpsertArgs } from '../dao';
 
 // prisma.$use(async (params, next) => {
@@ -39,9 +38,9 @@ export class BaseIngestor {
     return this.dao._createEntity(row);
   }
 
-  async _createSubjectObjectVerbPredicate(row: IPredicateUpsertArgs) {
+  async _createPredicate(row: IPredicateUpsertArgs) {
     this.logger.debug('_createSubjectObjectVerbPredicate for row:', row);
-    return this.dao._createSubjectObjectVerbPredicate(row);
+    return this.dao._createPredicate(row);
   }
 
 }

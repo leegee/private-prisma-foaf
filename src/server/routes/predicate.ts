@@ -1,6 +1,6 @@
 import { RouteOptions } from 'fastify';
-import { SimplePredicate } from '@src/service/dao';
-import { FastifyRequestX } from '@src/server';
+import { SimplePredicate } from 'src/service/dao';
+import { FastifyRequestX } from 'src/server';
 
 export const routes: RouteOptions[] = [{
   method: 'PUT',
@@ -20,10 +20,6 @@ export const routes: RouteOptions[] = [{
   },
 
   handler: async function (req, res) {
-    console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
-    console.dir(req.body);
-    console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
-
     await (req as FastifyRequestX).dao.createPredicate(
       (req as FastifyRequestX).body as SimplePredicate
     );
