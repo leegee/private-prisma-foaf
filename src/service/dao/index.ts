@@ -30,6 +30,7 @@ export interface IPredicateUpsertArgs {
   end?: string;
 }
 
+
 export interface ICache {
   Entity: Iknownas2id;
   Verb: Iknownas2id;
@@ -73,6 +74,12 @@ export type SimplePredicate = {
   Object: Entity,
 }
 
+export type SimplePredicateInput = {
+  subject: string,
+  verb: string,
+  object: string,
+}
+
 export type PredicateResult = SimplePredicate & Predicate;
 
 export class DAO {
@@ -112,11 +119,11 @@ export class DAO {
 
       if (!this.entityKnownas2Id[knownasList[knownasListIndex]]) {
         const knownasEntity = await this.prisma.entity.findFirst({
-          where: { knownas: knownasList[knownasListIndex] },
+          where: { knownas: knownasInput[knownasListIndex] },
           select: { id: true },
         });
 
-        if (knownasEntity === null) {
+        if (!!!knownasEntity) {
           throw new EntityNotFoundError(knownasList[knownasListIndex]);
         }
 
@@ -166,18 +173,7 @@ export class DAO {
     });
   }
 
-  async createPredicate(userInput: SimplePredicate) {
-    // userInput = normalise(userInput);
-    this.logger.debug(`Enter createPredicate`);
-    const rv = await this.prisma.predicate.create({
-      data: userInput
-    });
-    this.logger.debug('XXXXXXXXXXXXXXXX', rv);
-    return rv;
-  }
-
-
-  async _createEntity(row: IEntityUpsertArgs) {
+  async createEntity(row: IEntityUpsertArgs) {
     this.logger.debug('_createEntity for row:', row);
 
     const entity: { [key: string]: string | Date } = {};
@@ -213,7 +209,7 @@ export class DAO {
   /**
    * Enties and verbs may not yet exist.
    */
-  async _createPredicate(row: IPredicateUpsertArgs) {
+  async createPredicate(row: IPredicateUpsertArgs) {
     this.logger.debug('_createSubjectObjectVerbPredicate for row:', row);
 
     if (!row || !row.Subject || !row.Verb || !row.Object) {
@@ -237,8 +233,6 @@ export class DAO {
           formalname: row.Subject,
         },
         update: {
-          // knownas: row.Subject,
-          // formalname: row.Subject,
         },
       });
 
@@ -258,7 +252,6 @@ export class DAO {
           name: row.Verb
         },
         update: {
-          // name: row.Verb
         },
       });
 
@@ -279,8 +272,6 @@ export class DAO {
           formalname: row.Object,
         },
         update: {
-          // knownas: row.Object,
-          // formalname: row.Object,
         },
       });
 

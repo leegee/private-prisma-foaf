@@ -3,7 +3,7 @@ import { pactum } from 'testlib/pactum';
 
 describe('PUT /predicate', () => {
 
-  describe('should put "Oswald assassinated JFK"', () => {
+  describe('should put "Oswald assassinates JFK"', () => {
     it('JFK exists', async () => {
 
       await pactum.spec()
@@ -13,7 +13,7 @@ describe('PUT /predicate', () => {
         .expectJsonLike({
           entities: [{
             knownas: 'jfk',
-            formalname: 'John Fitzgerald Kennedy',
+            formalname: 'john f kennedy',
             "approved": false,
             "dob": null,
             "dod": null,
@@ -33,7 +33,7 @@ describe('PUT /predicate', () => {
         .expectJson({
           entities: [{
             knownas: 'oswald',
-            formalname: 'Lee Harvey Oswald',
+            formalname: 'lee harvey oswald',
             "approved": false,
             "dob": null,
             "dod": null,
@@ -69,25 +69,6 @@ describe('PUT /predicate', () => {
         .expectStatus(201);
     });
 
-    // .post('/entity/jfk')
-    // .withJson({
-    //   formalname: "John Test Kennedy"
-    // })
-    // .expectStatus(200)
-    // .useInteraction({
-    //   request: {
-    //     method: 'GET',
-    //     path: '/entity',
-    //     queryParams: { q: 'jfk' }
-    //   },
-    //   response: {
-    //     status: 200,
-    //     body: [{
-    //       knownas: 'jfk',
-    //       formalname: "John Test Kennedy",
-    //     }]
-    //   }
-    // });
   });
 
 });

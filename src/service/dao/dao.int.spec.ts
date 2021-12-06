@@ -29,8 +29,8 @@ describe('dao (int)', () => {
   describe('verb search', () => {
     test.each`
     input     | expectedResult
-    ${'ass'}  | ${'assassinated'}
-    ${'Ass'}  | ${'assassinated'}
+    ${'ass'}  | ${'assassinates'}
+    ${'Ass'}  | ${'assassinates'}
   `('expect $input to lead to $expectedResult', async ({ input, expectedResult }) => {
       const verbs = await dao.verbSearch(input);
       expect(verbs).toBeInstanceOf(Array);
@@ -39,5 +39,14 @@ describe('dao (int)', () => {
     })
   });
 
+  it('createPredicate', async () => {
+    expect(async () => {
+      await dao.createPredicate({
+        Subject: 'foo',
+        Verb: 'baz',
+        Object: 'baz',
+      });
+    }).not.toThrow();
+  });
 
 });

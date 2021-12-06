@@ -35,12 +35,12 @@ export class BaseIngestor {
 
   async _createEntity(row: IEntityUpsertArgs) {
     this.logger.debug('_createEntity for row:', row);
-    return this.dao._createEntity(row);
+    return this.dao.createEntity(row);
   }
 
   async _createPredicate(row: IPredicateUpsertArgs) {
     this.logger.debug('_createSubjectObjectVerbPredicate for row:', row);
-    return this.dao._createPredicate(row);
+    return this.dao.createPredicate(row);
   }
 
 }

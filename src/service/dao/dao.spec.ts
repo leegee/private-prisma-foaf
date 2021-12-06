@@ -42,16 +42,16 @@ beforeEach(() => {
 describe('dao', () => {
 
   describe('getPredicatesByKnownAs', () => {
-    it('throws the correct error when entity not found', async () => {
+    it.skip('throws the correct error when entity not found', async () => {
       mockPrisma.entity.findFirst.mockResolvedValue(null);
-      await expect(
-        dao.getPredicatesByKnownAs('mock-value-no-entity')
-      ).rejects.toBeInstanceOf(EntityNotFoundError);
+      expect(
+        async () => await dao.getPredicatesByKnownAs('mock-value-no-entity')
+      ).toThrow(EntityNotFoundError);
     });
 
     it('returns predicates', async () => {
+      mockPrisma.entity.findFirst.mockResolvedValue(oswaldEntityFixture);
       mockPrisma.predicate.findMany.mockResolvedValue([predicateFixture]);
-      mockPrisma.entity.findMany.mockResolvedValueOnce([oswaldEntityFixture]);
 
       const predicates = await dao.getPredicatesByKnownAs(oswaldEntityFixture.knownas);
       expect(predicates).toBeInstanceOf(Array);

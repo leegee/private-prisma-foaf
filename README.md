@@ -9,7 +9,7 @@
 
     npm run test:unit      # Run unit tests without the database
     npm run test:int       # Run integration tests upon the db and Prisma
-    npm run test:debug --  # following with match pattern
+    npm run test:debug --  # followed by match pattern
     npm run coverage
 
 ## Scheme
@@ -56,13 +56,13 @@ Verb search is easiest via stems, provided through an insert/update trigger on `
 
 ## TODO
 
-- DAO
-- High-level synonyms via wordnet?
+- Move to external OpenAPI scheme to share between routes and Pactum tests
+- Populate built-in synonym table via verbs reduced to toponyms via wordnet
+  - Link an `aka` table to Postgres Thesaurus configuration (Entity.id references Aka.id) and synonym table?
 - Middleware to
   - cast dates to strings?
   - remove empty fields (since usage dictates no blanking of extant fields, only replacement)
 - Kohenen projection!
-- Link an `aka` table to Postgres Thesaurus configuration (Entity.id references Aka.id) and synonym table
 - Given tiemstamps, map the episode!
 - [Github Actions with custom docker](https://stackoverflow.com/questions/64033686/how-can-i-use-private-docker-image-in-github-actions)
 - Prolog export

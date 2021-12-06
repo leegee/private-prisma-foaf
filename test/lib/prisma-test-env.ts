@@ -8,7 +8,7 @@ import { Client } from 'pg';
 import dotenv from 'dotenv';
 dotenv.config;
 
-import { prisma, dao, logger } from 'testlib/fixtures';
+import { prisma, dao, logger, nullLogger } from 'testlib/fixtures';
 
 import NodeEnvironment from 'jest-environment-node';
 import child_process from 'child_process';
@@ -38,12 +38,13 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
 
     beforeEach(async () => {
       logger.debug('PrismaTestEnvironment beforeEach enter');
+
       testEnv = new PrismaTestEnvironment({});
       await testEnv.setup();
 
       const gi = new CsvIngestor({
         dao,
-        logger,
+        logger: nullLogger,
       });
 
       await gi.parsePredicateFile('./test/lib/predicates.csv');

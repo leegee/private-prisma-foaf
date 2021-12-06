@@ -12,16 +12,13 @@ export type FastifyRequestX = FastifyRequest & {
   dao: DAO
 };
 
-// export type CustomRequest = FastifyRequest<{
-//   Body: { test: boolean };
-// }>
-
 export const server: FastifyInstance = Fastify({
   logger: false,
   pluginTimeout: 10000,
 });
 
 const dao = new DAO({ prisma, logger });
+
 // Not shared but made per request:
 server.addHook("onRequest", async (req) => (req as FastifyRequestX).dao = dao);
 

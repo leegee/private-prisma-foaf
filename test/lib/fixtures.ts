@@ -1,10 +1,10 @@
-import { logger } from 'src/service/logger';
+import { logger, nullLogger } from 'src/service/logger';
 import { prisma } from 'src/service/prisma-client';
 import { DAO } from 'src/service/dao';
 
 const dao = new DAO({ logger, prisma });
 
-export { prisma, logger, dao };
+export { prisma, logger, dao, nullLogger };
 
 export interface IFixtures {
   [key: string]: any
@@ -15,8 +15,8 @@ export async function setup(): Promise<IFixtures> {
 
   const fixtures: IFixtures = {};
 
-  fixtures.assassinated = await prisma.verb.findFirst({
-    where: { name: 'assassinated' }
+  fixtures.assassinates = await prisma.verb.findFirst({
+    where: { name: 'assassinates' }
   });
 
   fixtures.hosted = await prisma.verb.findFirst({
@@ -65,9 +65,9 @@ export async function setup(): Promise<IFixtures> {
     },
   });
 
-  fixtures.oswaldassassinatedJfk = await prisma.predicate.findFirst({
+  fixtures.oswaldassassinatesJfk = await prisma.predicate.findFirst({
     where: {
-      verbId: fixtures.assassinated.id,
+      verbId: fixtures.assassinates.id,
       subjectId: fixtures.oswald.id,
       objectId: fixtures.jfk.id,
       start: new Date('1963-11-22'),

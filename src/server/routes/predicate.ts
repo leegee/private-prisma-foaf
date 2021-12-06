@@ -20,10 +20,10 @@ export const routes: RouteOptions[] = [{
   },
 
   handler: async function (req, res) {
-    await (req as FastifyRequestX).dao.createPredicate(
-      (req as FastifyRequestX).body as SimplePredicate
-    );
-    res.send(201);
+    // await (req as FastifyRequestX).dao.createPredicate(
+    //   (req as FastifyRequestX).body as SimplePredicate
+    // );
+    // res.send(201);
   }
 
 }];
