@@ -56,7 +56,7 @@ Verb search is easiest via stems, provided through an insert/update trigger on `
 
 ## TODO
 
-- Move to external OpenAPI scheme to share between routes and Pactum tests
+- Move to external OpenAPI scheme to share between routes and superagent tests
 - Populate built-in synonym table via verbs reduced to toponyms via wordnet
   - Link an `aka` table to Postgres Thesaurus configuration (Entity.id references Aka.id) and synonym table?
 - Middleware to

@@ -21,7 +21,6 @@
     "jest-fetch-mock": "^3.0.3",
     "jest-html-reporter": "^3.4.2",
     "jest-mock-extended": "^2.0.4",
-    "pactum": "^3.1.0",
     "pg": "^8.7.1",
     "pino-pretty": "^7.2.0",
     "prisma": "^3.6.0",

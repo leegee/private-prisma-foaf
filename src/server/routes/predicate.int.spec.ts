@@ -1,72 +1,80 @@
-import { pactum } from 'testlib/pactum';
+import { Response } from 'supertest';
+import PrismaTestEnvironment from 'testlib/prisma-test-env';
+import { supertest, expectJsonLike } from 'testlib/supertest';
 
+import { buildServer } from 'src/server';
+import { logger } from 'src/service/logger';
+
+PrismaTestEnvironment.init();
+
+const server = buildServer({
+  logger
+});
+
+beforeAll(server.ready);
 
 describe('PUT /predicate', () => {
 
   describe('should put "Oswald assassinates JFK"', () => {
     it('JFK exists', async () => {
-
-      await pactum.spec()
-        .get('/entity')
-        .withQueryParams({ q: 'jfk' })
-        .expectStatus(200)
-        .expectJsonLike({
+      await supertest(server.server)
+        .get('/entity?q=jfk')
+        .expect(200)
+        .then((res: Response) => expectJsonLike(res.body, {
           entities: [{
             knownas: 'jfk',
             formalname: 'john f kennedy',
-            "approved": false,
-            "dob": null,
-            "dod": null,
-            "familyname": null,
-            "givenname": null,
-            id: '#type:number',
-            "middlenames": null,
+            'approved': false,
+            'dob': null,
+            'dod': null,
+            'familyname': 'kennedy',
+            'givenname': 'john',
+            'middlenames': 'fitzgerald',
           }]
-        })
+        }));
     });
 
     it('Oswald exists', async () => {
-      await pactum.spec()
-        .get('/entity')
-        .withQueryParams({ q: 'oswald' })
-        .expectStatus(200)
-        .expectJson({
+      await supertest(server.server)
+        .get('/entity?q=oswald')
+        .expect(200)
+        .then((res: Response) => expectJsonLike(res.body, {
           entities: [{
             knownas: 'oswald',
             formalname: 'lee harvey oswald',
-            "approved": false,
-            "dob": null,
-            "dod": null,
-            "familyname": null,
-            "givenname": null,
-            id: '#type:number',
-            "middlenames": null,
+            'approved': false,
+            'dob': null,
+            'dod': null,
+            'familyname': null,
+            'givenname': null,
+            'middlenames': null,
           }]
-        })
+        }));
     });
 
     it('Verb "assassinates" exists', async () => {
-      await pactum.spec()
-        .get('/verb')
-        .withQueryParams({ q: 'assassinates' })
-        .expectStatus(200)
-        .expectJsonLike({
+      const res = await supertest(server.server)
+        .get('/verb?q=assassinates')
+        .expect(200)
+        .then((res: Response) => expectJsonLike(res.body, {
           verbs: [{
             name: 'assassinates',
-            id: '#type:number',
           }]
-        })
+        }));
     });
 
     it('Sends preicate', async () => {
-      await pactum.spec()
+      jest.setTimeout(10000);
+      await supertest(server.server)
         .put('/predicate')
-        .withJson({
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .send({
           Subject: { knownas: 'oswald' },
           Verb: { name: 'assassinates' },
           Object: { knownas: 'jfk' },
         })
-        .expectStatus(201);
+        .expect(201);
     });
 
   });

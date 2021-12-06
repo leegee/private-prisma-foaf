@@ -1,11 +1,13 @@
 import { supertest } from 'testlib/supertest';
-import { server } from "../index";
+import { buildServer } from "../index";
+
+const server = buildServer();
+
+beforeAll(server.ready);
 
 describe('PUT /predicate', () => {
   describe('should put "Oswald assassinates JFK"', () => {
     it('Verb "assassinates" exists', async () => {
-
-      await server.ready()
 
       const res = await supertest(server.server)
         .get('/verb?q=assassinates')
@@ -13,7 +15,9 @@ describe('PUT /predicate', () => {
         .validateSchema()
         .expect('Content-Type', 'application/json; charset=utf-8');
 
-      expect(res.body.verbs[0].name).toEqual('assassinates');
+      expect(res.body.verbs[0]).toEqual(
+        expect.objectContaining({ name: 'assassinates' })
+      );
     });
   });
 });

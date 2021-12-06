@@ -13,5 +13,6 @@ declare global {
 declare module "supertest" {
   interface Test extends superagent.SuperAgentRequest {
     validateSchema(): this;
+    expectJsonLike(actual: object, expected: object): this;
   }
 }

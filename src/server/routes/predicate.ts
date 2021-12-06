@@ -2,6 +2,7 @@ import { RouteOptions } from 'fastify';
 import { SimplePredicate } from 'src/service/dao';
 import { FastifyRequestX } from 'src/server';
 
+
 export const routes: RouteOptions[] = [{
   method: 'PUT',
   url: '/predicate',
@@ -14,7 +15,7 @@ export const routes: RouteOptions[] = [{
     },
     response: {
       201: {
-        type: 'object',
+        // type: 'object',
       }
     }
   },
@@ -23,7 +24,9 @@ export const routes: RouteOptions[] = [{
     // await (req as FastifyRequestX).dao.createPredicate(
     //   (req as FastifyRequestX).body as SimplePredicate
     // );
-    // res.send(201);
+    this.log.info('xxxxxxxxxxxxxxxxxxxxxxxx201');
+    res.code(201);
+    res.send();
   }
 
 }];
