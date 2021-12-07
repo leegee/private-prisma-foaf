@@ -18,7 +18,8 @@ export const Templates = Object.create(null, {
         template = await fetch(url);
         template = await template.text();
       } catch (e) {
-        console.warn(e);
+        console.error(`Error loading template from ${url}`);
+        console.error(e);
         return;
       }
 
@@ -32,7 +33,7 @@ export const Templates = Object.create(null, {
         .querySelector('template');
 
       if (!template) {
-        console.warn('No template element found');
+        console.warn(`No template element found ${url}`);
       }
 
       // overwrite link tags' hrefs asuming they're always relative to the template

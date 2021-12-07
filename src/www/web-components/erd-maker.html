@@ -1,0 +1,23 @@
+<template>
+  <section>
+    <erd-video-citation id='citation'></erd-video-citation>
+  </section>
+
+  <main id='inputs'>
+    <erd-entity-input id='subject'>
+      <span slot="label">Subject</span>
+    </erd-entity-input>
+
+    <erd-verb-input id='verb'>Verb</erd-verb-input>
+
+    <erd-entity-input id='object'>
+      <span slot="label">Object</span>
+    </erd-entity-input>
+  </main>
+
+  <aside id='previews'>
+    <erd-entity-preview id='subject-preview'></erd-entity-preview>
+    <erd-verb-preview id='verb-preview'></erd-verb-preview>
+    <erd-entity-preview id='object-preview'></erd-entity-preview>
+  </aside>
+</template>

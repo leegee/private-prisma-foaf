@@ -2,6 +2,7 @@
 
 import { ErdBaseElement } from './erd-base-element.es6.js';
 
+/** A base class for inputs */
 export class ErdPredictiveInputElement extends ErdBaseElement {
   static name = 'erd-predictive-input';
 
@@ -23,8 +24,8 @@ export class ErdPredictiveInputElement extends ErdBaseElement {
   async onChange(e) {
     this.el.input.disabled = true;
 
-    // Normalise this.value
     // Send to server
+    // Server shall normalise this.value
     // Populate selection
     // Emit response
 
