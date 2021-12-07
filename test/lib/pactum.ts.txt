@@ -29,7 +29,7 @@ let server: FastifyInstance;
 beforeAll(async () => {
   // await pactum.mock.start(4000);
   server = await startServer();
-  pactum.request.setBaseUrl(`http://localhost:${process.env.ERD_PORT || 3000}`);
+  pactum.request.setBaseUrl(`http://localhost:${process.env.ERD_API_PORT || 3000}`);
 });
 
 afterAll(async () => {

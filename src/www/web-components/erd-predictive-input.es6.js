@@ -5,6 +5,7 @@ import { ErdBaseElement } from './erd-base-element.es6.js';
 /** A base class for inputs */
 export class ErdPredictiveInputElement extends ErdBaseElement {
   static name = 'erd-predictive-input';
+  apiurl = undefined;
 
   async connectedCallback() {
     await super.connectedCallback();
@@ -14,39 +15,34 @@ export class ErdPredictiveInputElement extends ErdBaseElement {
       suggestions: this.shadow.querySelector('#suggestions'),
     };
 
-    this.el.input.addEventListener('keyup', ErdBaseElement.debounce(() => this.onChange()));
+    this.el.input.addEventListener('keyup', ErdBaseElement.debounce(this.onChange.bind(this)));
   }
 
   disconnectedCallback() {
-    this.el.input.removeEventListener('keyup', ErdBaseElement.debounce(() => this.onChange()));
+    this.el.input.removeEventListener('keyup', ErdBaseElement.debounce(this.onChange.bind(this)));
   }
 
   async onChange(e) {
-    let suggestions;
+    if (this.el.input.value.length === 0) {
+      return;
+    }
+
     this.el.input.disabled = true;
     this.el.suggestions.innerText = '';
 
-    // Send to server
-    // Server shall normalise this.value
-    // Populate selection
-    // Emit response
+    const url = this.apiurl + encodeURIComponent(
+      this.el.input.value.toLocaleLowerCase().trim()
+    );
 
-    const res = await fetch(this.url);
-    suggestions = await res.json();
+    const res = await fetch(url, { mode: 'no-cors' });
 
-    suggestions.forEach(
-      text => {
-        const el = document.createElement('option');
-        el.value = text;
-        this.el.suggestions.appendChild(el);
-      });
+    const json = await res.json();
 
-    // this.shadow.dispatchEvent(
-    //   new CustomEvent('ready', {
-    //     bubbles: true,
-    //     detail: this.value,
-    //   })
-    // );
+    json.suggestions.forEach(text => {
+      const el = document.createElement('option');
+      el.value = text;
+      this.el.suggestions.appendChild(el);
+    });
 
     this.el.input.disabled = false;
   }

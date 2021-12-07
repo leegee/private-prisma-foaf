@@ -12,16 +12,22 @@ class ErdMaker extends ErdBaseElement {
   async connectedCallback() {
     await super.connectedCallback();
     this.el.video = this.shadow.querySelector('erd-video-citation');
-    this.el.video.addEventListener('timeChanged', this.timeChanged);
+    this.el.video.addEventListener('timeChanged', () => this.timeChanged());
+
+    const apiurl = this.getAttribute('apiurl');
+    ['subject', 'verb', 'object'].forEach(
+      id => this.shadow.querySelector('#' + id).setAttribute('apiurl', apiurl)
+    );
   }
 
   disconnectedCallback() {
-    // this.el.removeEventListener('pause', this.timeChanged);
+    this.el.video.removeEventListener('timeChanged', () => this.timeChanged());
   }
 
   timeChanged(e) {
     this.currentTime = e.detail.currentTime;
   }
+
 }
 
 window.customElements.define(ErdMaker.name, ErdMaker);

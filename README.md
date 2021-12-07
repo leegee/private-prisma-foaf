@@ -2,16 +2,18 @@
 
 ## Synopsis
 
-    npm db:start           # Start pg in a Docker container
-    npm run anew           # Build scheme, populate db, create ERD
+    npm db:start           # Start PG in a Docker container
+    npm run anew           # Build scheme, populate DB, create ERD
     npm test               # Run all tests
-    npm db:stop
-    npm wc:start           # mini http server for static web components
-    npm api:start          # fastify api http server
+    npm run db:stop
+    npm run wc:start       # Tiny HTTP server for the static web components demo
+    npm run api:start      # Fastify api http server
+    npm run api:dev        # "" in watch mode
+    npm run int:dev        # Concurrently run wc:start and api:start
 
     npm run test:unit      # Run unit tests without the database
-    npm run test:int       # Run integration tests upon the db and Prisma
-    npm run test:debug --  # followed by match pattern
+    npm run test:int       # Run integration tests upon the DB and Prisma
+    npm run test:debug --  # ...followed by a Jest match pattern
     npm run coverage
 
 ## Scheme

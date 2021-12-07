@@ -36,9 +36,10 @@
   "scripts": {
     "preapi:build": "rimraf dist",
     "api:startx": "ts-node-dev -r tsconfig-paths/register --ignore .+spec.+ src/scripts/start-api.ts",
-    "api:start": "npx ts-node -r tsconfig-paths/register  src/scripts/start-api.ts",
-    "api:dev": "npx ts-node-dev -r tsconfig-paths/register  src/scripts/start-api.ts",
+    "api:start": "npx ts-node -r dotenv/config -r tsconfig-paths/register  src/scripts/start-api.ts",
+    "api:dev": "npx ts-node-dev -r dotenv/config -r tsconfig-paths/register src/scripts/start-api.ts",
     "wc:start": "npx http-server src/www/",
+    "int:dev": "concurrently \"npm run api:dev\" \"npm run wc:start\"",
     "api:build": "tsc",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",

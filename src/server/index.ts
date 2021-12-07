@@ -20,7 +20,7 @@ export interface IBuildServerArgs {
 export function buildServer({ logger, dao }: IBuildServerArgs = {}) {
 
   const server: FastifyInstance = Fastify({
-    logger: false,
+    logger: true, // logger? true : false,
     pluginTimeout: 10000,
   });
 
