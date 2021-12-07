@@ -1,4 +1,4 @@
-// <erd>
+// <erd-maker>
 
 import { ErdBaseElement } from './erd-base-element.es6.js';
 

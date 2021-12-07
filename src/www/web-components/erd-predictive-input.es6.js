@@ -10,8 +10,8 @@ export class ErdPredictiveInputElement extends ErdBaseElement {
     await super.connectedCallback();
 
     this.el = {
-      input: this.shadow.getElementById('input'),
-      suggestions: this.shadow.getElementById('suggestions'),
+      input: this.shadow.querySelector('input'),
+      suggestions: this.shadow.querySelector('#suggestions'),
     };
 
     this.el.input.addEventListener('keyup', ErdBaseElement.debounce(() => this.onChange()));
@@ -29,9 +29,9 @@ export class ErdPredictiveInputElement extends ErdBaseElement {
     // Populate selection
     // Emit response
 
-    console.log(this.el);
+    console.log(this.el.suggestions);
 
-    this.el.suggestions.innerHTML = '';
+    this.el.suggestions.innerText = '';
 
     ['foo', 'bar'].forEach(
       text => {
@@ -40,12 +40,12 @@ export class ErdPredictiveInputElement extends ErdBaseElement {
         this.el.suggestions.appendChild(el);
       });
 
-    this.shadow.dispatchEvent(
-      new CustomEvent('ready', {
-        bubbles: true,
-        detail: this.value,
-      })
-    );
+    // this.shadow.dispatchEvent(
+    //   new CustomEvent('ready', {
+    //     bubbles: true,
+    //     detail: this.value,
+    //   })
+    // );
 
     this.el.input.disabled = false;
   }

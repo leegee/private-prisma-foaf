@@ -1,20 +1,12 @@
 <template id="template">
-  <span>
-    <style>
-    </style>
+  <style>
+  </style>
 
-    <label for='input'>
-      <slot name="label"></slot>
-    </label>
+  <label for='input'>
+    <slot name="label"></slot>
+  </label>
 
-    <input id='input' type='text' autocomplete="off" list="suggestions">
+  <input type='text' autocomplete="off" list="suggestions">
 
-    <datalist id="suggestions">
-      <!-- <option value="12">Twelve</option> -->
-    </datalist>
-
-
-
-
-  </span>
+  <datalist id="suggestions"></datalist>
 </template>
