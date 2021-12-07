@@ -1,4 +1,11 @@
 {
+  "include": [
+    "./src/**/*"
+  ],
+  "exclude": [
+    "./test",
+    "./src/**/*.spec.ts"
+  ],
   "compilerOptions": {
     "target": "ES2017",
     "module": "commonjs",
@@ -8,7 +15,6 @@
     "strict": true,
     "lib": [
       "esnext",
-      // "dom"
     ],
     "esModuleInterop": true,
     "moduleResolution": "node",

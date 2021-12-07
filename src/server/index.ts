@@ -59,7 +59,7 @@ export const start = async (...args: any) => {
     await server.listen(process.env.ERD_PORT || 3000);
     const address = server.server.address();
     const port = typeof address === 'string' ? address : address?.port;
-    logger.info(`Server running on port ${port}`);
+    console.info(`Server running on http://localhost:${port}`);
     return server;
   }
 

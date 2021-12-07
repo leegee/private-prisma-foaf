@@ -2,10 +2,12 @@
 
 ## Synopsis
 
-    npm start               # Start pg in a Docker container
-    npm restart             # aka `npm run anew` - Build scheme, populate db, create ERD
-    npm stop
+    npm db:start           # Start pg in a Docker container
+    npm run anew           # Build scheme, populate db, create ERD
     npm test               # Run all tests
+    npm db:stop
+    npm wc:start           # mini http server for static web components
+    npm api:start          # fastify api http server
 
     npm run test:unit      # Run unit tests without the database
     npm run test:int       # Run integration tests upon the db and Prisma

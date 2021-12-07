@@ -18,22 +18,23 @@ export class ErdPredictiveInputElement extends ErdBaseElement {
   }
 
   disconnectedCallback() {
-    this.el.input.removeEventListener('change', this.onChange);
+    this.el.input.removeEventListener('keyup', ErdBaseElement.debounce(() => this.onChange()));
   }
 
   async onChange(e) {
+    let suggestions;
     this.el.input.disabled = true;
+    this.el.suggestions.innerText = '';
 
     // Send to server
     // Server shall normalise this.value
     // Populate selection
     // Emit response
 
-    console.log(this.el.suggestions);
+    const res = await fetch(this.url);
+    suggestions = await res.json();
 
-    this.el.suggestions.innerText = '';
-
-    ['foo', 'bar'].forEach(
+    suggestions.forEach(
       text => {
         const el = document.createElement('option');
         el.value = text;
