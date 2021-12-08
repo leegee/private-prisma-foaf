@@ -13,7 +13,7 @@ class ErdEntityInput extends ErdPredictiveInputElement {
 
   async connectedCallback() {
     await super.connectedCallback();
-    this.apiurl = this.getAttribute('apiurl').replace(/\/$/, '') + '/entity?q=';
+    this.apiurl = this.getAttribute('apiurl').replace(/\/+$/, '/entity?q=');
   }
 }
 

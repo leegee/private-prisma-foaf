@@ -13,7 +13,7 @@ class ErdVerbInput extends ErdPredictiveInputElement {
 
   async connectedCallback() {
     await super.connectedCallback();
-    this.apiurl = this.getAttribute('apiurl').replace(/\/$/, '') + '/verb?q=';
+    this.apiurl = this.getAttribute('apiurl').replace(/\/+$/, '/verb?q=');
   }
 }
 
