@@ -4,7 +4,7 @@ import { ErdBaseElement } from './erd-base-element.es6.js';
 
 /** A base class for inputs */
 export class ErdPredictiveInputElement extends ErdBaseElement {
-  static name = 'erd-predictive-input';
+  static elName = 'erd-predictive-input';
   apiurl = undefined;
 
   async connectedCallback() {
@@ -53,4 +53,4 @@ export class ErdPredictiveInputElement extends ErdBaseElement {
   }
 }
 
-window.customElements.define(ErdPredictiveInputElement.name, ErdPredictiveInputElement);
+window.customElements.define(ErdPredictiveInputElement.elName, ErdPredictiveInputElement);

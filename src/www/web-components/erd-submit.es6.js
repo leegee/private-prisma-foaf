@@ -3,7 +3,7 @@
 import { ErdBaseElement } from './erd-base-element.es6.js';
 
 class ErdSubmit extends ErdBaseElement {
-  static name = 'erd-submit';
+  static elName = 'erd-submit';
   static suggestionsJsonKey = 'entities';
 
   el = undefined;
@@ -21,5 +21,5 @@ class ErdSubmit extends ErdBaseElement {
   }
 }
 
-window.customElements.define(ErdSubmit.name, ErdSubmit);
+window.customElements.define(ErdSubmit.elName, ErdSubmit);
 

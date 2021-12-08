@@ -3,7 +3,7 @@
 import { ErdPredictiveInputElement } from './erd-predictive-input.es6.js';
 
 class ErdVerbInput extends ErdPredictiveInputElement {
-  static name = 'erd-verb-input';
+  static elName = 'erd-verb-input';
   static suggestionsJsonKey = 'verbs';
 
   constructor() {
@@ -18,4 +18,4 @@ class ErdVerbInput extends ErdPredictiveInputElement {
 }
 
 
-window.customElements.define(ErdVerbInput.name, ErdVerbInput);
+window.customElements.define(ErdVerbInput.elName, ErdVerbInput);

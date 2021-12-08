@@ -51,7 +51,7 @@ export const Templates = Object.create(null, {
 });
 
 export class ErdBaseElement extends HTMLElement {
-  static name = 'erd-base-element--name-not-set-error';
+  static elName = 'erd-base-element--name-not-set-error';
 
   static debounce(func, timeout = 300) {
     let timer;
@@ -66,7 +66,7 @@ export class ErdBaseElement extends HTMLElement {
 
   constructor() {
     super();
-    this.templateUrl = `web-components/${this.constructor.name}.html`;
+    this.templateUrl = `web-components/${this.constructor.elName}.html`;
   };
 
   async connectedCallback() {

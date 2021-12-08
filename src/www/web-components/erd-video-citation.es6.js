@@ -4,7 +4,7 @@ import { ErdBaseElement } from './erd-base-element.es6.js';
 import './lib/youtube-video-element.js';
 
 class ErdVideoCitation extends ErdBaseElement {
-  static name = 'erd-video-citation';
+  static elName = 'erd-video-citation';
   el = {
     video: undefined,
     buttonSetUrl: undefined,
@@ -47,4 +47,4 @@ class ErdVideoCitation extends ErdBaseElement {
   }
 }
 
-window.customElements.define(ErdVideoCitation.name, ErdVideoCitation);
+window.customElements.define(ErdVideoCitation.elName, ErdVideoCitation);

@@ -3,7 +3,7 @@
 import { ErdPredictiveInputElement } from './erd-predictive-input.es6.js';
 
 class ErdEntityInput extends ErdPredictiveInputElement {
-  static name = 'erd-entity-input';
+  static elName = 'erd-entity-input';
   static suggestionsJsonKey = 'entities';
 
   constructor() {
@@ -17,5 +17,5 @@ class ErdEntityInput extends ErdPredictiveInputElement {
   }
 }
 
-window.customElements.define(ErdEntityInput.name, ErdEntityInput);
+window.customElements.define(ErdEntityInput.elName, ErdEntityInput);
 

@@ -3,7 +3,7 @@
 import { ErdBaseElement } from './erd-base-element.es6.js';
 
 class ErdMaker extends ErdBaseElement {
-  static name = 'erd-maker';
+  static elName = 'erd-maker';
 
   el = {};
   state = {};
@@ -59,4 +59,4 @@ class ErdMaker extends ErdBaseElement {
 
 }
 
-window.customElements.define(ErdMaker.name, ErdMaker);
+window.customElements.define(ErdMaker.elName, ErdMaker);
