@@ -27,7 +27,6 @@ export class ErdPredictiveInputElement extends ErdBaseElement {
       return;
     }
 
-    this.el.input.disabled = true;
     this.el.suggestions.innerText = '';
 
     const url = this.apiurl + encodeURIComponent(
@@ -40,16 +39,12 @@ export class ErdPredictiveInputElement extends ErdBaseElement {
 
       json[this.constructor.suggestionsJsonKey].forEach(verb => {
         const el = document.createElement('option');
-        el.value = verb.id;
-        el.innerText = verb.name;
+        el.value = verb.name; // should cache the latest n for IDs
         this.el.suggestions.appendChild(el);
       });
 
-
     } catch (e) {
       console.error(e);
-    } finally {
-      this.el.input.disabled = false;
     }
   }
 }

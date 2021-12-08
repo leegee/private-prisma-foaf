@@ -1,4 +1,10 @@
 <template>
+  <style>
+    main#inputs {
+      margin: 1em 0;
+    }
+  </style>
+
   <section>
     <erd-video-citation id='citation'></erd-video-citation>
   </section>
@@ -10,9 +16,7 @@
 
     <erd-verb-input id='verb'>Verb</erd-verb-input>
 
-    <erd-entity-input id='object'>
-      <span slot="label">Object</span>
-    </erd-entity-input>
+    <erd-entity-input id='object'><span slot="label">Object</span></erd-entity-input>
   </main>
 
   <aside id='previews'>
