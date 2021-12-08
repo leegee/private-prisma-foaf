@@ -9,7 +9,7 @@
     npm run wc:start       # Tiny HTTP server for the static web components demo
     npm run api:start      # Fastify api http server
     npm run api:dev        # "" in watch mode
-    npm run int:dev        # Concurrently run wc:start and api:start
+    npm run dev            # Concurrently run wc:start and api:start
 
     npm run test:unit      # Run unit tests without the database
     npm run test:int       # Run integration tests upon the DB and Prisma

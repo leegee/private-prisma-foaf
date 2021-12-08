@@ -4,6 +4,7 @@ import { ErdPredictiveInputElement } from './erd-predictive-input.es6.js';
 
 class ErdEntityInput extends ErdPredictiveInputElement {
   static name = 'erd-entity-input';
+  static suggestionsJsonKey = 'entities';
 
   constructor() {
     super();
@@ -14,7 +15,6 @@ class ErdEntityInput extends ErdPredictiveInputElement {
     await super.connectedCallback();
     this.apiurl = this.getAttribute('apiurl').replace(/\/$/, '') + '/entity?q=';
   }
-
 }
 
 window.customElements.define(ErdEntityInput.name, ErdEntityInput);

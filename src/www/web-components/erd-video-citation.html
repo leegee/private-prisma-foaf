@@ -10,12 +10,14 @@
       }
     </style>
 
-    <label for='input'>
-      <slot name="label">Video embed code:</slot>
-    </label>
+    <div>
+      <label for='input'>
+        <slot name="label">Video embed code:</slot>
+      </label>
 
-    <input id='video-url' type='text'>
-    <button id='set-video-src'>Set</button>
+      <input id='video-url' type='text'>
+      <button id='set-video-src'>Set</button>
+    </div>
 
     <youtube-video controls></youtube-video>
 

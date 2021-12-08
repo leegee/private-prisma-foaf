@@ -1,5 +1,6 @@
 import Fastify, { FastifyInstance, FastifyRequest, RouteOptions } from 'fastify';
 // import openapiGlue from 'fastify-openapi-glue';
+import fastifyCors from 'fastify-cors';
 
 import { routes as entityRoutes } from './routes/entity';
 import { routes as verbRoutes } from './routes/verb';
@@ -17,17 +18,18 @@ export interface IBuildServerArgs {
   dao?: DAO,
 }
 
-export function buildServer({ logger, dao }: IBuildServerArgs = {}) {
 
+export function buildServer({ logger, dao }: IBuildServerArgs = {}) {
   const server: FastifyInstance = Fastify({
     logger: true, // logger? true : false,
     pluginTimeout: 10000,
   });
 
-  dao = dao || new DAO({ prisma, logger });
+  server.addHook("onRequest", async (req) => (req as FastifyRequestX).dao = dao || new DAO({ prisma, logger }));
 
-  // Not shared, but made per request:
-  server.addHook("onRequest", async (req) => (req as FastifyRequestX).dao = dao!);
+  server.register(fastifyCors, {
+    origin: true
+  });
 
   [...entityRoutes, ...verbRoutes, ...predicateRoutes].forEach((route: RouteOptions) => server.route(route));
   return server;

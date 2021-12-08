@@ -34,17 +34,23 @@ export class ErdPredictiveInputElement extends ErdBaseElement {
       this.el.input.value.toLocaleLowerCase().trim()
     );
 
-    const res = await fetch(url, { mode: 'no-cors' });
+    try {
+      const res = await fetch(url);
+      const json = await res.json();
 
-    const json = await res.json();
+      json[this.constructor.suggestionsJsonKey].forEach(verb => {
+        const el = document.createElement('option');
+        el.value = verb.id;
+        el.innerText = verb.name;
+        this.el.suggestions.appendChild(el);
+      });
 
-    json.suggestions.forEach(text => {
-      const el = document.createElement('option');
-      el.value = text;
-      this.el.suggestions.appendChild(el);
-    });
 
-    this.el.input.disabled = false;
+    } catch (e) {
+      console.error(e);
+    } finally {
+      this.el.input.disabled = false;
+    }
   }
 }
 

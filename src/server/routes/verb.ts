@@ -35,7 +35,9 @@ export const routes: RouteOptions[] = [{
     const verbs = await (req as FastifyRequestX).dao.verbSearch(
       (req as FastifyRequestEntity).query.q
     );
-
-    res.send({ verbs });
+    res.code(200)
+      .header('Content-Type', 'application/json; charset=utf-8')
+      .send({ verbs });
+    console.dir({ verbs }, { depth: null });
   }
 }];
