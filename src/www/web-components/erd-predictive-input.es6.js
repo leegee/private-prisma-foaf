@@ -22,8 +22,12 @@ export class ErdPredictiveInputElement extends ErdBaseElement {
     this.el.input.removeEventListener('keyup', ErdBaseElement.debounce(this.onChange.bind(this)));
   }
 
-  async onChange(e) {
-    if (this.el.input.value.length === 0) {
+  async onChange() {
+    this.dispatchEvent(
+      new CustomEvent('change', { detail: this.el.input.value })
+    );
+
+    if (this.el.input.value.length < 2) {
       return;
     }
 

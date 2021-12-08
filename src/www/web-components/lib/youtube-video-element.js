@@ -145,9 +145,9 @@ class YoutubeVideoElement extends HTMLElement {
         if (state == 1) {
           this.dispatchEvent(new Event('play'));
         } else if (state == 2) {
-          this.dispatchEvent(new CustomEvent('pause', {
-            detail: { currentTime: this.currentTime }
-          }));
+          this.dispatchEvent(
+            new CustomEvent('change', { detail: this.currentTime })
+          );
         }
       }
 
@@ -201,7 +201,7 @@ class YoutubeVideoElement extends HTMLElement {
     // allowSeekAhead is true here,though should technically be false
     // when scrubbing w/ thumbnail previews
     this.ytPlayer.seekTo(timeInSeconds, true);
-    this.dispatchEvent(new Event('timeupdate'));
+    this.dispatchEvent(new CustomEvent('change', { detail: this.currentTime }));
   }
 
   get muted() {

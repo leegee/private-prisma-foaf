@@ -1,25 +1,23 @@
 <template id="template">
   <script src="https://www.youtube.com/iframe_api"></script>
 
-  <span>
-    <style>
-      #video {
-        width: auto;
-        height: 40vh;
-        background: silver;
-      }
-    </style>
+  <style>
+    #video {
+      width: auto;
+      height: 40vh;
+      background: silver;
+    }
+  </style>
 
-    <div>
-      <label for='input'>
-        <slot name="label">Video embed code:</slot>
-      </label>
+  <aside part='input-box'>
+    <label for='input' part='input-label'>
+      <slot name="label">Video embed code:</slot>
+    </label>
 
-      <input id='video-url' type='text'>
-      <button id='set-video-src'>Set</button>
-    </div>
+    <input id='video-url' type='text' part='input-input'>
+    <button id='set-video-src'>Set</button>
+  </aside>
 
-    <youtube-video controls></youtube-video>
+  <youtube-video controls></youtube-video>
 
-  </span>
 </template>

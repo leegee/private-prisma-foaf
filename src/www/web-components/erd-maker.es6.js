@@ -4,37 +4,57 @@ import { ErdBaseElement } from './erd-base-element.es6.js';
 
 class ErdMaker extends ErdBaseElement {
   static name = 'erd-maker';
-  el = {
-    video: undefined,
-    submit: undefined,
-  };
-  currentTime = 0;
+
+  el = {};
+  state = {};
+  apiurlRoot = undefined;
+  apiurl = undefined;
 
   async connectedCallback() {
     await super.connectedCallback();
 
-    const apiurl = this.getAttribute('apiurl');
-    ['subject', 'verb', 'object', 'submit'].forEach(
-      id => this.shadow.querySelector('#' + id).setAttribute('apiurl', apiurl)
-    );
+    this.apiurlRoot = this.getAttribute('apiurl');
+    this.apiurl = this.apiurlRoot.replace(/\/+$/, '/predicate');
 
-    this.el.video = this.shadow.querySelector('erd-video-citation');
-    this.el.video.addEventListener('timeChanged', this.timeChanged.bind(this));
+    ['subject', 'verb', 'object', 'submit', 'video'].forEach(
+      id => {
+        this.el[id] = this.shadow.querySelector('#' + id);
+        this.el[id].setAttribute('apiurl', this.apiurlRoot);
+        this.el[id].addEventListener('change', (e) => this.change(id, e));
+      }
+    );
 
     this.el.submit = this.shadow.querySelector('#submit');
     this.el.submit.addEventListener('submit', () => this.submit());
   }
 
-  disconnectedCallback() {
-    this.el.video.removeEventListener('timeChanged', this.timeChanged.bind(this));
+  change(elId, e) {
+    this.state[elId] = e.detail;
+    console.log('Set', elId, this.state[elId]);
+
+    const missing = ['subject', 'verb', 'object', 'video'].reduce(
+      (stack, id) => !this.state[id] || this.state[id].trim() === '' ? [...stack, id] : stack,
+      []
+    );
+    this.el.submit.disabled = missing.length === 0;
   }
 
-  timeChanged(e) {
-    this.currentTime = e.detail.currentTime;
-  }
+  async submit() {
+    const body = {
+      Subject: { knownas: this.state.subject },
+      Verb: { name: this.state.subject },
+      Object: { knownas: this.state.object },
+      citations: [this.state.video],
+    };
 
-  submit(e) {
-    console.log(e);
+    console.log(body);
+
+    const res = await fetch(this.apiurl, {
+      method: 'PUT',
+      body: JSON.stringify(body)
+    });
+
+    console.log(res.status());
   }
 
 }

@@ -21,7 +21,7 @@ export interface IBuildServerArgs {
 
 export function buildServer({ logger, dao }: IBuildServerArgs = {}) {
   const server: FastifyInstance = Fastify({
-    logger: true, // logger? true : false,
+    logger: logger ? true : false,
     pluginTimeout: 10000,
   });
 
@@ -66,7 +66,10 @@ export const start = async (...args: any) => {
   }
 
   catch (err) {
-    server ? server.log.error(err) : console.error(err);
-    process.exit(1);
+    if (server) {
+      server.log.error(err)
+    }
+    console.error(err);
+    process.exit(-9);
   }
 }

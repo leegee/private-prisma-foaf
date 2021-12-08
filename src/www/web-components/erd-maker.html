@@ -1,29 +1,48 @@
 <template>
   <style>
-    main#inputs {
+    #root {
+      --dark: black;
+      --light: oldlace;
+    }
+
+    section#inputs {
       margin: 1em 0;
+    }
+
+    erd-video-citation::part(input-box) {
+      padding: 0.5em;
+      margin: 0.5em;
+      border: 1pt solid var(--dark);
+    }
+
+    erd-video-citation::part(input-input) {
+      border: 0;
+      border-bottom: 1pt solid var(--dark);
+      width: 40em;
     }
   </style>
 
-  <section>
-    <erd-video-citation id='citation'></erd-video-citation>
-  </section>
+  <main id='root'>
+    <section>
+      <erd-video-citation id='video'></erd-video-citation>
+    </section>
 
-  <main id='inputs'>
-    <erd-entity-input id='subject'>
-      <span slot="label">Subject</span>
-    </erd-entity-input>
+    <section id='inputs'>
+      <erd-entity-input id='subject'>
+        <span slot="label">Subject</span>
+      </erd-entity-input>
 
-    <erd-verb-input id='verb'>Verb</erd-verb-input>
+      <erd-verb-input id='verb'>Verb</erd-verb-input>
 
-    <erd-entity-input id='object'><span slot="label">Object</span></erd-entity-input>
+      <erd-entity-input id='object'><span slot="label">Object</span></erd-entity-input>
 
-    <erd-submit id='submit'></erd-submit>
-  </main>
+      <erd-submit id='submit'></erd-submit>
+    </section>
 
-  <!-- <aside id='previews'>
+    <!-- <aside id='previews'>
     <erd-entity-preview id='subject-preview'></erd-entity-preview>
     <erd-verb-preview id='verb-preview'></erd-verb-preview>
     <erd-entity-preview id='object-preview'></erd-entity-preview>
   </aside> -->
+  </main>
 </template>
