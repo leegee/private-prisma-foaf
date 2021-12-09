@@ -5,13 +5,9 @@ import { start } from 'src/server';
 
 start({
   logger: {
-    prettyPrint:
-      process.env.NODE_END !== 'production'
-        ? {
-          translateTime: 'HH:MM:ss Z',
-          ignore: 'pid,hostname',
-          level: 'debug'
-        }
-        : false
+    level: 'trace',
+    prettyPrint: {
+      ignore: 'pid,hostname,reqId,id',
+    }
   }
 });

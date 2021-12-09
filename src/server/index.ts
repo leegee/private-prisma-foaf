@@ -24,6 +24,7 @@ export function buildServer({ logger, dao }: IBuildServerArgs = {}) {
   const server: FastifyInstance = Fastify({
     logger: logger || false,
     pluginTimeout: 10000,
+    disableRequestLogging: logger ? false : true,
   });
 
   if (!dao) {
@@ -35,9 +36,9 @@ export function buildServer({ logger, dao }: IBuildServerArgs = {}) {
 
   server.addHook(
     "onRequest",
-    async (req) => {
+    async (req, _reply) => {
       (req as FastifyRequestX).dao = dao || daoInstance;
-      server.log.info('Request');
+      req.log.info({ url: req.raw.url, id: req.id }, "received request");
     }
   );
 
@@ -68,7 +69,7 @@ server.setErrorHandler((error, _request, reply) => {
 });
 */
 
-export const start = async (...args: any) => {
+export const start = async (args: any) => {
   let server;
   try {
     server = buildServer(args);
@@ -82,8 +83,9 @@ export const start = async (...args: any) => {
   catch (err) {
     if (server) {
       server.log.error(err)
+    } else {
+      console.error(err);
     }
-    console.error(err);
     process.exit(-9);
   }
 }
