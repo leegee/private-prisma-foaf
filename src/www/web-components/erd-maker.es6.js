@@ -49,12 +49,13 @@ class ErdMaker extends ErdBaseElement {
 
     console.log(body);
 
+    console.log('PUT ', this.apiurl);
     const res = await fetch(this.apiurl, {
       method: 'PUT',
       body: JSON.stringify(body)
     });
 
-    console.log(res.status());
+    console.log(res.status);
   }
 
 }

@@ -24,6 +24,7 @@ Testing Prisma: a small app to create ERDs via Graphviz from CSVs or user-input 
 - Docker (just for Postgres)
 - Graphviz
 - Typescript
+- Pino
 - Jest
 - Playwright
 

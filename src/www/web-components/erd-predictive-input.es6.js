@@ -27,17 +27,23 @@ export class ErdPredictiveInputElement extends ErdBaseElement {
       new CustomEvent('change', { detail: this.el.input.value })
     );
 
-    if (this.el.input.value.length < 2) {
+    let input = this.el.input.value;
+    if (input.length) {
+      input = input.toLocaleLowerCase().trim();
+    }
+
+    if (input.length < 2 || input === this._storedInputValue) {
       return;
     }
 
+    this.el.input.value === input;
+
     this.el.suggestions.innerText = '';
 
-    const url = this.apiurl + encodeURIComponent(
-      this.el.input.value.toLocaleLowerCase().trim()
-    );
+    const url = this.apiurl + encodeURIComponent(input);
 
     try {
+      console.log('GET', url);
       const res = await fetch(url);
       const json = await res.json();
 

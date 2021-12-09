@@ -1,4 +1,4 @@
-import Fastify, { FastifyInstance, FastifyRequest, RouteOptions } from 'fastify';
+import Fastify, { FastifyInstance, FastifyLoggerInstance, FastifyRequest, RouteOptions } from 'fastify';
 // import openapiGlue from 'fastify-openapi-glue';
 import fastifyCors from 'fastify-cors';
 
@@ -6,26 +6,40 @@ import { routes as entityRoutes } from './routes/entity';
 import { routes as verbRoutes } from './routes/verb';
 import { routes as predicateRoutes } from './routes/predicate';
 import { prisma } from 'src/service/prisma-client';
-import { ILogger, logger } from 'src/service/logger';
 import { DAO } from 'src/service/dao';
+import { logger as loggerInstance } from 'src/service/logger';
 
 export type FastifyRequestX = FastifyRequest & {
   dao: DAO
 };
 
 export interface IBuildServerArgs {
-  logger?: ILogger,
+  logger?: FastifyLoggerInstance | boolean,
   dao?: DAO,
 }
 
+let daoInstance: DAO;
 
 export function buildServer({ logger, dao }: IBuildServerArgs = {}) {
   const server: FastifyInstance = Fastify({
-    logger: logger ? true : false,
+    logger: logger || false,
     pluginTimeout: 10000,
   });
 
-  server.addHook("onRequest", async (req) => (req as FastifyRequestX).dao = dao || new DAO({ prisma, logger }));
+  if (!dao) {
+    daoInstance = new DAO({
+      prisma,
+      logger: logger ? loggerInstance : undefined
+    });
+  }
+
+  server.addHook(
+    "onRequest",
+    async (req) => {
+      (req as FastifyRequestX).dao = dao || daoInstance;
+      server.log.info('Request');
+    }
+  );
 
   server.register(fastifyCors, {
     origin: true
