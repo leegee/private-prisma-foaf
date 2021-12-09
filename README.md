@@ -1,4 +1,6 @@
-# Testing Prisma
+# Testing Prisma: Entity-relations Diagrams
+
+Testing Prisma: a small app to create ERDs via Graphviz from CSVs or user-input against a YouTube video, to help visualise information presented in videos.
 
 ## Synopsis
 
@@ -16,7 +18,16 @@
     npm run test:debug --  # ...followed by a Jest match pattern
     npm run coverage
 
-## Scheme
+## Dependencies
+
+- Prisma
+- Docker (just for Postgres)
+- Graphviz
+- Typescript
+- Jest
+- Playwright
+
+## DB Scheme
 
 A simplistic star scheme that centers on predicates, used to describe who did what to whom, when it happened, with citations, where the 'who' is an `Entity` (either a person or organisation).
 
