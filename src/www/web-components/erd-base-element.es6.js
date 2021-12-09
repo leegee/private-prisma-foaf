@@ -74,7 +74,7 @@ export class ErdBaseElement extends HTMLElement {
     this.template = await Templates.load(this.templateUrl);
     console.debug(`Loaded ${this.templateUrl}`);
 
-    this.shadow = this.attachShadow({ mode: 'closed' });
+    this.shadow = this.attachShadow({ mode: 'open' });
     this.shadow.appendChild(
       this.template.content.cloneNode(true)
     );
