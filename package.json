@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "license": "MIT",
   "devDependencies": {
+    "@playwright/test": "^1.17.1",
     "@types/fetch-mock": "^7.3.5",
     "@types/graphviz": "^0.0.34",
     "@types/jest": "^27.0.2",
@@ -52,7 +53,7 @@
     "test:watch:unit": "cross-env JEST_WATCH=1 jest --watch -- .int.ts",
     "test:coverage": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:e2e": "npx playwright test --headed",
     "db:start": "docker-compose up -d --remove-orphans",
     "db:stop": "docker-compose down",
     "db:shell": "docker exec -it postgres psql -U admin -a foaf",
