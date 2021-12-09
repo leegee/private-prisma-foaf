@@ -37,8 +37,11 @@ class ErdMaker extends ErdBaseElement {
       []
     );
 
-    this.el.submit.disabled = missing.length > 0;
-    console.log(missing);
+    this.el.submit.setAttribute('disabled', missing.length > 0);
+
+    console.log("Change", missing.length > 0,
+      this.el.submit.getAttribute('disabled')
+    );
   }
 
   async submit() {
@@ -61,6 +64,7 @@ class ErdMaker extends ErdBaseElement {
       this.dispatchEvent(new CustomEvent('rest'));
     } else {
       alert('Error');
+      console.log(await res.json());
     }
   }
 

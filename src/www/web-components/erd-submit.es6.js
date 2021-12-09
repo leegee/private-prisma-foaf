@@ -4,12 +4,13 @@ import { ErdBaseElement } from './erd-base-element.es6.js';
 
 class ErdSubmit extends ErdBaseElement {
   static elName = 'erd-submit';
-  static suggestionsJsonKey = 'entities';
   static get observedAttributes() { return ['disabled']; }
 
   set disabled(val) {
-    if (this.el) {
-      this.el.setAttribute('disabled', val);
+    if (val === 'true' || val === true) {
+      this.el.setAttribute('disabled', true);
+    } else {
+      this.el.removeAttribute('disabled');
     }
   }
 
@@ -19,14 +20,23 @@ class ErdSubmit extends ErdBaseElement {
     await super.connectedCallback();
     this.apiurl = this.getAttribute('apiurl').replace(/\/+$/, '/predicate');
     this.el = this.shadow.querySelector('button');
-    this.el.addEventListener(
-      'click', this.submit.bind(this)
-    );
+    this.el.addEventListener('click', this.submit.bind(this));
     this.disabled = true;
   }
 
+  attributeChangedCallback(_name, _oldValue, newValue) {
+    if (newValue !== this.disabled) {
+      console.log('submit attr ok', newValue);
+      this.disabled = newValue;
+    }
+  }
+
   submit() {
-    this.dispatchEvent(new CustomEvent('submit'));
+    if (this.getAttribute('disabled')) {
+      console.warn('Tried to submit when disabled');
+    } else {
+      this.dispatchEvent(new CustomEvent('submit'));
+    }
   }
 }
 

@@ -1,28 +1,35 @@
 import { test, expect } from '@playwright/test';
 
-
 test.describe('e2e', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('http://localhost:8081/index.html');
   });
 
   test('with known values', async ({ page }) => {
-    await page.fill('#video-url', 'https://www.youtube.com/watch?v=-lVQHIC3QYw&t=315s');
+    await page.click('#video-url');
+    await page.keyboard.type('https://www.youtube.com/watch?v=-lVQHIC3QYw&t=315s');
     await page.click('#set-video-src');
+    await page.waitForRequest(/^.+\/youtube.+$/);
 
-    await page.focus('#subject > input');
-    await page.fill('#subject > input', 'oswald');
     await page.click('#subject > input');
+    await page.keyboard.type('oswald');
+    await page.waitForRequest(/^.+\/entity.+$/);
 
-    await page.focus('#verb > input');
-    await page.fill('#verb > input', 'assassinated');
+    await page.click('#verb > input');
+    await page.keyboard.type('assassinated');
+    await page.waitForRequest(/\/verb/);
 
-    await page.focus('#object > input');
-    await page.fill('#object > input', 'jfk');
+    await page.click('#object > input');
+    await page.keyboard.type('jfk');
+    await page.waitForRequest(/\/entity/);
 
-    await new Promise(_ => setTimeout(_, 1000));
+    await new Promise(_ => setTimeout(_, 2000));
 
+    await expect(page.locator('#submit > button')).toBeEnabled({ timeout: 10000 });
     await page.click('#submit > button');
+    await page.waitForRequest('**/*predicate*');
+
+    await page.waitForSelector('never', { timeout: 100000 });
   });
 });
 
