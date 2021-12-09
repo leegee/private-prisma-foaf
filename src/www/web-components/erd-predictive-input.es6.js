@@ -16,6 +16,8 @@ export class ErdPredictiveInputElement extends ErdBaseElement {
     };
 
     this.el.input.addEventListener('keyup', ErdBaseElement.debounce(this.onChange.bind(this)));
+
+    this.addEventListener('reset', () => this.el.input.value = '');
   }
 
   disconnectedCallback() {

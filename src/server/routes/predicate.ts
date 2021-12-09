@@ -2,9 +2,8 @@ import { RouteOptions } from 'fastify';
 import { FastifyRequestX } from '..';
 
 export const routes: RouteOptions[] = [{
-  method: 'PUT',
+  method: 'POST',
   url: '/predicate',
-  // Todo: move to external file, to be shared by e2e tests, etc - autocreate from TS types...?
   schema: {
     body: {
       Subject: { knownas: { type: 'string' } },
@@ -14,12 +13,12 @@ export const routes: RouteOptions[] = [{
         type: 'array',
         items: { type: 'string' }
       },
-      // start: { type: 'string' },
-      // end: { type: 'string' },
+      start: { type: 'string', optinal: true },
+      end: { type: 'string', optinal: true },
     },
     response: {
       201: {
-        // type: 'object',
+        type: 'null',
       }
     }
   },
@@ -28,7 +27,7 @@ export const routes: RouteOptions[] = [{
     // await (req as FastifyRequestX).dao.createPredicate(
     //   (req as FastifyRequestX).body as SimplePredicate
     // );
-    this.log.info('xxxxxxxxxxxxxxxxxxxxxxxx201', (req as FastifyRequestX).body);
+    req.log.info('---------body:' + JSON.stringify(req.body));
 
     res.code(201);
     res.send();

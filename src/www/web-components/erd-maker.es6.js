@@ -47,15 +47,19 @@ class ErdMaker extends ErdBaseElement {
       citations: [this.state.video],
     };
 
-    console.log(body);
+    console.log('SEND ', this.apiurl, body);
 
-    console.log('PUT ', this.apiurl);
     const res = await fetch(this.apiurl, {
-      method: 'PUT',
+      method: 'POST',
       body: JSON.stringify(body)
     });
 
-    console.log(res.status);
+    if (res.status === 201) {
+      this.state = {};
+      this.dispatchEvent(new CustomEvent('rest'));
+    } else {
+      alert('Error');
+    }
   }
 
 }
