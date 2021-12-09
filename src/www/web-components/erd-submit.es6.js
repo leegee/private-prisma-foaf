@@ -32,7 +32,7 @@ class ErdSubmit extends ErdBaseElement {
   }
 
   submit() {
-    if (this.getAttribute('disabled')) {
+    if (this.disabled) {
       console.warn('Tried to submit when disabled');
     } else {
       this.dispatchEvent(new CustomEvent('submit'));

@@ -23,11 +23,9 @@ test.describe('e2e', () => {
     await page.keyboard.type('jfk');
     await page.waitForRequest(/\/entity/);
 
-    await new Promise(_ => setTimeout(_, 2000));
-
-    await expect(page.locator('#submit > button')).toBeEnabled({ timeout: 10000 });
+    await expect(page.locator('#submit > button')).toBeEnabled({ timeout: 200 });
     await page.click('#submit > button');
-    await page.waitForRequest('**/*predicate*');
+    await page.waitForRequest(/\/predicate/);
 
     await page.waitForSelector('never', { timeout: 100000 });
   });
