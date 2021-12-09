@@ -115,7 +115,6 @@ class YoutubeVideoElement extends HTMLElement {
     const src = this.getAttribute('src');
 
     if (!src) {
-      console.error('YoutubeVideoElement: No src was set when load() was called.');
       return;
     }
 
@@ -136,7 +135,9 @@ class YoutubeVideoElement extends HTMLElement {
 
         this.timeupdateInterval = setInterval(() => {
           this.dispatchEvent(new Event('timeupdate'));
-        }, 25);
+        }, 500);
+
+        this.dispatchEvent(new CustomEvent('change', { detail: this.currentTime }));
       }
 
       const onPlayerStateChange = (event) => {
@@ -145,14 +146,12 @@ class YoutubeVideoElement extends HTMLElement {
         if (state == 1) {
           this.dispatchEvent(new Event('play'));
         } else if (state == 2) {
-          this.dispatchEvent(
-            new CustomEvent('change', { detail: this.currentTime })
-          );
+          this.dispatchEvent(new CustomEvent('change', { detail: this.currentTime }));
         }
       }
 
       const onPlayerError = (event) => {
-        console.log('onPlayerError', event.data, event);
+        console.error('onPlayerError', event.data, event);
       }
 
       this.ytPlayer = new YT.Player(iframe, {

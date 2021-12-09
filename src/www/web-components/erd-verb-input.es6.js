@@ -17,5 +17,4 @@ class ErdVerbInput extends ErdPredictiveInputElement {
   }
 }
 
-
 window.customElements.define(ErdVerbInput.elName, ErdVerbInput);

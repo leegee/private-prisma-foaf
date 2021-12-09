@@ -36,7 +36,9 @@ class ErdMaker extends ErdBaseElement {
       (stack, id) => !this.state[id] || this.state[id].trim() === '' ? [...stack, id] : stack,
       []
     );
-    this.el.submit.disabled = missing.length === 0;
+
+    this.el.submit.disabled = missing.length > 0;
+    console.log(missing);
   }
 
   async submit() {

@@ -29,7 +29,7 @@ class ErdVideoCitation extends ErdBaseElement {
   }
 
   change(e) {
-    const url = this.el.video.getAttribute('src') + '?t=' + e.detail;
+    const url = this.el.video.getAttribute('src') + (e ? '?t=' + e.detail : '');
     this.el.input.setAttribute('value', url);
     this.dispatchEvent(new CustomEvent('change', {
       detail: url
