@@ -74,18 +74,12 @@ export class ErdBaseElement extends HTMLElement {
   };
 
   async connectedCallback() {
-    console.debug(`Load ${this.templateUrl}`);
     this.template = await Templates.load(this.templateUrl);
-    console.debug(`Loaded ${this.templateUrl}`);
 
     this.shadow = this.attachShadow({ mode: 'open' });
     this.shadow.appendChild(
       this.template.content.cloneNode(true)
     );
   }
-
-  // disconnectedCallback() { }
-
-  // attributeChangedCallback(attrName, oldVal, newVal) { }
 }
 

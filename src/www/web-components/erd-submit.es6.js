@@ -26,7 +26,6 @@ class ErdSubmit extends ErdBaseElement {
 
   attributeChangedCallback(_name, _oldValue, newValue) {
     if (newValue !== this.disabled) {
-      console.log('submit attr ok', newValue);
       this.disabled = newValue;
     }
   }

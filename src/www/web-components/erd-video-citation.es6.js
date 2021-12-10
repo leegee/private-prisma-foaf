@@ -41,7 +41,6 @@ class ErdVideoCitation extends ErdBaseElement {
     if (!url) {
       alert('Please enter a URL');
     } else {
-      console.log('Change video url', url);
       this.el.video.setAttribute('src', url);
     }
   }

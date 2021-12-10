@@ -105,7 +105,6 @@ class YoutubeVideoElement extends HTMLElement {
   }
 
   load() {
-    console.log('Load video', this.getAttribute('src'));
     // Destroy previous videos
     this.ytPlayer = null;
     this.shadowRoot.querySelector('#iframeContainer').innerHTML = '';
