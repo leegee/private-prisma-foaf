@@ -1,5 +1,23 @@
 <template id="template">
   <style>
+    :host {
+      border: 1px solid grey;
+      box-sizing: border-box;
+      width: 33%;
+      padding: 0.5em;
+      margin: 0.5em;
+    }
+
+    label {
+      font-family: sans-serif;
+      font-variant: small-caps;
+      text-transform: lowercase;
+    }
+
+    input[type=text] {
+      border: 0;
+      border-bottom: 1px solid black;
+    }
   </style>
 
   <label for='input'>

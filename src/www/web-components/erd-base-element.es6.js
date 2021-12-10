@@ -36,6 +36,10 @@ export const Templates = Object.create(null, {
         console.warn(`No template element found ${url}`);
       }
 
+      if (!template.content) {
+        throw new Error(`Template has no content? ${url}`);
+      }
+
       // overwrite link tags' hrefs asuming they're always relative to the template
       for (let link of template.content.querySelectorAll('link')) {
         const href = new URL(

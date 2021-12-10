@@ -24,8 +24,9 @@ test.describe('e2e', () => {
     await page.waitForRequest(/\/entity/);
 
     await expect(page.locator('#submit > button')).toBeEnabled({ timeout: 100 });
-    await page.click('#submit > button');
-    await page.waitForRequest(/\/predicate/, { timeout: 5000 });
+
+    page.click('#submit > button');
+    page.waitForResponse(/\/predicate/, { timeout: 5000 });
   });
 });
 

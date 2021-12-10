@@ -38,10 +38,6 @@ class ErdMaker extends ErdBaseElement {
     );
 
     this.el.submit.setAttribute('disabled', missing.length > 0);
-
-    console.log("Change", missing.length > 0,
-      this.el.submit.getAttribute('disabled')
-    );
   }
 
   async submit() {
@@ -51,8 +47,6 @@ class ErdMaker extends ErdBaseElement {
       Object: { knownas: this.state.object },
       citations: [this.state.video],
     };
-
-    console.log('SEND ', this.apiurl, body);
 
     const res = await fetch(this.apiurl, {
       headers: { 'Content-Type': 'application/json' },
@@ -65,7 +59,17 @@ class ErdMaker extends ErdBaseElement {
       this.dispatchEvent(new CustomEvent('rest'));
     } else {
       alert('Error');
-      console.log(await res.json());
+      const json = await res.json();
+      document.dispatchEvent(
+        new CustomEvent('erd-message', {
+          detail: {
+            text: JSON.stringify(json, null, 2),
+            class: 'error',
+          }
+        })
+      );
+
+      console.error(json);
     }
   }
 
