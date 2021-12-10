@@ -72,7 +72,6 @@ class ErdMaker extends ErdBaseElement {
       console.error(json);
     }
   }
-
 }
 
 window.customElements.define(ErdMaker.elName, ErdMaker);

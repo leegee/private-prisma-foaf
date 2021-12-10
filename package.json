@@ -36,11 +36,11 @@
     "typescript": "4.4.4"
   },
   "scripts": {
-    "preapi:build": "rimraf dist",
+    "dev": "concurrently \"npm run api:dev\" \"npm run wc:start\"",
     "api:start": "npx ts-node -r dotenv/config -r tsconfig-paths/register  src/scripts/start-api.ts",
     "api:dev": "npx ts-node-dev -r dotenv/config -r tsconfig-paths/register src/scripts/start-api.ts",
     "wc:start": "npx http-server src/www/",
-    "dev": "concurrently \"npm run api:dev\" \"npm run wc:start\"",
+    "preapi:build": "rimraf dist",
     "api:build:prod": "tsc --config tsconfig.testless.json",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
@@ -74,6 +74,7 @@
     "module-alias": "^2.2.2",
     "node-fetch": "^2.0.0",
     "pino": "^7.3.0",
+    "tmp-promise": "^3.0.3",
     "ts-jest": "^27.0.7"
   },
   "engines": {
