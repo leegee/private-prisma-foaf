@@ -1,12 +1,13 @@
 import * as path from 'path';
 import * as child_process from 'child_process';
+import { file as tempFile } from 'tmp-promise'
 import fs, { unlinkSync } from 'fs';
 import { Erd, IErdArgs } from 'src/service/erd';
-
 
 export interface IGraphvizArgs extends IErdArgs {
   layout?: string;
   layouts?: string[];
+  savepath?: string;
 }
 
 export class Graphviz extends Erd {
@@ -22,30 +23,46 @@ export class Graphviz extends Erd {
     super(args);
   }
 
-  async graphviz(knownas?: string | string[]) {
+  /**
+   * If this.savepath exists, graph is created there, or returned.
+   */
+  async graphviz(knownas?: string | string[]): Promise<string | undefined> {
     this.logger.debug(`Enter useGraphviz`);
 
-    if (!this.savepath) {
-      throw new Error('savepath was not supplied during construction');
+    let savepath;
+    let cleanup;
+    let rv;
+
+    if (this.savepath) {
+      savepath = this.savepath;
+    } else {
+      const temp = await tempFile();
+      savepath = temp.path
+      cleanup = temp.cleanup;
     }
 
     await this.getPredicates(knownas);
 
-    const graph = await this._predicates2graph();
+    const dotGraph = await this._predicates2graph();
 
     const tempOutputPath = path.resolve(
       path.join(this.tmpDir, 'temp.dot'),
     );
 
-    fs.writeFileSync(tempOutputPath, graph);
+    fs.writeFileSync(tempOutputPath, dotGraph);
 
     child_process.execSync(
-      `dot -T${this.format} ${tempOutputPath} > ${this.savepath} `
+      `dot -T${this.format} ${tempOutputPath} > ${savepath} `
     );
 
-    if (!process.env.CRUFT) {
-      unlinkSync(tempOutputPath);
+    unlinkSync(tempOutputPath);
+
+    if (cleanup) {
+      rv = fs.readFileSync(savepath, 'utf-8');
+      cleanup();
     }
+
+    return rv;
   }
 
   async _predicates2graph(): Promise<string> {

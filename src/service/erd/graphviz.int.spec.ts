@@ -27,7 +27,7 @@ describe('graphviz integration', () => {
   });
 
 
-  it('saves to file', async () => {
+  it('saves one to file', async () => {
     const savepath = './temp-oswald.png';
     if (fs.existsSync(savepath)) {
       fs.unlinkSync(savepath);
@@ -41,6 +41,14 @@ describe('graphviz integration', () => {
     if (!process.env.CRUFT) {
       fs.unlinkSync(savepath);
     }
+  });
+
+  it('without a savepath', async () => {
+    const erd = new Erd({ dao });
+    const graphstring = await erd.graphviz('Oswald');
+
+    expect(graphstring).toBeDefined();
+    expect(graphstring).toMatch(/^<svg/i);
   });
 });
 
