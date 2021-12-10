@@ -15,10 +15,8 @@ export const routes: RouteOptions[] = [{
     const erd: string = await graphviz.graphviz() || '';
 
     res.code(200)
-      .headers([
-        'Content-Type', 'image/svg+xml',
-        'Content-Disposition', 'filename="graph.svg"'
-      ])
+      .type('image/svg+xml')
+      .header('Content-Disposition', 'filename="graph.svg"')
       .send(erd);
   }
 }];

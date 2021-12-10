@@ -5,6 +5,10 @@
       --light: oldlace;
     }
 
+    #erd {
+      width: 100%;
+    }
+
     section#inputs {
       margin: 1em 0;
     }
@@ -51,5 +55,5 @@
   </aside> -->
   </main>
 
-  <img src='http://127.0.0.1:3000/graph' crossOrigin="anonymous">
+  <img id='erd' src='http://127.0.0.1:3000/graph' onclick='this.src=`http://127.0.0.1:3000/graph?${new Date()}`'>
 </template>
