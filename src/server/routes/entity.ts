@@ -14,7 +14,13 @@ export const routes: RouteOptions[] = [{
   // Todo: move to external file, to be shared by e2e tests, etc - autocreate from TS types...?
   schema: {
     querystring: {
-      q: { type: 'string' },
+      type: 'object',
+      properties: {
+        q: {
+          type: 'string'
+        },
+      },
+      required: ['q']
     },
     response: {
       200: {

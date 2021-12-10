@@ -11,11 +11,18 @@ interface FastifyRequestEntity extends FastifyRequestX {
 export const routes: RouteOptions[] = [{
   method: 'GET',
   url: '/verb',
-  // Todo: move to external file, to be shared by e2e tests, etc - autocreate from TS types...?
+  // Todo: move to external file, to be shared by int tests, etc - autocreate from TS types...?
   schema: {
     querystring: {
-      q: { type: 'string' },
+      type: 'object',
+      properties: {
+        q: {
+          type: 'string'
+        },
+      },
+      required: ['q']
     },
+
     response: {
       200: {
         type: 'object',
@@ -38,6 +45,5 @@ export const routes: RouteOptions[] = [{
     res.code(200)
       .header('Content-Type', 'application/json; charset=utf-8')
       .send({ verbs });
-    console.dir({ verbs }, { depth: null });
   }
 }];
