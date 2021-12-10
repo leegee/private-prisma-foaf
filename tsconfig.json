@@ -1,11 +1,4 @@
 {
-  "include": [
-    "./src/**/*"
-  ],
-  "exclude": [
-    "./test",
-    "./src/**/*.spec.ts"
-  ],
   "compilerOptions": {
     "target": "ES2017",
     "module": "commonjs",

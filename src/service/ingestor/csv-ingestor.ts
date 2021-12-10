@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { parse } from 'csv-parse';
 
-import { BaseIngestor } from './base-ingestor';
+import { BaseIngestor } from 'src/service/ingestor/base-ingestor';
 import { GrammarError } from 'src/service/dao';
 
 export class CsvIngestor extends BaseIngestor {
@@ -47,6 +47,10 @@ export class CsvIngestor extends BaseIngestor {
     }
     this.logger.debug('Enter parsePredicateFile for ' + filepath);
 
+    if (!fs.existsSync(filepath)) {
+      throw new Error('No such file as ' + filepath);
+    }
+
     let reastream;
     try {
       reastream = fs.createReadStream(filepath);
@@ -72,4 +76,12 @@ export class CsvIngestor extends BaseIngestor {
       });
   }
 
+  async _createPredicate(row: any) { // xxx
+    this.logger.debug('_createSubjectObjectVerbPredicate for row:', row);
+    return this.dao.createPredicate({
+      Subject: { knownas: row.Subject },
+      Verb: { name: row.Verb },
+      Object: { knownas: row.Object },
+    });
+  }
 }

@@ -55,6 +55,7 @@ class ErdMaker extends ErdBaseElement {
     console.log('SEND ', this.apiurl, body);
 
     const res = await fetch(this.apiurl, {
+      headers: { 'Content-Type': 'application/json' },
       method: 'POST',
       body: JSON.stringify(body)
     });

@@ -15,14 +15,14 @@ describe('base-ingestor (int)', () => {
 
     try {
       gi._createPredicate({
-        Subject: 's',
-        Verb: 'v',
-        Object: 'o',
+        Subject: { knownas: 's' },
+        Verb: { name: 'v' },
+        Object: { knownas: 'o' },
       });
       gi._createPredicate({
-        Subject: 's',
-        Verb: 'v',
-        Object: 'o',
+        Subject: { knownas: 's' },
+        Verb: { name: 'v' },
+        Object: { knownas: 'o' },
       });
 
       errorFree = true;

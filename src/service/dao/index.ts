@@ -22,9 +22,10 @@ export interface IEntityUpsertArgs {
 }
 
 export interface IPredicateUpsertArgs {
-  Subject: string;
-  Verb: string;
-  Object: string;
+  Subject: { knownas: string };
+  Verb: { name: string };
+  Object: { knownas: string };
+  Citations?: string[];
   Comment?: string;
   start?: string;
   end?: string;
@@ -216,66 +217,66 @@ export class DAO {
       throw new GrammarError(JSON.stringify(row, null, 2));
     }
 
-    row.Subject = normalise(row.Subject);
-    row.Verb = normalise(row.Verb);
-    row.Object = normalise(row.Object);
+    const subject = normalise(row.Subject.knownas);
+    const verb = normalise(row.Verb.name);
+    const object = normalise(row.Object.knownas);
 
-    const foundSubject = CachedIds.Entity[row.Subject]
+    const foundSubject = CachedIds.Entity[subject]
       ? {
-        id: CachedIds.Entity[row.Subject],
+        id: CachedIds.Entity[subject],
         knownas: row.Subject
       }
       : await this.prisma.entity.upsert({
         select: { id: true },
-        where: { knownas: row.Subject },
+        where: { knownas: subject },
         create: {
-          knownas: row.Subject,
-          formalname: row.Subject,
+          knownas: subject,
+          formalname: subject,
         },
         update: {
         },
       });
 
-    CachedIds.Entity[row.Subject] = foundSubject.id;
+    CachedIds.Entity[subject] = foundSubject.id;
 
     this.logger.debug(`Got subject '${JSON.stringify(foundSubject)}' via '${row.Subject}'`,);
 
-    const foundVerb = CachedIds.Verb[row.Verb]
+    const foundVerb = CachedIds.Verb[verb]
       ? {
-        id: CachedIds.Verb[row.Verb],
+        id: CachedIds.Verb[verb],
         name: row.Verb
       }
       : await this.prisma.verb.upsert({
         select: { id: true },
-        where: { name: row.Verb },
+        where: { name: verb },
         create: {
-          name: row.Verb
+          name: verb
         },
         update: {
         },
       });
 
-    CachedIds.Verb[row.Verb] = foundVerb.id;
+    CachedIds.Verb[verb] = foundVerb.id;
 
     this.logger.debug(`Got verb '${JSON.stringify(foundVerb)}' via '${row.Verb}'`,);
 
-    const foundObject = CachedIds.Entity[row.Object]
+    const foundObject = CachedIds.Entity[object]
       ? {
-        id: CachedIds.Entity[row.Object],
+        id: CachedIds.Entity[object],
         knownas: row.Object
       }
       : await this.prisma.entity.upsert({
         select: { id: true },
-        where: { knownas: row.Object },
+        where: { knownas: object },
         create: {
-          knownas: row.Object,
-          formalname: row.Object,
+          knownas: object,
+          formalname: object,
         },
         update: {
         },
       });
 
-    CachedIds.Entity[row.Object] = foundObject.id;
+    CachedIds.Entity[object] = foundObject.id;
 
     this.logger.debug(`Got object '${JSON.stringify(foundObject)}' via '${row.Object}'`,);
 

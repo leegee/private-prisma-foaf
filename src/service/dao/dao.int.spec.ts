@@ -48,9 +48,9 @@ describe('dao (int)', () => {
   it('createPredicate', async () => {
     expect(async () => {
       await dao.createPredicate({
-        Subject: 'foo',
-        Verb: 'baz',
-        Object: 'baz',
+        Subject: { knownas: 'foo' },
+        Verb: { name: 'baz' },
+        Object: { knownas: 'baz' },
       });
     }).not.toThrow();
   });

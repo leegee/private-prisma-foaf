@@ -1,4 +1,5 @@
 import { RouteOptions } from 'fastify';
+import { SimplePredicate } from 'src/service/dao';
 import { FastifyRequestX } from '..';
 
 export const routes: RouteOptions[] = [{
@@ -24,10 +25,9 @@ export const routes: RouteOptions[] = [{
   },
 
   handler: async function (req, res) {
-    // await (req as FastifyRequestX).dao.createPredicate(
-    //   (req as FastifyRequestX).body as SimplePredicate
-    // );
-    req.log.info('---------body:' + JSON.stringify(req.body));
+    await (req as FastifyRequestX).dao.createPredicate(
+      (req as FastifyRequestX).body as SimplePredicate
+    );
 
     res.code(201);
     res.send();

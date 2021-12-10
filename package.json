@@ -42,7 +42,7 @@
     "api:dev": "npx ts-node-dev -r dotenv/config -r tsconfig-paths/register src/scripts/start-api.ts",
     "wc:start": "npx http-server src/www/",
     "dev": "concurrently \"npm run api:dev\" \"npm run wc:start\"",
-    "api:build": "tsc",
+    "api:build:prod": "tsc --config tsconfig.testless.json",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
     "test": "jest",

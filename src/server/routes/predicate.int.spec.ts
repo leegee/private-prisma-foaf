@@ -63,10 +63,10 @@ describe('PUT /predicate', () => {
         }));
     });
 
-    it('Sends preicate', async () => {
+    it('Sends predicate data', async () => {
       jest.setTimeout(10000);
       await supertest(server.server)
-        .put('/predicate')
+        .post('/predicate')
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .send({

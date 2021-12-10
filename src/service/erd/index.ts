@@ -13,7 +13,10 @@ export function normaliseArray(list: string[]): string[] {
 }
 
 export function normalise(subject: string): string {
-  return typeof subject === 'undefined' ? subject : subject.toLowerCase().replace(/[^\w\s'-]+/, '').replace(/\s+/gs, ' ').trim()
+  if (typeof subject === 'undefined') {
+    throw new TypeError('normalise requires a string');
+  }
+  return subject.toLowerCase().replace(/[^\w\s'-]+/, '').replace(/\s+/gs, ' ').trim()
 }
 
 export function makePredicateId(subjectId: number, verbId: number, objectId: number): string {

@@ -32,9 +32,11 @@ jest.setTimeout(1000 * 40);
 describe('erd', () => {
   describe('normalise', () => {
     test.each`
-      input     | expectedResult
-      ${' xxxx '}  | ${'xxxx'}
-      ${' x  x '}   | ${'x x'}
+      input       | expectedResult
+      ${' xxxx '} | ${'xxxx'}
+      ${' x  x '} | ${'x x'}
+      ${' '}      | ${''}
+      ${''}       | ${''}
     `('normalises $input to $expectedResult', ({ input, expectedResult }) => {
       expect(normalise(input)).toBe(expectedResult)
     })
