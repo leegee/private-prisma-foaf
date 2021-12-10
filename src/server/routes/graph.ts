@@ -9,12 +9,16 @@ export const routes: RouteOptions[] = [{
 
     const graphviz = new Graphviz({
       dao: (req as FastifyRequestX).dao,
+      logger: req.log
     });
 
     const erd: string = await graphviz.graphviz() || '';
 
     res.code(200)
-      .header('Content-Type', 'image/svg')
+      .headers([
+        'Content-Type', 'image/svg+xml',
+        'Content-Disposition', 'filename="graph.svg"'
+      ])
       .send(erd);
   }
 }];

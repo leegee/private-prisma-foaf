@@ -5,6 +5,7 @@ import fastifyCors from 'fastify-cors';
 import { routes as entityRoutes } from './routes/entity';
 import { routes as verbRoutes } from './routes/verb';
 import { routes as predicateRoutes } from './routes/predicate';
+import { routes as graphRoutes } from './routes/graph';
 import { prisma } from 'src/service/prisma-client';
 import { DAO } from 'src/service/dao';
 import { logger as loggerInstance } from 'src/service/logger';
@@ -27,6 +28,8 @@ export function buildServer({ logger, dao }: IBuildServerArgs = {}) {
     disableRequestLogging: logger ? false : true,
   });
 
+  server.register(fastifyCors, { origin: '*' });
+
   if (!dao) {
     daoInstance = new DAO({
       prisma,
@@ -34,19 +37,21 @@ export function buildServer({ logger, dao }: IBuildServerArgs = {}) {
     });
   }
 
-  server.addHook(
-    "onRequest",
+  server.addHook("onRequest",
     async (req, _reply) => {
       (req as FastifyRequestX).dao = dao || daoInstance;
       req.log.info({ url: req.raw.url, id: req.id }, "received request");
     }
   );
 
-  server.register(fastifyCors, {
-    origin: true
-  });
 
-  [...entityRoutes, ...verbRoutes, ...predicateRoutes].forEach((route: RouteOptions) => server.route(route));
+  [
+    ...graphRoutes,
+    ...entityRoutes,
+    ...verbRoutes,
+    ...predicateRoutes
+  ].forEach((route: RouteOptions) => server.route(route));
+
   return server;
 }
 

@@ -35,7 +35,7 @@ export class Erd {
   logger: ILogger;
   dao: DAO;
   predicates: PredicateResult[] = []; // TODO types
-  savepath: string = 'erd-output.svg';
+  savepath?: string;
   tmpDir = fs.mkdtempSync(os.tmpdir() + path.sep + 'entity-erd-');
   format = '';
 
@@ -44,10 +44,10 @@ export class Erd {
     if (!!savepath) {
       this.savepath = savepath;
     }
-    if (this.savepath.length < 5) {
+    if (this.savepath && this.savepath.length < 5) {
       throw new TypeError('savepath too short');
     }
-    this.format = format || this.savepath.substr(this.savepath.length - 3, 3);
+    this.format = format || this.savepath ? this.savepath!.substr(this.savepath!.length - 3, 3) : 'svg';
     this.logger = _logger || logger;
   }
 

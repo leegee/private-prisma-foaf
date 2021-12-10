@@ -1,14 +1,17 @@
+import os from 'os';
 import * as path from 'path';
 import * as child_process from 'child_process';
-import { file as tempFile } from 'tmp-promise'
 import fs, { unlinkSync } from 'fs';
 import { Erd, IErdArgs } from 'src/service/erd';
+
 
 export interface IGraphvizArgs extends IErdArgs {
   layout?: string;
   layouts?: string[];
   savepath?: string;
 }
+
+export const tempPath = () => path.join(os.tmpdir(), process.hrtime.bigint().toString());
 
 export class Graphviz extends Erd {
   static layouts: { [key: string]: string } = {
@@ -27,41 +30,39 @@ export class Graphviz extends Erd {
    * If this.savepath exists, graph is created there, or returned.
    */
   async graphviz(knownas?: string | string[]): Promise<string | undefined> {
-    this.logger.debug(`Enter useGraphviz`);
+    this.logger.debug(`Enter useGraphviz ${knownas || ''}`);
 
     let savepath;
-    let cleanup;
     let rv;
+    let tempSvg;
+    let tempDot = tempPath();
 
     if (this.savepath) {
       savepath = this.savepath;
     } else {
-      const temp = await tempFile();
-      savepath = temp.path
-      cleanup = temp.cleanup;
+      tempSvg = tempPath();
+      savepath = tempSvg;
     }
+
+    this.logger.debug(`shall save svg at ${savepath}`);
 
     await this.getPredicates(knownas);
 
     const dotGraph = await this._predicates2graph();
 
-    const tempOutputPath = path.resolve(
-      path.join(this.tmpDir, 'temp.dot'),
-    );
-
-    fs.writeFileSync(tempOutputPath, dotGraph);
+    fs.writeFileSync(tempDot, dotGraph);
 
     child_process.execSync(
-      `dot -T${this.format} ${tempOutputPath} > ${savepath} `
+      `dot -T${this.format} ${tempDot} > ${savepath} `
     );
 
-    unlinkSync(tempOutputPath);
-
-    if (cleanup) {
-      rv = fs.readFileSync(savepath, 'utf-8');
-      cleanup();
+    if (tempSvg) {
+      rv = fs.readFileSync(savepath, { encoding: 'utf-8' });
+      this.logger.debug(`read svg from ${savepath}`);
+      fs.unlinkSync(tempSvg);
     }
 
+    fs.unlinkSync(tempDot);
     return rv;
   }
 
@@ -73,8 +74,6 @@ export class Graphviz extends Erd {
   fontsize="48pt"
   ${Graphviz.layouts[this.layout]}
   `;
-
-    this.logger.debug(`Predicates: "${this.predicates}"`);
 
     this.predicates.forEach((predicate) => {
       try {
@@ -105,8 +104,6 @@ Entity${predicate.Subject.id} -> Entity${predicate.Object.id} [class=verb label=
     });
 
     graph += "\n}\n"; // EOF
-
-    this.logger.debug(`Graph: "${graph}"`);
 
     return graph;
   }

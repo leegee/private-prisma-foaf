@@ -1,5 +1,3 @@
-// <erd-predictive-input></erd-predictive-input>
-
 import { ErdBaseElement } from './erd-base-element.es6.js';
 
 /** A base class for inputs */
@@ -18,10 +16,6 @@ export class ErdPredictiveInputElement extends ErdBaseElement {
     this.el.input.addEventListener('keyup', ErdBaseElement.debounce(this.onChange.bind(this)));
 
     this.addEventListener('reset', () => this.el.input.value = '');
-  }
-
-  disconnectedCallback() {
-    this.el.input.removeEventListener('keyup', ErdBaseElement.debounce(this.onChange.bind(this)));
   }
 
   async onChange() {
@@ -45,7 +39,6 @@ export class ErdPredictiveInputElement extends ErdBaseElement {
     const url = this.apiurl + encodeURIComponent(input);
 
     try {
-      console.log('GET', url);
       const res = await fetch(url);
       const json = await res.json();
 
