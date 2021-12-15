@@ -3,6 +3,7 @@
  * @see https://developers.google.com/sheets/api/guides/concepts
  */
 import fetch from 'node-fetch';
+import { IPredicateUpsertArgs } from '../dao';
 import { BaseIngestor, ConfigType as IngestorConfigType, IBaseingestorArgs, IBaseingestorArgs as IBaseIngestorArgs } from './base-ingestor';
 
 export type GooglesheetsConfigType = IngestorConfigType & {
@@ -48,9 +49,9 @@ export class GooglesheetsIngestor extends BaseIngestor {
       + '?key=' + this.config.googlesheetsApiKey;
   };
 
-  async _getResource() {
+  async _getGoogleJson() {
     const url = this._getGoogleSheetsUrlForSheetName();
-    this.logger.debug('_getResource from', url);
+    this.logger.debug('_getGoogleJson from', url);
 
     let res;
     let json;
@@ -73,6 +74,11 @@ export class GooglesheetsIngestor extends BaseIngestor {
     }
 
     return json;
+  }
+
+  async _createPredicate(row: IPredicateUpsertArgs) { // xxx
+    this.logger.debug('_createSubjectObjectVerbPredicate for row:', row);
+    return this.dao.createPredicate(row);
   }
 
 }

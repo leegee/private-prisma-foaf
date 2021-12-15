@@ -4,13 +4,12 @@ import { mockPrisma } from 'testlib/mock-prisma';
 import { DAO, EntityNotFoundError } from 'src/service/dao';
 import PrismaTestEnvironment from 'testlib/prisma-test-env';
 
-PrismaTestEnvironment.init();
+PrismaTestEnvironment.setup();
 
 const verbFixture: MockProxy<Verb> = {
   name: 'mock-name',
   description: 'mock description',
   id: 1,
-  stem: '{mock-stem}'
 };
 
 const predicateFixture: MockProxy<Predicate> = {

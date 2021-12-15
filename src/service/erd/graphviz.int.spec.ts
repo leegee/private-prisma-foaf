@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import { dao } from 'testlib/fixtures';
 import { Graphviz as Erd } from 'src/service/erd/graphviz';
 
-PrismaTestEnvironment.init();
+PrismaTestEnvironment.setup();
 jest.setTimeout(1000 * 30);
 
 describe('graphviz integration', () => {

@@ -5,7 +5,7 @@ import { logger } from 'src/service/logger';
 import { prisma } from 'src/service/prisma-client';
 
 import PrismaTestEnvironment from 'testlib/prisma-test-env';
-PrismaTestEnvironment.init();
+PrismaTestEnvironment.setup();
 
 main();
 

@@ -3,7 +3,7 @@ import PrismaTestEnvironment from "testlib/prisma-test-env";
 import { supertest } from 'testlib/supertest';
 import { buildServer } from "../index";
 
-PrismaTestEnvironment.init();
+PrismaTestEnvironment.setup();
 
 const server = buildServer();
 beforeAll(server.ready);
@@ -20,7 +20,7 @@ describe('GET /entity?q=', () => {
 
     expect(res.body.entities[0]).toEqual(
       expect.objectContaining(
-        { "approved": false, "dob": null, "dod": null, "familyname": "kennedy", "formalname": "john f kennedy", "givenname": "john", "id": 15, "knownas": "jfk", "middlenames": "fitzgerald" }
+        { "approved": false, "dob": null, "dod": "1963-11-22T00:00:00.000Z", "familyname": "kennedy", "formalname": "john f kennedy", "givenname": "john", "id": 8, "knownas": "jfk", "middlenames": "fitzgerald" }
       )
     );
 

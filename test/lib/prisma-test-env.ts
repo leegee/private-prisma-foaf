@@ -34,7 +34,7 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
   static dao = dao;
 
   /** Maybe faster to load public and copy to test schema when needed */
-  static init({ ingest }: { ingest: boolean } = { ingest: true }) {
+  static setup({ ingest }: { ingest: boolean } = { ingest: true }) {
     logger.debug('PrismaTestEnvironment.init Enter');
     let testEnv: PrismaTestEnvironment;
 
@@ -69,14 +69,10 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
 
   constructor(config?: Config.ProjectConfig) {
     super(config ? config : {} as Config.ProjectConfig);
-
     // Generate a unique schema identifier for this test context
     this.schema = `erdtest_${+ new Date()}_${process.hrtime.bigint()}`;
-
-    logger.debug(`Init new test env with temporary schema: ${this.schema}`);
-
-    // Generate the pg connection string for the test schema
     this.connectionString = `postgresql://${process.env.DB_USER}:${process.env.DB_PASS}@localhost:${process.env.DB_PORT}/${process.env.DB_NAME}?schema=${this.schema}`;
+    logger.debug(`Init new test env with temporary schema: ${this.schema}`);
   }
 
   async setup() {
@@ -84,8 +80,9 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
     process.env.DATABASE_URL = this.connectionString;
     this.global.process.env.DATABASE_URL = this.connectionString;
 
-    // Run the migrations to ensure our schema has the required structure
+    logger.debug(`Running migrations - creating test env temp schema, ${this.schema}.`);
     child_process.execSync(`${prismaBinary} migrate deploy`);
+    logger.debug(`Running migrations - done ${this.schema}.`);
 
     logger.debug('Test env setup almost done');
     return super.setup();

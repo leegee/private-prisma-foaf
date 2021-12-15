@@ -66,10 +66,6 @@ See examples.
 
 Logging is via `pino`. `LOG_LEVEL` environment variable takes a lower-case log level (eg `debug`).
 
-## Queries
-
-Verb search is easiest via stems, provided through an insert/update trigger on `Verb.name` that populates `Verb.stem` the Postgres Snowball lexeme string. (It could contain multiple values, but it's a good enough for now.)
-
 ## TODO
 
 - Move to external OpenAPI scheme to share between routes and superagent tests

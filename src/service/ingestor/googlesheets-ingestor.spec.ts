@@ -42,7 +42,7 @@ describe('code that uses fetch', () => {
 
     o._getGoogleSheetsUrlForSheetName = jest.fn(() => 'mock-url');
 
-    await o._getResource();
+    await o._getGoogleJson();
 
     expect(o._getGoogleSheetsUrlForSheetName).toHaveBeenCalled();
     expect(fetchMock).toHaveBeenCalledTimes(1);

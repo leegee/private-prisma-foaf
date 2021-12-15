@@ -6,7 +6,7 @@ import PrismaTestEnvironment from "testlib/prisma-test-env";
 
 jest.setTimeout(1000 * 30);
 
-PrismaTestEnvironment.init({ ingest: false });
+PrismaTestEnvironment.setup({ ingest: false });
 
 let mocks: { [key: string]: any };
 

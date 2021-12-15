@@ -24,15 +24,9 @@ export interface IEntityUpsertArgs extends IInterable {
 }
 
 export interface IPredicateUpsertArgs {
-  Subject: {
-    knownas: string
-  };
-  Verb: {
-    name: string
-  };
-  Object: {
-    knownas: string
-  };
+  Subject: string,
+  Verb: string,
+  Object: string,
   Citations?: string[];
   Comment?: string;
   start?: string;
@@ -84,9 +78,9 @@ export type SimplePredicate = {
 }
 
 export type SimplePredicateInput = {
-  subject: string,
-  verb: string,
-  object: string,
+  Subject: string,
+  Verb: string,
+  Object: string,
 }
 
 export type PredicateResult = SimplePredicate & Predicate;
@@ -190,8 +184,9 @@ export class DAO {
     for (const key in row) {
       if (typeof row[key] !== 'undefined' && row[key]!.length) {
         // TODO Middleare
-        if (row[key]!.match(/^\d{4}-\d{2}-\d{2}/)) {
-          entity[key] = new Date(entity[key]).toISOString();
+        const match = row[key]!.match(/^\s*(\d{4}-\d{2}-\d{2})/);
+        if (match !== null) {
+          entity[key] = new Date(match[1]).toISOString();
         } else {
           entity[key] = normalise(row[key]!);
           if (entity[key].length === 0) {
@@ -225,9 +220,9 @@ export class DAO {
       throw new GrammarError(JSON.stringify(row, null, 2));
     }
 
-    const subject = normalise(row.Subject.knownas);
-    const verb = normalise(row.Verb.name);
-    const object = normalise(row.Object.knownas);
+    const subject = normalise(row.Subject);
+    const verb = normalise(row.Verb);
+    const object = normalise(row.Object);
 
     const foundSubject = CachedIds.Entity[subject]
       ? {

@@ -38,9 +38,4 @@ export class BaseIngestor {
     return this.dao.createEntity(row);
   }
 
-  async _createPredicate(row: IPredicateUpsertArgs) { // xxx
-    this.logger.debug('_createSubjectObjectVerbPredicate for row:', row);
-    return this.dao.createPredicate(row);
-  }
-
 }

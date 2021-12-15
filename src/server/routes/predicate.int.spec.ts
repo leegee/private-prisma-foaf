@@ -5,11 +5,9 @@ import { supertest, expectJsonLike } from 'testlib/supertest';
 import { buildServer } from 'src/server';
 import { logger } from 'src/service/logger';
 
-PrismaTestEnvironment.init();
+PrismaTestEnvironment.setup();
 
-const server = buildServer({
-  logger
-});
+const server = buildServer({ logger: true });
 
 beforeAll(server.ready);
 

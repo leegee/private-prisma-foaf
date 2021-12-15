@@ -1,6 +1,6 @@
 import { prisma } from '../src/service/prisma-client';
 
-main();
+// main();
 
 async function main() {
   try {

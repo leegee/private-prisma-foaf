@@ -1,5 +1,5 @@
 import { RouteOptions } from 'fastify';
-import { SimplePredicate } from 'src/service/dao';
+import { SimplePredicate, SimplePredicateInput } from 'src/service/dao';
 import { FastifyRequestX } from '..';
 
 export const routes: RouteOptions[] = [{
@@ -7,15 +7,16 @@ export const routes: RouteOptions[] = [{
   url: '/predicate',
   schema: {
     body: {
-      Subject: { knownas: { type: 'string' } },
-      Verb: { name: { type: 'string' } },
-      Object: { knownas: { type: 'string' } },
-      citation: {
+      Subject: { type: 'string' },
+      Verb: { type: 'string' },
+      Object: { type: 'string' },
+      Citation: {
         type: 'array',
-        items: { type: 'string' }
+        items: { type: 'string' },
+        optional: true,
       },
-      start: { type: 'string', optinal: true },
-      end: { type: 'string', optinal: true },
+      start: { type: 'string', optional: true },
+      end: { type: 'string', optional: true },
     },
     response: {
       201: {
@@ -26,7 +27,7 @@ export const routes: RouteOptions[] = [{
 
   handler: async function (req, res) {
     await (req as FastifyRequestX).dao.createPredicate(
-      (req as FastifyRequestX).body as SimplePredicate
+      (req as FastifyRequestX).body as SimplePredicateInput
     );
 
     res.code(201);

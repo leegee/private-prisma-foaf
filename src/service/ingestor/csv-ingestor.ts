@@ -75,9 +75,9 @@ export class CsvIngestor extends BaseIngestor {
       filepath,
       (row: CsvPredicateRow) => {
         this.dao.createPredicate({
-          Subject: { knownas: row.Subject },
-          Verb: { name: row.Verb },
-          Object: { knownas: row.Object },
+          Subject: row.Subject,
+          Verb: row.Verb,
+          Object: row.Object,
         } as IPredicateUpsertArgs)
       },
     );

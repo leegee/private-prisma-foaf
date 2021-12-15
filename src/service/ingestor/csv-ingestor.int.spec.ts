@@ -7,7 +7,7 @@ import PrismaTestEnvironment from 'testlib/prisma-test-env';
 
 jest.setTimeout(1000 * 30);
 
-PrismaTestEnvironment.init({ ingest: false });
+PrismaTestEnvironment.setup({ ingest: false });
 
 
 describe('csv-ingestor (int)', () => {

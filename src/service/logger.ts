@@ -6,6 +6,7 @@ export type ILogger = {
   error: Function
 };
 
+import { FastifyLoggerInstance } from 'fastify';
 import { Console } from 'node:console';
 import pino from 'pino';
 // import PinoPretty from 'pino-pretty';

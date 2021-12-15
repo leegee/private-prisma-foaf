@@ -26,7 +26,7 @@ const entityFixture: MockProxy<Entity> = {
   approved: false,
 };
 
-PrismaTestEnvironment.init();
+PrismaTestEnvironment.setup();
 jest.setTimeout(1000 * 40);
 
 describe('erd', () => {

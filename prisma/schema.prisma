@@ -17,8 +17,7 @@ generator erd {
 
 model Verb {
   id          Int         @id @default(autoincrement())
-  name        String      @db.VarChar(128)
-  stem        String?     @db.VarChar(128)
+  name        String      @db.Text
   description String?
   Predicate   Predicate[]
 
@@ -27,7 +26,7 @@ model Verb {
 
 model Entity {
   id          Int         @id @default(autoincrement())
-  knownas     String      @db.VarChar(128) // eg JFK, Bell
+  knownas     String      @db.Text // eg JFK, Bell
   formalname  String      @db.VarChar(128) // eg John F Kennedy, Bell Aircraft Corporation
   givenname   String?     @db.VarChar(128) // eg John
   middlenames String?     @db.VarChar(128) // eg Fitzgerald
