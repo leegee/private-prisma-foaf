@@ -16,14 +16,21 @@ const config = {
   level: process.env.LOG_LEVEL ? process.env.LOG_LEVEL.toLowerCase() : 'info',
 };
 
+const level = process.env.LOG_LEVEL || 'info';
+
 let devConfig = {
   ...config,
   transport: {
+    level,
     target: '../../test/lib/pino-log-message',
     options: {
+      colorize: false,
       levelFirst: true,
       hidePretty: false,
       destination: 2,
+      ignore: 'time,pid,hostname',
+      hideObject: false,
+      singleLine: false,
     }
   }
 };
@@ -33,7 +40,7 @@ const myPino = pino({
   ...(process.env.NODE_ENV !== 'production' ? devConfig : [])
 });
 
-export const logger = new Console(process.stdout, process.stderr);
+export const logger = myPino; // new Console(process.stdout, process.stderr);
 
 if (process.env.NODE_ENV !== 'production') {
   logger.debug('Init logging');

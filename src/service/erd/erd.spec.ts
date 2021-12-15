@@ -3,7 +3,7 @@ import PrismaTestEnvironment from "testlib/prisma-test-env";
 import { Entity, Predicate } from '@prisma/client';
 import { MockProxy } from 'jest-mock-extended';
 import { mockDao, mockPrisma } from 'testlib/mock-prisma';
-import { Erd, normalise } from 'src/service/erd';
+import { Erd } from 'src/service/erd';
 import { EntityNotFoundError } from "../dao";
 
 const predicateFixture: MockProxy<Predicate> = {
@@ -30,17 +30,6 @@ PrismaTestEnvironment.setup();
 jest.setTimeout(1000 * 40);
 
 describe('erd', () => {
-  describe('normalise', () => {
-    test.each`
-      input       | expectedResult
-      ${' xxxx '} | ${'xxxx'}
-      ${' x  x '} | ${'x x'}
-      ${' '}      | ${''}
-      ${''}       | ${''}
-    `('normalises $input to $expectedResult', ({ input, expectedResult }) => {
-      expect(normalise(input)).toBe(expectedResult)
-    })
-  })
 
   describe('_getPredicates', () => {
     it('throws the correct error when entity not found', async () => {

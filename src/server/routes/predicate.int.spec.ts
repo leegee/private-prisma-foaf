@@ -51,7 +51,7 @@ describe('PUT /predicate', () => {
     });
 
     it('Verb "assassinates" exists', async () => {
-      const res = await supertest(server.server)
+      await supertest(server.server)
         .get('/verb?q=assassinates')
         .expect(200)
         .then((res: Response) => expectJsonLike(res.body, {

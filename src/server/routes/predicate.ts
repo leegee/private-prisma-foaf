@@ -1,5 +1,5 @@
 import { RouteOptions } from 'fastify';
-import { SimplePredicate, SimplePredicateInput } from 'src/service/dao';
+import { SimplePredicateInput } from 'src/service/dao';
 import { FastifyRequestX } from '..';
 
 export const routes: RouteOptions[] = [{

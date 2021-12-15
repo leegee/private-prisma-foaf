@@ -32,7 +32,11 @@ Testing Prisma: a small app to create ERDs via Graphviz from CSVs or user-input 
 
 A simplistic star scheme that centers on predicates, used to describe who did what to whom, when it happened, with citations, where the 'who' is an `Entity` (either a person or organisation).
 
-Both predicates and entities have date ranges.
+Both predicates and entities have date optional ranges (`start`/`end` and `dob`/`dod`, respectively).
+
+## ERD
+
+[![ERD](./erd.svg)](./erd.svg)
 
 ## About the environment
 
@@ -115,10 +119,6 @@ CSV, with columns headered:
     Subject, Verb, Object, Comment
 
 Consider PROLOG.
-
-## ERD
-
-[![ERD](./erd.svg)](./erd.svg)
 
 ## SVGs output from db seed
 

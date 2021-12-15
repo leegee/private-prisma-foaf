@@ -1,10 +1,10 @@
 import { Entity, Predicate, Verb } from '@prisma/client';
 import { MockProxy } from 'jest-mock-extended';
 import { mockPrisma } from 'testlib/mock-prisma';
-import { DAO, EntityNotFoundError } from 'src/service/dao';
-import PrismaTestEnvironment from 'testlib/prisma-test-env';
+import { DAO, EntityNotFoundError, normaliseEntity, normaliseVerb } from 'src/service/dao';
 
-PrismaTestEnvironment.setup();
+import PrismaTestEnvironment from 'testlib/prisma-test-env';
+PrismaTestEnvironment.setup({ ingest: false });
 
 const verbFixture: MockProxy<Verb> = {
   name: 'mock-name',
@@ -39,6 +39,26 @@ beforeEach(() => {
 });
 
 describe('dao', () => {
+  describe('normaliseEntity', () => {
+    test.each`
+      input       | expectedResult
+      ${' xxxx '} | ${'xxxx'}
+      ${' x  x '} | ${'x x'}
+      ${' '}      | ${''}
+      ${''}       | ${''}
+    `('normalises $input to $expectedResult', ({ input, expectedResult }) => {
+      expect(normaliseEntity(input)).toBe(expectedResult)
+    });
+  });
+
+  describe('normaliseVerb', () => {
+    test.each`
+      input       | expectedResult
+      ${'assassinates'} | ${'assassinate'}
+    `('normalises $input to $expectedResult', ({ input, expectedResult }) => {
+      expect(normaliseVerb(input)).toEqual(expectedResult)
+    });
+  });
 
   describe('getPredicatesByKnownAs', () => {
     it('throws the correct error when entity not found', () => {
