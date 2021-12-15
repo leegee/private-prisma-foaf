@@ -1,6 +1,6 @@
+import nlp from 'compromise';
 import { Entity, Predicate, Prisma, PrismaClient, Verb } from '@prisma/client';
 import { logger, ILogger } from 'src/service/logger';
-import { normalise, makePredicateId } from 'src/service/erd';
 
 export interface Iknownas2id {
   [key: string]: number;
@@ -33,7 +33,6 @@ export interface IPredicateUpsertArgs {
   end?: string;
 }
 
-
 export interface ICache {
   Entity: Iknownas2id;
   Verb: Iknownas2id;
@@ -45,6 +44,32 @@ const CachedIds: ICache = {
   Verb: {},
   Predicate: {},
 };
+
+export function normaliseVerb(subject: string): string {
+  if (typeof subject === 'undefined') {
+    throw new TypeError('prepareVerb requires a string');
+  }
+
+  const n = normaliseEntity(subject);
+
+  // Todo: Middleware
+  return nlp(n).verbs().toInfinitive().text() || n;
+}
+
+export function normaliseArray(list: string[]): string[] {
+  return list.map(subject => normaliseEntity(subject));
+}
+
+export function normaliseEntity(subject: string): string {
+  if (typeof subject === 'undefined') {
+    throw new TypeError('normalise requires a string');
+  }
+  return subject.toLowerCase().replace(/[^\w\s'-]+/, '').replace(/\s+/gs, ' ').trim()
+}
+
+export function makePredicateId(subjectId: number, verbId: number, objectId: number): string {
+  return [subjectId, verbId, objectId].join('-');
+}
 
 export class GrammarError extends Error {
   constructor(message: string) {
@@ -117,7 +142,7 @@ export class DAO {
       if (knownasList[knownasListIndex] === undefined) {
         throw new TypeError('Called without .knownas');
       } else {
-        knownasList[knownasListIndex] = normalise(knownasList[knownasListIndex]).toLowerCase();
+        knownasList[knownasListIndex] = normaliseEntity(knownasList[knownasListIndex]).toLowerCase();
       }
 
       if (!this.entityKnownas2Id[knownasList[knownasListIndex]]) {
@@ -156,7 +181,7 @@ export class DAO {
   }
 
   async entitySearch(target: string): Promise<Entity[]> {
-    target = normalise(target);
+    target = normaliseEntity(target);
     this.logger.debug(`entitySearch for '${target}'`);
     return await this.prisma.entity.findMany({
       where: {
@@ -169,10 +194,10 @@ export class DAO {
   }
 
   async verbSearch(target: string): Promise<Verb[]> {
-    target = normalise(target);
+    target = normaliseEntity(target);
     this.logger.debug(`verbSearch for '${target}'`);
     return await this.prisma.verb.findMany({
-      where: { name: { contains: target } },
+      where: { name: { contains: normaliseVerb(target) } },
     });
   }
 
@@ -188,7 +213,7 @@ export class DAO {
         if (match !== null) {
           entity[key] = new Date(match[1]).toISOString();
         } else {
-          entity[key] = normalise(row[key]!);
+          entity[key] = normaliseEntity(row[key]!);
           if (entity[key].length === 0) {
             delete entity[key];
           }
@@ -220,9 +245,9 @@ export class DAO {
       throw new GrammarError(JSON.stringify(row, null, 2));
     }
 
-    const subject = normalise(row.Subject);
-    const verb = normalise(row.Verb);
-    const object = normalise(row.Object);
+    const subject = normaliseEntity(row.Subject);
+    const verb = normaliseVerb(row.Verb);
+    const object = normaliseEntity(row.Object);
 
     const foundSubject = CachedIds.Entity[subject]
       ? {

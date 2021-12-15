@@ -6,23 +6,7 @@ import * as path from 'path';
 import fs from 'fs';
 import os from 'os';
 import { logger, ILogger } from 'src/service/logger';
-import { DAO, PredicateResult } from 'src/service/dao';
-
-export function normaliseArray(list: string[]): string[] {
-  return list.map(subject => normalise(subject));
-}
-
-export function normalise(subject: string): string {
-  if (typeof subject === 'undefined') {
-    throw new TypeError('normalise requires a string');
-  }
-  return subject.toLowerCase().replace(/[^\w\s'-]+/, '').replace(/\s+/gs, ' ').trim()
-}
-
-export function makePredicateId(subjectId: number, verbId: number, objectId: number): string {
-  return [subjectId, verbId, objectId].join('-');
-}
-
+import { DAO, normaliseEntity, normaliseArray, PredicateResult } from 'src/service/dao';
 
 export interface IErdArgs {
   savepath?: string;
@@ -59,7 +43,7 @@ export class Erd {
     let predicates: PredicateResult[] = [];
 
     if (!!knownas) {
-      const subject = knownas instanceof Array ? normaliseArray(knownas) : normalise(knownas);
+      const subject = knownas instanceof Array ? normaliseArray(knownas) : normaliseEntity(knownas);
       predicates = await this.dao.getPredicatesByKnownAs(subject);
     }
 
