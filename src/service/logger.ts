@@ -6,6 +6,7 @@ export type ILogger = {
   error: Function
 };
 
+import { Console } from 'node:console';
 import pino from 'pino';
 // import PinoPretty from 'pino-pretty';
 
@@ -26,10 +27,12 @@ let devConfig = {
   }
 };
 
-export const logger = pino({
+const myPino = pino({
   ...config,
   ...(process.env.NODE_ENV !== 'production' ? devConfig : [])
 });
+
+export const logger = new Console(process.stdout, process.stderr);
 
 if (process.env.NODE_ENV !== 'production') {
   logger.debug('Init logging');

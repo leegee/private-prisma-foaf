@@ -48,7 +48,7 @@ describe('graphviz integration', () => {
     const graphstring = await erd.graphviz('Oswald');
 
     expect(graphstring).toBeDefined();
-    expect(graphstring).toMatch(/^<svg/i);
+    expect(graphstring).toMatch(/^<\?\s*xml/i);
   });
 });
 

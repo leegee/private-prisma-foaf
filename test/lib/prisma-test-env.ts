@@ -5,6 +5,7 @@
 // @see https://jestjs.io/docs/configuration#testenvironment-string
 
 import { Client } from 'pg';
+import type { Config } from '@jest/types';
 import dotenv from 'dotenv';
 dotenv.config;
 
@@ -40,7 +41,7 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
     beforeEach(async () => {
       logger.debug('PrismaTestEnvironment beforeEach enter');
 
-      testEnv = new PrismaTestEnvironment({});
+      testEnv = new PrismaTestEnvironment();
       await testEnv.setup();
 
       if (ingest) {
@@ -66,8 +67,8 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
   schema = '';
   connectionString = '';
 
-  constructor(config: any) {
-    super(config);
+  constructor(config?: Config.ProjectConfig) {
+    super(config ? config : {} as Config.ProjectConfig);
 
     // Generate a unique schema identifier for this test context
     this.schema = `erdtest_${+ new Date()}_${process.hrtime.bigint()}`;
@@ -78,7 +79,7 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
     this.connectionString = `postgresql://${process.env.DB_USER}:${process.env.DB_PASS}@localhost:${process.env.DB_PORT}/${process.env.DB_NAME}?schema=${this.schema}`;
   }
 
-  setup() {
+  async setup() {
     // Set the required environment variable to contain the connection string for the database test schema
     process.env.DATABASE_URL = this.connectionString;
     this.global.process.env.DATABASE_URL = this.connectionString;
@@ -101,7 +102,7 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
     await client.connect();
     logger.debug(`Dropping test env temp schema, ${this.schema}.`);
     await client.query(`DROP SCHEMA IF EXISTS "${this.schema}" CASCADE`);
-    await client.end();
     logger.debug(`Dropped test env temp schema, ${this.schema}.`);
+    await client.end();
   }
 }

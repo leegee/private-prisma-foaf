@@ -6,31 +6,37 @@ import PrismaTestEnvironment from "testlib/prisma-test-env";
 
 jest.setTimeout(1000 * 30);
 
-let mocks: { [key: string]: any } = {
-  ReadStream: jest.fn().mockImplementation(() => {
-    const readable = new Readable();
-    readable.push('Oswald,assinated,JFK');
-    readable.push('Arthur Young,hosted,Oswald');
-    readable.push(null);
-    return readable;
-  }),
-  existsSync: jest.spyOn(fs, 'existsSync').mockImplementation(
-    (): boolean => false
-  ),
-};
+PrismaTestEnvironment.init({ ingest: false });
 
-fs.createReadStream = mocks.ReadStream;
-fs.existsSync = mocks.existsSync;
+let mocks: { [key: string]: any };
 
-PrismaTestEnvironment.init();
+beforeEach(() => {
+  mocks = {
+    ReadStream: jest.fn().mockImplementation(() => {
+      const readable = new Readable();
+      readable.push('Oswald,assinated,JFK');
+      readable.push('Arthur Young,hosted,Oswald');
+      readable.push(null);
+      return readable;
+    }),
+    existsSync: jest.spyOn(fs, 'existsSync').mockImplementation(
+      (): boolean => false
+    ),
+  };
 
-describe('csv-ingestor', () => {
+  fs.createReadStream = mocks.ReadStream;
+  // fs.existsSync = mocks.existsSync;
+});
+
+
+describe.skip('csv-ingestor', () => {
   describe('ingest file', () => {
     it('should read a mock relations file', async () => {
       const gi = new CsvIngestor({
         dao: PrismaTestEnvironment.dao,
       });
       await gi.parsePredicateFile('irrelevant-as-file-not-accessed');
+      expect(fs.existsSync).toHaveBeenCalled();
       expect(mocks.ReadStream).toHaveBeenCalled();
     });
 
@@ -39,6 +45,7 @@ describe('csv-ingestor', () => {
         dao: PrismaTestEnvironment.dao,
       });
       await gi.parseEntityFile('irrelevant-as-file-not-accessed');
+      expect(fs.existsSync).toHaveBeenCalled();
       expect(mocks.ReadStream).toHaveBeenCalled();
     });
   });

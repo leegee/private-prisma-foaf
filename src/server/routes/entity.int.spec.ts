@@ -19,19 +19,10 @@ describe('GET /entity?q=', () => {
       .expect('Content-Type', 'application/json; charset=utf-8');
 
     expect(res.body.entities[0]).toEqual(
-      expect.objectContaining({
-        "approved": false,
-        "dob": null,
-        "dod": null,
-        "familyname": null,
-        "formalname": "jfk",
-        "givenname": null,
-        "id": 19,
-        "knownas": "jfk",
-        "middlenames": null
-      })
+      expect.objectContaining(
+        { "approved": false, "dob": null, "dod": null, "familyname": "kennedy", "formalname": "john f kennedy", "givenname": "john", "id": 15, "knownas": "jfk", "middlenames": "fitzgerald" }
+      )
     );
 
   });
-
 });

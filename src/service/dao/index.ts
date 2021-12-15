@@ -10,8 +10,10 @@ export interface Iknownas2boolean {
   [key: string]: boolean;
 }
 
-export interface IEntityUpsertArgs {
+export interface IInterable {
   [key: string]: string | undefined;
+}
+export interface IEntityUpsertArgs extends IInterable {
   knownas: string;
   formalname: string;
   givenname?: string;
@@ -22,9 +24,15 @@ export interface IEntityUpsertArgs {
 }
 
 export interface IPredicateUpsertArgs {
-  Subject: { knownas: string };
-  Verb: { name: string };
-  Object: { knownas: string };
+  Subject: {
+    knownas: string
+  };
+  Verb: {
+    name: string
+  };
+  Object: {
+    knownas: string
+  };
   Citations?: string[];
   Comment?: string;
   start?: string;
@@ -177,16 +185,16 @@ export class DAO {
   async createEntity(row: IEntityUpsertArgs) {
     this.logger.debug('_createEntity for row:', row);
 
-    const entity: { [key: string]: string | Date } = {};
+    const entity: { [key: string]: string } = {};
 
     for (const key in row) {
       if (typeof row[key] !== 'undefined' && row[key]!.length) {
         // TODO Middleare
         if (row[key]!.match(/^\d{4}-\d{2}-\d{2}/)) {
-          entity[key] = new Date(entity[key]);
+          entity[key] = new Date(entity[key]).toISOString();
         } else {
           entity[key] = normalise(row[key]!);
-          if (entity[key].toString().length === 0) {
+          if (entity[key].length === 0) {
             delete entity[key];
           }
         }
