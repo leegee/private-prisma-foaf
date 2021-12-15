@@ -27,7 +27,6 @@
     "pg": "^8.7.1",
     "pino-pretty": "^7.2.0",
     "playwright": "^1.17.1",
-    "prisma": "^3.6.0",
     "prisma-erd-generator": "^0.6.0",
     "supertest": "^6.1.6",
     "ts-node": "10.4.0",
@@ -74,6 +73,7 @@
     "module-alias": "^2.2.2",
     "node-fetch": "^2.0.0",
     "pino": "^7.3.0",
+    "prisma": "^3.6.0",
     "temporary": "^1.1.0",
     "tmp-promise": "^3.0.3",
     "ts-jest": "^27.0.7"
