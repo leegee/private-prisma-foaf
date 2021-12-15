@@ -24,7 +24,7 @@ describe('PUT /predicate', () => {
             formalname: 'john f kennedy',
             'approved': false,
             'dob': null,
-            'dod': null,
+            "dod": "1963-11-22T00:00:00.000Z",
             'familyname': 'kennedy',
             'givenname': 'john',
             'middlenames': 'fitzgerald',
