@@ -42,10 +42,10 @@ class ErdMaker extends ErdBaseElement {
 
   async submit() {
     const body = {
-      Subject: { knownas: this.state.subject },
-      Verb: { name: this.state.subject },
-      Object: { knownas: this.state.object },
-      citations: [this.state.video],
+      Subject: this.state.subject,
+      Verb: this.state.subject,
+      Object: this.state.object,
+      Citations: [this.state.video],
     };
 
     const res = await fetch(this.apiurl, {

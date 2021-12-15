@@ -68,9 +68,9 @@ describe('PUT /predicate', () => {
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .send({
-          Subject: { knownas: 'oswald' },
-          Verb: { name: 'assassinates' },
-          Object: { knownas: 'jfk' },
+          Subject: 'oswald',
+          Verb: 'assassinates',
+          Object: 'jfk',
         })
         .expect(201);
     });

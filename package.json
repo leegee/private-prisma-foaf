@@ -43,7 +43,7 @@
     "api:build:prod": "tsc --config tsconfig.testless.json",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
-    "test": "jest",
+    "test": "jest -i",
     "test:int": "jest --testPathPattern \\.int\\.spec\\.ts$",
     "test:unit": "jest --testPathIgnorePatterns \\.int\\.spec\\.ts$ --testPathPattern \\.spec\\.ts$",
     "test:watch": "cross-env JEST_WATCH=1 jest --watch",
