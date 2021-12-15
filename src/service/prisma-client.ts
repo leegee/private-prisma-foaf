@@ -1,9 +1,10 @@
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 
-// import { TypeConversion } from './prisma-middleware/type-conversion';
+const LOG_LEVELS: Prisma.LogLevel[] = ['query', 'error', 'info', 'warn'];
 
 export const prisma = new PrismaClient({
-  log: ['warn', 'error'], // 'query', 'info', 'warn', 'error'],
+  log: LOG_LEVELS.map((level) => {
+    return { emit: 'stdout', level } as Prisma.LogDefinition
+  })
 });
 
-// prisma.$use(TypeConversion);
