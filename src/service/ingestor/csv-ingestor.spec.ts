@@ -1,13 +1,12 @@
 import { Readable } from 'stream';
-import fs from 'fs';
+import fs, { PathLike } from 'fs';
 
 import { CsvIngestor } from './csv-ingestor';
 import PrismaTestEnvironment from "testlib/prisma-test-env";
 
-PrismaTestEnvironment.init();
 jest.setTimeout(1000 * 30);
 
-const mocks = {
+let mocks: { [key: string]: any } = {
   ReadStream: jest.fn().mockImplementation(() => {
     const readable = new Readable();
     readable.push('Oswald,assinated,JFK');
@@ -15,9 +14,15 @@ const mocks = {
     readable.push(null);
     return readable;
   }),
+  existsSync: jest.spyOn(fs, 'existsSync').mockImplementation(
+    (): boolean => false
+  ),
 };
 
 fs.createReadStream = mocks.ReadStream;
+fs.existsSync = mocks.existsSync;
+
+PrismaTestEnvironment.init();
 
 describe('csv-ingestor', () => {
   describe('ingest file', () => {

@@ -31,11 +31,6 @@ export const logger = pino({
   ...(process.env.NODE_ENV !== 'production' ? devConfig : [])
 });
 
-// TDOO sort this mess out.
-export const nullLogger = logger;
-nullLogger.debug = () => { };
-nullLogger.info = () => { };
-
 if (process.env.NODE_ENV !== 'production') {
   logger.debug('Init logging');
 }

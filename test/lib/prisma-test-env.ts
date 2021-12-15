@@ -8,7 +8,7 @@ import { Client } from 'pg';
 import dotenv from 'dotenv';
 dotenv.config;
 
-import { prisma, dao, logger, nullLogger } from 'testlib/fixtures';
+import { prisma, dao, logger } from 'testlib/fixtures';
 
 import NodeEnvironment from 'jest-environment-node';
 import child_process from 'child_process';
@@ -27,12 +27,13 @@ process.on('unhandledRejection', (error) => {
   process.exit(1);
 })
 
+
 export default class PrismaTestEnvironment extends NodeEnvironment {
   static prisma = prisma;
   static dao = dao;
 
   /** Maybe faster to load public and copy to test schema when needed */
-  static init() {
+  static init({ ingest }: { ingest: boolean } = { ingest: true }) {
     logger.debug('PrismaTestEnvironment.init Enter');
     let testEnv: PrismaTestEnvironment;
 
@@ -42,20 +43,21 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
       testEnv = new PrismaTestEnvironment({});
       await testEnv.setup();
 
-      const gi = new CsvIngestor({
-        dao,
-        logger: nullLogger,
-      });
+      if (ingest) {
+        const gi = new CsvIngestor({ dao, logger });
 
-      await gi.parsePredicateFile('./test/lib/predicates.csv');
+        await gi.parsePredicateFile('./test/lib/predicates.csv');
+      }
 
       logger.debug('PrismaTestEnvironment beforeEach leave');
     });
 
     afterEach(async () => {
-      logger.debug('PrismaTestEnvironment afterEach enter');
-      await testEnv.teardown();
-      logger.debug('PrismaTestEnvironment after afterEach Leave');
+      if (testEnv) {
+        logger.debug('PrismaTestEnvironment afterEach enter');
+        await testEnv.teardown();
+        logger.debug('PrismaTestEnvironment after afterEach Leave');
+      }
     });
 
     logger.debug('PrismaTestEnvironment.init Leave');
