@@ -35,12 +35,11 @@ export class CsvIngestor extends BaseIngestor {
     }
 
     return new Promise((resolve, reject) => {
-
-      fs.createReadStream(filepath)
-        .on('error', (error: Error) => {
-          this.logger.error(error);
-          reject(error);
-        })
+      const stream = fs.createReadStream(filepath);
+      stream.on('error', (error: Error) => {
+        this.logger.error(error);
+        reject(error);
+      })
         .pipe(
           parse({
             columns: true,
@@ -53,7 +52,9 @@ export class CsvIngestor extends BaseIngestor {
           if (!row) {
             throw new GrammarError(`inputTextline: "${row}"`);
           }
+          stream.pause();
           await callback(row);
+          stream.resume();
         })
         .on('end', () => {
           this.logger.debug(`Completed ingestion of ${filepath}`);
