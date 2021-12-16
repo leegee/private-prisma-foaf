@@ -9,6 +9,7 @@ PrismaTestEnvironment.setup({ ingest: false });
 const verbFixture: MockProxy<Verb> = {
   name: 'mock-name',
   description: 'mock description',
+  hypernym: 'mock-hypernym',
   id: 1,
 };
 

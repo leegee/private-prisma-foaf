@@ -18,6 +18,7 @@ generator erd {
 model Verb {
   id          Int         @id @default(autoincrement())
   name        String      @db.Text
+  hypernym    String      @db.Text
   description String?
   Predicate   Predicate[]
 

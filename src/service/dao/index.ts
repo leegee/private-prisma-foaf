@@ -1,7 +1,9 @@
 import nlp from 'compromise';
 import { Entity, Predicate, Prisma, PrismaClient, Verb } from '@prisma/client';
 import { logger, ILogger } from 'src/service/logger';
+import { Wordnet, IndexEntry, Sense } from 'wordnet-binary-search';
 
+Wordnet.dataDir = '../downloads/WordNet-3.0/dict';
 export interface Iknownas2id {
   [key: string]: number;
 }
@@ -44,6 +46,20 @@ const CachedIds: ICache = {
   Verb: {},
   Predicate: {},
 };
+
+const wordnet = new Wordnet();
+
+type Itterable = {
+  [key: string]: string;
+}
+interface IndexEntryFix extends IndexEntry {
+  senses: Sense[]
+}
+
+export function hypernym(verb: string): string {
+  const indexEntry = Wordnet.find(verb, 'v');
+  return indexEntry && (indexEntry as any).hypernym[0].word || verb;
+}
 
 export function normaliseVerb(subject: string): string {
   if (typeof subject === 'undefined') {
@@ -278,7 +294,8 @@ export class DAO {
         select: { id: true },
         where: { name: verb },
         create: {
-          name: verb
+          name: verb,
+          hypernym: hypernym(verb),
         },
         update: {
         },
