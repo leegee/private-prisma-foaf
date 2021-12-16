@@ -16,29 +16,31 @@ const config = {
 };
 
 
-let devConfig = {
+const devConfig = {
   transport: {
     level,
     target: '../../test/lib/pino-log-message',
     options: {
+      destination: 2, // stderr
       colorize: true,
       levelFirst: true,
       hidePretty: false,
-      destination: 2,
-      ignore: 'time,pid,hostname',
       hideObject: false,
       singleLine: false,
+      ignore: 'time,pid,hostname',
     }
   }
 };
 
-const myPino = pino(
-  (process.env.NODE_ENV === 'production' ? config : devConfig)
+export const logger = pino(
+  process.env.NODE_ENV === 'production' ? config : devConfig
 );
 
-export const logger = myPino; // new Console(process.stdout, process.stderr);
-
-if (process.env.NODE_ENV !== 'production') {
-  logger.debug('Init logging');
+/*
+if (process.env.NODE_ENV === 'production'){
+  logger.destination(
 }
+*/
+
+logger.debug('Init logger');
 
