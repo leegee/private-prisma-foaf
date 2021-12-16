@@ -108,4 +108,12 @@ describe('dao', () => {
       expect(verbs[0]).toEqual(verbFixture);
     });
   });
+
+  describe('hypernym', () => {
+    it('create -> make', () => {
+      expect(
+        PrismaTestEnvironment.dao.hypernym('create')
+      ).toEqual('make');
+    });
+  });
 });

@@ -3,7 +3,7 @@ import { Entity, Predicate, Prisma, PrismaClient, Verb } from '@prisma/client';
 import { logger, ILogger } from 'src/service/logger';
 import { Wordnet, IndexEntry, Sense } from 'wordnet-binary-search';
 
-Wordnet.dataDir = '../downloads/WordNet-3.0/dict';
+Wordnet.dataDir = 'assets/wordnet/';
 export interface Iknownas2id {
   [key: string]: number;
 }
@@ -48,18 +48,6 @@ const CachedIds: ICache = {
 };
 
 const wordnet = new Wordnet();
-
-type Itterable = {
-  [key: string]: string;
-}
-interface IndexEntryFix extends IndexEntry {
-  senses: Sense[]
-}
-
-export function hypernym(verb: string): string {
-  const indexEntry = Wordnet.find(verb, 'v');
-  return indexEntry && (indexEntry as any).hypernym[0].word || verb;
-}
 
 export function normaliseVerb(subject: string): string {
   if (typeof subject === 'undefined') {
@@ -140,6 +128,14 @@ export class DAO {
     this.prisma = prisma;
   }
 
+  hypernym(verb: string): string {
+    const indexEntry = Wordnet.find(verb, 'v');
+    const senses = (indexEntry && (indexEntry as any).senses) || undefined;
+    const rv = senses && senses[0].word || verb;
+    this.logger.debug(`hypernym for '${verb}' is '${rv}'`);
+    return normaliseVerb(rv);
+  }
+
   async getAllPredicates(): Promise<PredicateResult[]> {
     return await this.prisma.predicate.findMany({
       include: {
@@ -202,18 +198,26 @@ export class DAO {
     return await this.prisma.entity.findMany({
       where: {
         OR: [
-          { knownas: { contains: target } },
-          { formalname: { contains: target } },
+          { knownas: { search: target, mode: 'insensitive', } },
+          { formalname: { search: target, mode: 'insensitive', } },
         ],
       }
     });
   }
 
-  async verbSearch(target: string): Promise<Verb[]> {
-    target = normaliseEntity(target);
-    this.logger.debug(`verbSearch for '${target}'`);
+  async verbSearch(input: string): Promise<Verb[]> {
+    const target = normaliseVerb(input);
+    const hypernym = this.hypernym(target);
+
+    this.logger.debug(`verbSearch for '${input}' as '${target}'`);
+
     return await this.prisma.verb.findMany({
-      where: { name: { contains: normaliseVerb(target) } },
+      where: {
+        OR: [
+          { name: { search: normaliseVerb(target), mode: 'insensitive', } },
+          { hypernym: { search: hypernym } },
+        ]
+      },
     });
   }
 
@@ -295,7 +299,7 @@ export class DAO {
         where: { name: verb },
         create: {
           name: verb,
-          hypernym: hypernym(verb),
+          hypernym: this.hypernym(verb),
         },
         update: {
         },

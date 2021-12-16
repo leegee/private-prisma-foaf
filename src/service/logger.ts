@@ -21,7 +21,7 @@ const devConfig = {
     level,
     target: '../../test/lib/pino-log-message',
     options: {
-      destination: 2, // stderr
+      destination: 1, // 2=stderr
       colorize: true,
       levelFirst: true,
       hidePretty: false,

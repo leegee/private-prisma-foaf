@@ -35,8 +35,8 @@ describe('dao (int)', () => {
   describe('verb search', () => {
     test.each`
     input     | expectedResult
-    ${'ass'}  | ${'assassinates'}
-    ${'Ass'}  | ${'assassinates'}
+    ${'ass'}  | ${'assassinate'}
+    ${'Ass'}  | ${'assassinate'}
   `('expect $input to lead to $expectedResult', async ({ input, expectedResult }) => {
       const verbs = await dao.verbSearch(input);
       expect(verbs).toBeInstanceOf(Array);

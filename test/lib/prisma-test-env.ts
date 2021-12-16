@@ -29,36 +29,35 @@ process.on('unhandledRejection', (error) => {
 })
 
 
+let testEnv: PrismaTestEnvironment;
+
 export default class PrismaTestEnvironment extends NodeEnvironment {
   static prisma = prisma;
   static dao = dao;
 
+  static async setupOnce({ ingest }: { ingest: boolean } = { ingest: true }) {
+    testEnv = new PrismaTestEnvironment();
+    await testEnv.setup();
+
+    if (ingest) {
+      const gi = new CsvIngestor({ dao, logger });
+      await gi.parsePredicateFile('./test/lib/predicates.csv');
+    }
+  }
+
   /** Maybe faster to load public and copy to test schema when needed */
   static setup({ ingest }: { ingest: boolean } = { ingest: true }) {
     logger.debug('PrismaTestEnvironment.init Enter');
-    let testEnv: PrismaTestEnvironment;
-
     beforeEach(async () => {
       logger.debug('PrismaTestEnvironment beforeEach enter');
-
-      testEnv = new PrismaTestEnvironment();
-      await testEnv.setup();
-
-      if (ingest) {
-        const gi = new CsvIngestor({ dao, logger });
-
-        await gi.parsePredicateFile('./test/lib/predicates.csv');
-      }
-
+      this.setupOnce({ ingest });
       logger.debug('PrismaTestEnvironment beforeEach leave');
     });
 
     afterEach(async () => {
-      if (testEnv) {
-        logger.debug('PrismaTestEnvironment afterEach enter');
-        await testEnv.teardown();
-        logger.debug('PrismaTestEnvironment after afterEach Leave');
-      }
+      logger.debug('PrismaTestEnvironment afterEach enter');
+      await testEnv.teardown();
+      logger.debug('PrismaTestEnvironment after afterEach Leave');
     });
 
     logger.debug('PrismaTestEnvironment.init Leave');
