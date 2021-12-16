@@ -6,25 +6,22 @@ export type ILogger = {
   error: Function
 };
 
-import { FastifyLoggerInstance } from 'fastify';
-import { Console } from 'node:console';
 import pino from 'pino';
-// import PinoPretty from 'pino-pretty';
+
+export const level = process.env.LOG_LEVEL || 'info';
 
 const config = {
   transport: undefined,
-  level: process.env.LOG_LEVEL ? process.env.LOG_LEVEL.toLowerCase() : 'info',
+  level
 };
 
-const level = process.env.LOG_LEVEL || 'info';
 
 let devConfig = {
-  ...config,
   transport: {
     level,
     target: '../../test/lib/pino-log-message',
     options: {
-      colorize: false,
+      colorize: true,
       levelFirst: true,
       hidePretty: false,
       destination: 2,
@@ -35,10 +32,9 @@ let devConfig = {
   }
 };
 
-const myPino = pino({
-  ...config,
-  ...(process.env.NODE_ENV !== 'production' ? devConfig : [])
-});
+const myPino = pino(
+  (process.env.NODE_ENV === 'production' ? config : devConfig)
+);
 
 export const logger = myPino; // new Console(process.stdout, process.stderr);
 

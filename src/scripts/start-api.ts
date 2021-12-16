@@ -1,13 +1,7 @@
 import { start } from 'src/server';
+import { logger } from 'src/service/logger';
 
 // import PrismaTestEnvironment from "testlib/prisma-test-env";
 // PrismaTestEnvironment.init();
 
-start({
-  logger: {
-    level: 'trace',
-    prettyPrint: {
-      ignore: 'pid,hostname,reqId,id',
-    }
-  }
-});
+start({ logger });

@@ -56,7 +56,7 @@ describe('PUT /predicate', () => {
         .expect(200)
         .then((res: Response) => expectJsonLike(res.body, {
           verbs: [{
-            name: 'assassinates',
+            name: 'assassinate',
           }]
         }));
     });
