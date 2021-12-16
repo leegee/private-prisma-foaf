@@ -62,9 +62,12 @@ Instead, call the custom environment manually, so it can set beforeEach and afte
 
     import PrismaTestEnvironment from "testlib/prisma-test-env";
 
-    PrismaTestEnvironment.init();
+    # To setup a DB for every test:
+    PrismaTestEnvironment.setup({ingest: true});
+    # Or just one for this file:
+    PrismaTestEnvironment.setupOnce({ingest: true});
 
-Because use of a long-running global transpredicate apparently not supported by Prisma, the above creates a PG DB schema per test, which it destroys after the test.
+Because use of long-running global transactions are apparently not supported by Prisma, the above creates a PG DB schema per test, which it destroys after the test.
 
 ## Writing Unit Tests
 
