@@ -63,9 +63,12 @@ Instead, call the custom environment manually, so it can set beforeEach and afte
     import PrismaTestEnvironment from "testlib/prisma-test-env";
 
     # To setup a DB for every test:
-    PrismaTestEnvironment.setup({ingest: true});
+    PrismaTestEnvironment.setup({ingest: false});
+
     # Or just one for this file:
-    PrismaTestEnvironment.setupOnce({ingest: true});
+    let testEnvInstance: PrismaTestEnvironment;
+    beforeAll(async () => testEnvInstance = await PrismaTestEnvironment.setupOnce({ ingest: false }));
+    afterAll(() => PrismaTestEnvironment.teardown(testEnvInstance));
 
 Because use of long-running global transactions are apparently not supported by Prisma, the above creates a PG DB schema per test, which it destroys after the test.
 
