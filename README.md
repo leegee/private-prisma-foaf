@@ -1,22 +1,24 @@
-# Testing Prisma: Entity-relations Diagrams
+# Testing Prisma: Predicate Visualisation Through Entity-relations Diagrams
 
 WIP
 
-Testing Prisma: a small app to create ERDs via Graphviz from CSVs or user-input against a YouTube video, to help visualise information presented in videos.
+Testing Prisma: a small app to create ERDs via Graphviz from CSVs or through fastify/webcomponents gathering user-input against a YouTube video, to help visualise information presented in videos.
 
 ## Synopsis
 
     npm db:start           # Start PG in a Docker container
-    npm run anew           # Build scheme, populate DB, create ERD
-    npm test               # Run all tests
     npm run db:stop
+    npm run anew           # Build scheme, populate DB, create ERD
+
     npm run wc:start       # Tiny HTTP server for the static web components demo
     npm run api:start      # Fastify api http server
     npm run api:dev        # "" in watch mode
     npm run dev            # Concurrently run wc:start and api:start
 
+    npm test               # Run all tests
     npm run test:unit      # Run unit tests without the database
     npm run test:int       # Run integration tests upon the DB and Prisma
+    npm run test:e2e       # Run Playwright tests
     npm run test:debug --  # ...followed by a Jest match pattern
     npm run coverage
 
