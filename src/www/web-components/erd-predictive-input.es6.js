@@ -42,9 +42,9 @@ export class ErdPredictiveInputElement extends ErdBaseElement {
       const res = await fetch(url);
       const json = await res.json();
 
-      json[this.constructor.suggestionsJsonKey].forEach(verb => {
+      json[this.constructor.suggestionsJsonKey].forEach(verbOrEntity => {
         const el = document.createElement('option');
-        el.value = verb.name; // should cache the latest n for IDs
+        el.value = verbOrEntity[this.constructor.suggestionsJsonTextIn]; // should cache the latest n
         this.el.suggestions.appendChild(el);
       });
 
