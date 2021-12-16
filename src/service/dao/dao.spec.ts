@@ -4,7 +4,6 @@ import { mockPrisma } from 'testlib/mock-prisma';
 import { DAO, EntityNotFoundError, normaliseEntity, normaliseVerb } from 'src/service/dao';
 
 import PrismaTestEnvironment from 'testlib/prisma-test-env';
-PrismaTestEnvironment.setup({ ingest: false });
 
 const verbFixture: MockProxy<Verb> = {
   name: 'mock-name',
@@ -34,6 +33,11 @@ const oswaldEntityFixture: MockProxy<Entity> = {
 };
 
 let dao: DAO;
+
+let testEnvInstance: PrismaTestEnvironment;
+
+beforeAll(async () => testEnvInstance = await PrismaTestEnvironment.setupOnce({ ingest: false }));
+afterAll(() => PrismaTestEnvironment.teardown(testEnvInstance));
 
 beforeEach(() => {
   dao = new DAO({ prisma: mockPrisma });

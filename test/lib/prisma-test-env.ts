@@ -34,8 +34,9 @@ let testEnv: PrismaTestEnvironment;
 export default class PrismaTestEnvironment extends NodeEnvironment {
   static prisma = prisma;
   static dao = dao;
+  static testEnv: Promise<PrismaTestEnvironment>;
 
-  static async setupOnce({ ingest }: { ingest: boolean } = { ingest: true }) {
+  static async setupOnce({ ingest }: { ingest: boolean } = { ingest: true }): Promise<PrismaTestEnvironment> {
     testEnv = new PrismaTestEnvironment();
     await testEnv.setup();
 
@@ -43,6 +44,8 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
       const gi = new CsvIngestor({ dao, logger });
       await gi.parsePredicateFile('./test/lib/predicates.csv');
     }
+
+    return testEnv;
   }
 
   /** Maybe faster to load public and copy to test schema when needed */
@@ -50,7 +53,7 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
     logger.debug('PrismaTestEnvironment.init Enter');
     beforeEach(async () => {
       logger.debug('PrismaTestEnvironment beforeEach enter');
-      this.setupOnce({ ingest });
+      this.testEnv = this.setupOnce({ ingest });
       logger.debug('PrismaTestEnvironment beforeEach leave');
     });
 
@@ -61,6 +64,18 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
     });
 
     logger.debug('PrismaTestEnvironment.init Leave');
+  }
+
+  static async teardown(envInstance: PrismaTestEnvironment) {
+    await prisma.$disconnect();
+    const client = new Client({
+      connectionString: envInstance.connectionString,
+    });
+    await client.connect();
+    logger.debug(`Dropping test env temp schema, ${envInstance.schema}.`);
+    await client.query(`DROP SCHEMA IF EXISTS "${envInstance.schema}" CASCADE`);
+    logger.debug(`Dropped test env temp schema, ${envInstance.schema}.`);
+    await client.end();
   }
 
   schema = '';
@@ -89,16 +104,6 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
 
   // Drop the schema after the tests have completed
   async teardown() {
-    await prisma.$disconnect();
-
-    // todo: use prisma.query:-
-    const client = new Client({
-      connectionString: this.connectionString,
-    });
-    await client.connect();
-    logger.debug(`Dropping test env temp schema, ${this.schema}.`);
-    await client.query(`DROP SCHEMA IF EXISTS "${this.schema}" CASCADE`);
-    logger.debug(`Dropped test env temp schema, ${this.schema}.`);
-    await client.end();
+    PrismaTestEnvironment.teardown(this);
   }
 }
