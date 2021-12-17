@@ -75,6 +75,27 @@ export function makePredicateId(subjectId: number, verbId: number, objectId: num
   return [subjectId, verbId, objectId].join('-');
 }
 
+export function hypernym(verb: string): string {
+  const normalisedVerb = normaliseVerb(verb);
+  let rv = [];
+  const indexEntry = Wordnet.find(normalisedVerb, 'v');
+  const senses = (indexEntry && (indexEntry as any).senses) || undefined;
+
+  for (let s = 0; s < senses.length; s++) {
+    const hypernyms: Sense[] = senses[s].hypernym;
+    if (!hypernyms) {
+      continue;
+    }
+    for (let h = 0; h < hypernyms.length; h++) {
+      if (hypernyms[h].word !== normalisedVerb) {
+        rv.push(normaliseVerb(hypernyms[h].word));
+      }
+    }
+  }
+
+  return rv.length ? rv.sort().join(', ') : normalisedVerb;
+}
+
 export class GrammarError extends Error {
   constructor(message: string) {
     super(message);
@@ -126,14 +147,6 @@ export class DAO {
   constructor({ prisma, logger: _logger }: IDaoArgs) {
     this.logger = _logger || logger;
     this.prisma = prisma;
-  }
-
-  hypernym(verb: string): string {
-    const indexEntry = Wordnet.find(verb, 'v');
-    const senses = (indexEntry && (indexEntry as any).senses) || undefined;
-    const rv = senses && senses[0].word || verb;
-    this.logger.debug(`hypernym for '${verb}' is '${rv}'`);
-    return normaliseVerb(rv);
   }
 
   async getAllPredicates(): Promise<PredicateResult[]> {
@@ -207,7 +220,7 @@ export class DAO {
 
   async verbSearch(input: string): Promise<Verb[]> {
     const target = normaliseVerb(input);
-    const hypernym = this.hypernym(target);
+    const hyp = hypernym(target);
 
     this.logger.info(`verbSearch for '${input}' as '${target}'`);
 
@@ -215,10 +228,10 @@ export class DAO {
       where: {
         OR: [
           { name: { search: target, mode: 'insensitive', } },
-          { hypernym: { search: hypernym, mode: 'insensitive', } },
+          { hypernym: { search: hyp, mode: 'insensitive', } },
           // Check min input length for TEXT columns, change, or use below when input.length < db.minLength
           { name: { contains: target, mode: 'insensitive', } },
-          { hypernym: { contains: hypernym, mode: 'insensitive', } },
+          { hypernym: { contains: hyp, mode: 'insensitive', } },
         ]
       },
     });
@@ -306,7 +319,7 @@ export class DAO {
         where: { name: verb },
         create: {
           name: verb,
-          hypernym: this.hypernym(verb),
+          hypernym: hypernym(verb),
         },
         update: {
         },

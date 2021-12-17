@@ -1,7 +1,7 @@
 import { Entity, Predicate, Verb } from '@prisma/client';
 import { MockProxy } from 'jest-mock-extended';
 import { mockPrisma } from 'testlib/mock-prisma';
-import { DAO, EntityNotFoundError, normaliseEntity, normaliseVerb } from 'src/service/dao';
+import { DAO, EntityNotFoundError, normaliseEntity, normaliseVerb, hypernym } from 'src/service/dao';
 
 import PrismaTestEnvironment from 'testlib/prisma-test-env';
 
@@ -44,6 +44,14 @@ beforeEach(() => {
 });
 
 describe('dao', () => {
+
+  describe('hypernym', () => {
+    it('expected', () => {
+      expect(hypernym('assassinate')).toEqual('defame, kill');
+      expect(hypernym('create')).toEqual("act, appoint, make");
+    });
+  });
+
   describe('normaliseEntity', () => {
     test.each`
       input       | expectedResult
@@ -113,11 +121,4 @@ describe('dao', () => {
     });
   });
 
-  describe('hypernym', () => {
-    it('create -> make', () => {
-      expect(
-        PrismaTestEnvironment.dao.hypernym('create')
-      ).toEqual('make');
-    });
-  });
 });

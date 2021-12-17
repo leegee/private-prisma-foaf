@@ -16,7 +16,7 @@ describe('PUT /predicate', () => {
         .expect('Content-Type', 'application/json; charset=utf-8');
 
       expect(res.body.verbs[0]).toEqual(
-        expect.objectContaining({ name: 'assassinates' })
+        expect.objectContaining({ name: 'assassinate' })
       );
     });
   });
