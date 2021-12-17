@@ -100,6 +100,20 @@ class YoutubeVideoElement extends HTMLElement {
     this.shadowRoot.appendChild(template.content.cloneNode(true));
   }
 
+  async connectedCallback() {
+    window.addEventListener('erd-video-toggle-pause', () => this.toggle());
+  }
+
+  toggle() {
+    if (this.ytPlayer) {
+      if (this.paused) {
+        this.play();
+      } else {
+        this.pause();
+      }
+    }
+  }
+
   attributeChangedCallback(name, oldValue, newValue) {
     this.load();
   }
@@ -166,9 +180,6 @@ class YoutubeVideoElement extends HTMLElement {
       });
     });
   }
-
-  // connectedCallback() {
-  // }
 
   /* onStateChange
     -1 (unstarted)

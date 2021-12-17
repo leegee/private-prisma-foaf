@@ -4,11 +4,17 @@ import { ErdBaseElement } from './erd-base-element.es6.js';
 
 class ErdMaker extends ErdBaseElement {
   static elName = 'erd-maker';
+  elNameUppercase = undefined;
 
   el = {};
   state = {};
   apiurlRoot = undefined;
   apiurl = undefined;
+
+  constructor() {
+    super();
+    this.elNameUppercase = this.constructor.elName.toUpperCase();
+  }
 
   async connectedCallback() {
     await super.connectedCallback();
@@ -26,6 +32,15 @@ class ErdMaker extends ErdBaseElement {
 
     this.el.submit = this.shadow.querySelector('#submit');
     this.el.submit.addEventListener('submit', () => this.submit());
+
+    window.addEventListener('keydown', this.captureSpaceBar);
+  }
+
+  captureSpaceBar(e) {
+    if (e.keyCode === 32 && e.target.nodeName !== this.elNameUppercase) {
+      window.dispatchEvent(new Event('erd-video-toggle-pause'));
+      e.preventDefault();
+    };
   }
 
   change(elId, e) {
