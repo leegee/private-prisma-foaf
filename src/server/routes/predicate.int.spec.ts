@@ -7,7 +7,7 @@ import { logger } from 'src/service/logger';
 
 PrismaTestEnvironment.setup();
 
-const server = buildServer({ logger: true });
+const server = buildServer();
 
 beforeAll(server.ready);
 
