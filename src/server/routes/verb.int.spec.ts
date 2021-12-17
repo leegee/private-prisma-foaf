@@ -1,8 +1,11 @@
+import PrismaTestEnvironment from "testlib/prisma-test-env";
+
 import { supertest } from 'testlib/supertest';
 import { buildServer } from "../index";
 
-const server = buildServer();
+PrismaTestEnvironment.setup();
 
+const server = buildServer();
 beforeAll(server.ready);
 
 describe('PUT /predicate', () => {
