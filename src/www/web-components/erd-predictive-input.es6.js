@@ -39,8 +39,20 @@ export class ErdPredictiveInputElement extends ErdBaseElement {
     const url = this.apiurl + encodeURIComponent(input);
 
     try {
+      console.debug('erd-predictive-input fetch', url);
       const res = await fetch(url);
-      const json = await res.json();
+      const resClone = res.clone();
+      let json;
+
+      try {
+        json = await res.json();
+      } catch (e) {
+        console.error(`JSON parsing error: ${await resClone.text()}`);
+        throw e;
+      }
+
+      console.debug(json);
+      console.debug(this.constructor.suggestionsJsonKey, this.constructor.suggestionsJsonTextIn);
 
       json[this.constructor.suggestionsJsonKey].forEach(verbOrEntity => {
         const el = document.createElement('option');

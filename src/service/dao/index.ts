@@ -209,16 +209,23 @@ export class DAO {
     const target = normaliseVerb(input);
     const hypernym = this.hypernym(target);
 
-    this.logger.debug(`verbSearch for '${input}' as '${target}'`);
+    this.logger.info(`verbSearch for '${input}' as '${target}'`);
 
-    return await this.prisma.verb.findMany({
+    const rv = await this.prisma.verb.findMany({
       where: {
         OR: [
-          { name: { search: normaliseVerb(target), mode: 'insensitive', } },
-          { hypernym: { search: hypernym } },
+          { name: { search: target, mode: 'insensitive', } },
+          { hypernym: { search: hypernym, mode: 'insensitive', } },
+          // Check min input length for TEXT columns, change, or use below when input.length < db.minLength
+          { name: { contains: target, mode: 'insensitive', } },
+          { hypernym: { contains: hypernym, mode: 'insensitive', } },
         ]
       },
     });
+
+    this.logger.info(rv);
+
+    return rv;
   }
 
   async createEntity(row: IEntityUpsertArgs) {

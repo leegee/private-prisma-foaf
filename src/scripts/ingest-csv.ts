@@ -1,11 +1,10 @@
-import { CsvIngestor } from 'src/service/ingestor/csv-ingestor';
+import { CsvIngestor } from '../service/ingestor/csv-ingestor';
 
-import PrismaTestEnvironment from "testlib/prisma-test-env";
+import PrismaTestEnvironment from "../../test/lib/prisma-test-env";
 PrismaTestEnvironment.setup();
 
 main();
 
-/** @throws */
 async function main() {
   const gi = new CsvIngestor({
     dao: PrismaTestEnvironment.dao

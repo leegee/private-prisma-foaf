@@ -15,13 +15,10 @@ export type FastifyRequestX = FastifyRequest & {
 };
 
 export interface IBuildServerArgs {
-  logger?: FastifyLoggerInstance | boolean,
-  dao?: DAO,
+  logger?: FastifyLoggerInstance,
 }
 
-let daoInstance: DAO;
-
-export function buildServer({ logger, dao }: IBuildServerArgs = {}) {
+export function buildServer({ logger = loggerInstance }: IBuildServerArgs = {}) {
   const server: FastifyInstance = Fastify({
     logger: logger || false,
     pluginTimeout: 10000,
@@ -30,20 +27,13 @@ export function buildServer({ logger, dao }: IBuildServerArgs = {}) {
 
   server.register(fastifyCors, { origin: '*' });
 
-  if (!dao) {
-    daoInstance = new DAO({
-      prisma,
-      logger: logger ? loggerInstance : undefined
-    });
-  }
+  const daoInstance = new DAO({ prisma, logger: server.log });
 
   server.addHook("onRequest",
     async (req, _reply) => {
-      (req as FastifyRequestX).dao = dao || daoInstance;
-      req.log.info({ url: req.raw.url, id: req.id }, "received request");
+      (req as FastifyRequestX).dao = daoInstance;
     }
   );
-
 
   [
     ...graphRoutes,
@@ -74,10 +64,10 @@ server.setErrorHandler((error, _request, reply) => {
 });
 */
 
-export const start = async (args: any) => {
+export const start = async () => {
   let server;
   try {
-    server = buildServer(args);
+    server = buildServer();
     await server.listen(process.env.ERD_PORT || 3000);
     const address = server.server.address();
     const port = typeof address === 'string' ? address : address?.port;

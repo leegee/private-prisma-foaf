@@ -13,12 +13,6 @@ beforeEach(() => {
 
 describe('dao (int)', () => {
 
-  // it('Verbs have stems', async () => {
-  //   const ents = await prisma.verb.findMany();
-  //   expect(ents[0].stem).toBeDefined();
-  //   expect(ents[0].stem).toMatch(/^{.+}$/);
-  // });
-
   describe('entity search', () => {
     test.each`
     input     | expectedResult
