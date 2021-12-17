@@ -75,24 +75,33 @@ export function makePredicateId(subjectId: number, verbId: number, objectId: num
   return [subjectId, verbId, objectId].join('-');
 }
 
+interface IndexEntryWithWSense extends IndexEntry {
+  senses: Sense[];
+}
+interface SenseWithHypernym extends Sense {
+  hypernym: Sense[];
+}
+
 export function hypernym(verb: string): string {
   const normalisedVerb = normaliseVerb(verb);
   let rv = [];
-  const indexEntry = Wordnet.find(normalisedVerb, 'v');
-  const senses = (indexEntry && (indexEntry as any).senses) || undefined;
+  const indexEntry = Wordnet.find(normalisedVerb, 'v') as IndexEntryWithWSense;
 
-  for (let s = 0; s < senses.length; s++) {
-    const hypernyms: Sense[] = senses[s].hypernym;
-    if (!hypernyms) {
-      continue;
-    }
-    for (let h = 0; h < hypernyms.length; h++) {
-      if (hypernyms[h].word !== normalisedVerb) {
-        rv.push(normaliseVerb(hypernyms[h].word));
+  if (indexEntry && indexEntry.senses && indexEntry.senses.length) {
+    const senses = indexEntry.senses as SenseWithHypernym[];
+
+    for (let s = 0; s < senses.length; s++) {
+      const hypernyms = senses[s].hypernym;
+      if (!hypernyms) {
+        continue;
+      }
+      for (let h = 0; h < hypernyms.length; h++) {
+        if (hypernyms[h].word !== normalisedVerb) {
+          rv.push(normaliseVerb(hypernyms[h].word));
+        }
       }
     }
   }
-
   return rv.length ? rv.sort().join(', ') : normalisedVerb;
 }
 
@@ -206,13 +215,15 @@ export class DAO {
   }
 
   async entitySearch(target: string): Promise<Entity[]> {
-    target = normaliseEntity(target);
-    this.logger.info(`entitySearch for '${target}'`);
+    const normalisedTarget = normaliseEntity(target);
+    this.logger.info(`entitySearch for '${target}' as '${normalisedTarget}'`);
     return await this.prisma.entity.findMany({
       where: {
         OR: [
-          { knownas: { search: target, mode: 'insensitive', } },
-          { formalname: { search: target, mode: 'insensitive', } },
+          { knownas: { search: normalisedTarget, mode: 'insensitive', } },
+          { formalname: { search: normalisedTarget, mode: 'insensitive', } },
+          { knownas: { contains: normalisedTarget, mode: 'insensitive', } },
+          { formalname: { contains: normalisedTarget, mode: 'insensitive', } },
         ],
       }
     });
