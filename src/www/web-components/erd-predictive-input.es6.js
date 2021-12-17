@@ -51,14 +51,13 @@ export class ErdPredictiveInputElement extends ErdBaseElement {
         throw e;
       }
 
-      console.debug(json);
-      console.debug(this.constructor.suggestionsJsonKey, this.constructor.suggestionsJsonTextIn);
-
-      json[this.constructor.suggestionsJsonKey].forEach(verbOrEntity => {
-        const el = document.createElement('option');
-        el.value = verbOrEntity[this.constructor.suggestionsJsonTextIn]; // should cache the latest n
-        this.el.suggestions.appendChild(el);
-      });
+      if (json[this.constructor.suggestionsJsonKey] instanceof Array) {
+        json[this.constructor.suggestionsJsonKey].forEach(verbOrEntity => {
+          const el = document.createElement('option');
+          el.value = verbOrEntity[this.constructor.suggestionsJsonTextIn]; // should cache the latest n
+          this.el.suggestions.appendChild(el);
+        });
+      }
 
     } catch (e) {
       console.error(e);

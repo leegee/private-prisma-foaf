@@ -37,10 +37,17 @@ class ErdMaker extends ErdBaseElement {
   }
 
   captureSpaceBar(e) {
-    if (e.keyCode === 32 && e.target.nodeName !== this.elNameUppercase) {
-      window.dispatchEvent(new Event('erd-video-toggle-pause'));
-      e.preventDefault();
-    };
+    if (e.keyCode === 32) {
+      const allowed = e.path.reduce(
+        (prev, current) => prev && !(current instanceof HTMLInputElement),
+        true
+      );
+
+      if (allowed) {
+        window.dispatchEvent(new Event('erd-video-toggle-pause'));
+        e.preventDefault();
+      };
+    }
   }
 
   change(elId, e) {

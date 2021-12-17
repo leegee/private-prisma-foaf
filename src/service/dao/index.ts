@@ -194,7 +194,7 @@ export class DAO {
 
   async entitySearch(target: string): Promise<Entity[]> {
     target = normaliseEntity(target);
-    this.logger.debug(`entitySearch for '${target}'`);
+    this.logger.info(`entitySearch for '${target}'`);
     return await this.prisma.entity.findMany({
       where: {
         OR: [
