@@ -84,7 +84,7 @@ interface SenseWithHypernym extends Sense {
 
 export function hypernym(verb: string): string {
   const normalisedVerb = normaliseVerb(verb);
-  let rv = [];
+  let rv: string[] = [];
   const indexEntry = Wordnet.find(normalisedVerb, 'v') as IndexEntryWithWSense;
 
   if (indexEntry && indexEntry.senses && indexEntry.senses.length) {
