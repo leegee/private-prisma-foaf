@@ -235,14 +235,14 @@ export class DAO {
 
     this.logger.info(`verbSearch for '${input}' as '${target}'`);
 
+    // Check min input length for TEXT columns, change, or use below when input.length < db.minLength
     const rv = await this.prisma.verb.findMany({
       where: {
         OR: [
-          { name: { search: target, mode: 'insensitive', } },
-          { hypernym: { search: hyp, mode: 'insensitive', } },
-          // Check min input length for TEXT columns, change, or use below when input.length < db.minLength
-          { name: { contains: target, mode: 'insensitive', } },
-          { hypernym: { contains: hyp, mode: 'insensitive', } },
+          { name: { search: target } },
+          { name: { contains: target, mode: 'insensitive' } },
+          { hypernym: { search: hyp } },
+          { hypernym: { contains: hyp, mode: 'insensitive' } },
         ]
       },
     });
