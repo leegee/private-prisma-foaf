@@ -102,7 +102,7 @@ export function hypernym(verb: string): string {
       }
     }
   }
-  return rv.length ? rv.sort().join(', ') : normalisedVerb;
+  return rv.length ? rv.sort().join(',') : normalisedVerb;
 }
 
 export class GrammarError extends Error {
