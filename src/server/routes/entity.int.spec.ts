@@ -20,7 +20,7 @@ describe('GET /entity?q=', () => {
 
     expect(res.body.entities[0]).toEqual(
       expect.objectContaining(
-        { "approved": false, "dob": null, "dod": "1963-11-22T00:00:00.000Z", "familyname": "kennedy", "formalname": "john f kennedy", "givenname": "john", "id": 14, "knownas": "jfk", "middlenames": "fitzgerald" }
+        { "approved": false, "dob": null, "dod": "1963-11-22T00:00:00.000Z", "familyname": "kennedy", "formalname": "john f kennedy", "givenname": "john", "id": 16, "knownas": "jfk", "middlenames": "fitzgerald" }
       )
     );
 
