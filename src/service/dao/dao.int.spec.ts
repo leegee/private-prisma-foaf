@@ -50,3 +50,56 @@ describe('dao (int)', () => {
   });
 
 });
+
+
+
+
+
+
+
+
+
+
+/*
+let assassinatesId: number | null;
+
+it('Find and removes existing predicate', async () => {
+  const assassinatesVerb = await prisma.verb.findFirst({
+    where: {
+      name: 'assassinates',
+    },
+    select: {
+      id: true
+    }
+  });
+
+  expect(assassinatesVerb).not.toBeNull();
+
+  assassinatesId = assassinatesVerb!.id;
+
+  const predicate = await prisma.predicate.findFirst({
+    where: {
+      verbId: assassinatesId
+    },
+    select: {
+      subjectId: true,
+      verbId: true,
+      objectId: true,
+    }
+  });
+
+  expect(predicate).not.toBeNull();
+
+  const rv = await prisma.predicate.delete({
+    where: {
+      subjectId_objectId_verbId: {
+        subjectId: predicate!.subjectId,
+        verbId: predicate!.verbId,
+        objectId: predicate!.objectId,
+      }
+    }
+  });
+
+  expect(rv).not.toBeNull();
+});
+*/

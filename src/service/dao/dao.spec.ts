@@ -47,8 +47,8 @@ describe('dao', () => {
 
   describe('hypernym', () => {
     it('expected', () => {
-      expect(hypernym('assassinate')).toEqual('defame, kill');
-      expect(hypernym('create')).toEqual("act, appoint, make");
+      expect(hypernym('assassinate')).toEqual('defame,kill');
+      expect(hypernym('create')).toEqual("act,appoint,make");
     });
   });
 

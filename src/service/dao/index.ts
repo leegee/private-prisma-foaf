@@ -71,10 +71,6 @@ export function normaliseEntity(subject: string): string {
   return subject.toLowerCase().replace(/[^\w\s'-]+/, '').replace(/\s+/gs, ' ').trim()
 }
 
-export function makePredicateId(subjectId: number, verbId: number, objectId: number): string {
-  return [subjectId, verbId, objectId].join('-');
-}
-
 interface IndexEntryWithWSense extends IndexEntry {
   senses: Sense[];
 }
@@ -152,6 +148,14 @@ export class DAO {
     never,
     Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
   >;
+
+
+  /**
+   * Creates `subjectId_objectId_verbId` for Predicate
+   */
+  static createPredicateId(subjectId: number, verbId: number, objectId: number): string {
+    return [subjectId, verbId, objectId].join('-');
+  }
 
   constructor({ prisma, logger: _logger }: IDaoArgs) {
     this.logger = _logger || logger;
@@ -290,7 +294,7 @@ export class DAO {
    * Enties and verbs may not yet exist.
    */
   async createPredicate(row: IPredicateUpsertArgs) {
-    this.logger.debug('_createSubjectObjectVerbPredicate for row:', row);
+    this.logger.debug('createPredicate for row:', row);
 
     if (!row || !row.Subject || !row.Verb || !row.Object) {
       throw new GrammarError(JSON.stringify(row, null, 2));
@@ -360,7 +364,7 @@ export class DAO {
 
     this.logger.debug(`Got object '${JSON.stringify(foundObject)}' via '${row.Object}'`,);
 
-    const predicateId = makePredicateId(
+    const predicateId = DAO.createPredicateId(
       foundSubject.id,
       foundVerb.id,
       foundObject.id,

@@ -3,7 +3,7 @@ import PrismaTestEnvironment from 'testlib/prisma-test-env';
 import { supertest, expectJsonLike } from 'testlib/supertest';
 
 import { buildServer } from 'src/server';
-import { logger } from 'src/service/logger';
+import { prisma } from 'src/service/prisma-client';
 
 PrismaTestEnvironment.setup();
 
@@ -14,6 +14,8 @@ beforeAll(server.ready);
 describe('PUT /predicate', () => {
 
   describe('should put "Oswald assassinates JFK"', () => {
+    let assassinatesVerbId: number;
+
     it('JFK exists', async () => {
       await supertest(server.server)
         .get('/entity?q=jfk')
@@ -54,27 +56,47 @@ describe('PUT /predicate', () => {
       await supertest(server.server)
         .get('/verb?q=assassinates')
         .expect(200)
-        .then((res: Response) => expectJsonLike(res.body, {
-          verbs: [{
-            name: 'assassinate',
-          }]
-        }));
+        .then((res: Response) => {
+          expectJsonLike(res.body, {
+            verbs: [{
+              name: 'assassinate',
+            }]
+          });
+
+          assassinatesVerbId = res.body.verbs[0].id;
+        });
     });
 
-    it('Sends predicate data', async () => {
+    describe('Sends predicate data', () => {
       jest.setTimeout(10000);
-      await supertest(server.server)
-        .post('/predicate')
-        .set('Content-Type', 'application/json')
-        .set('Accept', 'application/json')
-        .send({
-          Subject: 'oswald',
-          Verb: 'assassinates',
-          Object: 'jfk',
-        })
-        .expect(201);
+
+      it('Sends predicate data', async () => {
+        await supertest(server.server)
+          .post('/predicate')
+          .set('Content-Type', 'application/json')
+          .set('Accept', 'application/json')
+          .send({
+            Subject: 'oswald',
+            Verb: 'assassinates',
+            Object: 'jfk',
+          })
+          .expect(201);
+
+        const predicate = await prisma.predicate.findFirst({
+          where: {
+            verbId: assassinatesVerbId
+          },
+          select: {
+            subjectId: true,
+            verbId: true,
+            objectId: true,
+          }
+        });
+
+        expect(predicate).not.toBeNull();
+      });
+
     });
-
   });
-
 });
+
