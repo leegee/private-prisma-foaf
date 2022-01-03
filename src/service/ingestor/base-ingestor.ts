@@ -1,6 +1,6 @@
 import { Value } from '@prisma/client/runtime';
 import * as loggerModule from 'src/service/logger';
-import { DAO, IEntityUpsertArgs, IPredicateUpsertArgs } from '../dao';
+import { DAO, IEntityUpsertArgs } from '../dao';
 
 // prisma.$use(async (params, next) => {
 // const before = process.hrtime.bigint;
