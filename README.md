@@ -32,6 +32,15 @@ Testing Prisma: a small app to create ERDs via Graphviz from CSVs or through fas
 - Jest
 - Playwright
 
+## Installation
+
+Make sure Docker is running - tested with Docker Desktop 4.3.1.
+
+npm install
+npm run db:start
+npm run anew
+npm test
+
 ## DB Scheme
 
 A simplistic star scheme that centers on logical predicates, used to describe who did what to whom, when it happened, with citations, where the 'who' is an `Entity` (either a person or organisation).
