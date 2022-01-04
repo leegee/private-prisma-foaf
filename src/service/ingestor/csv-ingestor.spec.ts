@@ -18,6 +18,9 @@ beforeEach(() => {
   });
 });
 
+afterEach(() => {
+  (fs.createReadStream as any).mockRestore();
+});
 
 describe('csv-ingestor', () => {
   describe('ingest file', () => {
