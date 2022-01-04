@@ -8,6 +8,8 @@ jest.setTimeout(1000 * 30);
 
 PrismaTestEnvironment.setup({ ingest: false });
 
+const origFsCreateReadStream = fs.createReadStream;
+
 beforeEach(() => {
   fs.createReadStream = jest.fn().mockImplementation(() => {
     const readable = new Readable();
@@ -19,7 +21,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  (fs.createReadStream as any).mockRestore();
+  fs.createReadStream = origFsCreateReadStream;
 });
 
 describe('csv-ingestor', () => {
