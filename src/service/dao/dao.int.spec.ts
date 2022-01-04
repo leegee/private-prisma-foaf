@@ -1,6 +1,6 @@
 import PrismaTestEnvironment from "testlib/prisma-test-env";
 import { prisma } from 'testlib/fixtures';
-import { DAO } from 'src/service/dao';
+import { DAO, EntityNotFoundError } from 'src/service/dao';
 
 PrismaTestEnvironment.setup();
 jest.setTimeout(1000 * 40);
@@ -12,6 +12,28 @@ beforeEach(() => {
 });
 
 describe('dao (int)', () => {
+
+  describe('getPredicatesByKnownAs', () => {
+    it('throws the correct error when entity not found', () => {
+      expect(
+        dao.getPredicatesByKnownAs('mock-value-no-entity')
+      ).rejects.toThrow(EntityNotFoundError);
+    });
+
+    it('returns predicates', async () => {
+      let predicates;
+      try {
+        predicates = await dao.getPredicatesByKnownAs('oswald');
+      } catch (e) {
+      }
+      expect(predicates).toBeInstanceOf(Array);
+      if (predicates) {
+        expect(predicates[0].Subject.knownas).toEqual('oswald');
+      }
+    });
+
+  });
+
 
   describe('entity search', () => {
     test.each`

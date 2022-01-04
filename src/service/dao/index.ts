@@ -4,6 +4,7 @@ import { logger, ILogger } from 'src/service/logger';
 import { Wordnet, IndexEntry, Sense } from 'wordnet-binary-search';
 
 Wordnet.dataDir = 'assets/wordnet/';
+
 export interface Iknownas2id {
   [key: string]: number;
 }
@@ -81,7 +82,7 @@ interface SenseWithHypernym extends Sense {
 export function hypernym(verb: string): string {
   const normalisedVerb = normaliseVerb(verb);
   let rv: string[] = [];
-  const indexEntry = Wordnet.find(normalisedVerb, 'v') as IndexEntryWithWSense;
+  const indexEntry = Wordnet.findVerb(normalisedVerb) as IndexEntryWithWSense;
 
   if (indexEntry && indexEntry.senses && indexEntry.senses.length) {
     const senses = indexEntry.senses as SenseWithHypernym[];
@@ -178,14 +179,14 @@ export class DAO {
 
     for (let knownasListIndex = 0; knownasListIndex < knownasList.length; knownasListIndex++) {
       if (knownasList[knownasListIndex] === undefined) {
-        throw new TypeError('Called without .knownas');
+        throw new TypeError('Called with an undefined knownas input value');
       } else {
-        knownasList[knownasListIndex] = normaliseEntity(knownasList[knownasListIndex]).toLowerCase();
+        knownasList[knownasListIndex] = normaliseEntity(knownasList[knownasListIndex]);
       }
 
       if (!this.entityKnownas2Id[knownasList[knownasListIndex]]) {
         const knownasEntity = await this.prisma.entity.findFirst({
-          where: { knownas: knownasInput[knownasListIndex] },
+          where: { knownas: knownasList[knownasListIndex] },
           select: { id: true },
         });
 
