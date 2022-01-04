@@ -41,8 +41,13 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
     await testEnv.setup();
 
     if (ingest) {
-      const gi = new CsvIngestor({ dao, logger });
-      await gi.parsePredicateFile('./test/lib/predicates.csv');
+      try {
+        const gi = new CsvIngestor({ dao, logger });
+        await gi.parsePredicateFile('./test/lib/predicates.csv');
+      } catch (e) {
+        console.trace();
+        throw e;
+      }
     }
 
     return testEnv;

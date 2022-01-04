@@ -16,7 +16,7 @@ describe('PUT /predicate', () => {
   describe('should put "Oswald assassinates JFK"', () => {
     let assassinatesVerbId: number;
 
-    it('JFK exists', async () => {
+    it('Get JFK', async () => {
       await supertest(server.server)
         .get('/entity?q=jfk')
         .expect(200)
@@ -34,7 +34,7 @@ describe('PUT /predicate', () => {
         }));
     });
 
-    it('Oswald exists', async () => {
+    it('Get Oswald', async () => {
       await supertest(server.server)
         .get('/entity?q=oswald')
         .expect(200)
@@ -52,7 +52,7 @@ describe('PUT /predicate', () => {
         }));
     });
 
-    it('Verb "assassinates" exists', async () => {
+    it('Get verb "assassinates"', async () => {
       await supertest(server.server)
         .get('/verb?q=assassinates')
         .expect(200)
@@ -67,10 +67,10 @@ describe('PUT /predicate', () => {
         });
     });
 
-    describe('Sends predicate data', () => {
+    describe('Creates predicate', () => {
       jest.setTimeout(10000);
 
-      it('Sends predicate data', async () => {
+      it('Post predicate', async () => {
         await supertest(server.server)
           .post('/predicate')
           .set('Content-Type', 'application/json')

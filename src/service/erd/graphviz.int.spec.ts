@@ -3,7 +3,7 @@ import PrismaTestEnvironment from "testlib/prisma-test-env";
 import * as fs from 'fs';
 
 import { dao } from 'testlib/fixtures';
-import { Graphviz as Erd } from 'src/service/erd/graphviz';
+import { Graphviz } from 'src/service/erd/graphviz';
 
 PrismaTestEnvironment.setup();
 jest.setTimeout(1000 * 30);
@@ -12,8 +12,12 @@ describe('graphviz integration', () => {
 
   describe('Lee Harvey Oswald', () => {
     it('gets predicates', async () => {
-      const erd = new Erd({ dao });
-      await erd.getPredicates('Oswald');
+      const erd = new Graphviz({ dao });
+      try {
+        await erd.getPredicates('Oswald');
+      } catch (e) {
+        console.error(e);
+      }
 
       expect(erd.predicates).toBeDefined();
 
@@ -33,7 +37,7 @@ describe('graphviz integration', () => {
       fs.unlinkSync(savepath);
     }
 
-    const erd = new Erd({ dao, savepath });
+    const erd = new Graphviz({ dao, savepath });
     await erd.graphviz('Oswald');
 
     expect(fs.existsSync(savepath)).toBeTruthy();
@@ -44,8 +48,13 @@ describe('graphviz integration', () => {
   });
 
   it('without a savepath', async () => {
-    const erd = new Erd({ dao });
-    const graphstring = await erd.graphviz('Oswald');
+    const erd = new Graphviz({ dao });
+    let graphstring;
+    try {
+      graphstring = await erd.graphviz('Oswald');
+    } catch (e) {
+      console.error(e);
+    }
 
     expect(graphstring).toBeDefined();
     expect(graphstring).toMatch(/^<\?\s*xml/i);
@@ -59,7 +68,7 @@ describe('All', () => {
       fs.unlinkSync(savepath);
     }
 
-    const erd = new Erd({ dao, savepath });
+    const erd = new Graphviz({ dao, savepath });
     await erd.graphviz();
 
     const exists = fs.existsSync(savepath);

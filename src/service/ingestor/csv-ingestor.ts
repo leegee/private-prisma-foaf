@@ -31,11 +31,17 @@ export class CsvIngestor extends BaseIngestor {
     this.logger.debug('Enter parseEntityFile for ' + filepath);
 
     if (!fs.existsSync(filepath)) {
-      throw new TypeError(`filepath not found: '${filepath}'`);
+      throw new TypeError(`Supplied file path not found: '${filepath}'`);
     }
 
     return new Promise((resolve, reject) => {
       const stream = fs.createReadStream(filepath);
+
+      if (!stream) {
+        console.trace();
+        reject(`Could not create ReadStream with file path '${filepath}'`);
+      }
+
       stream.on('error', (error: Error) => {
         this.logger.error(error);
         reject(error);
