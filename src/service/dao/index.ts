@@ -4,7 +4,7 @@ import { logger, ILogger } from 'src/service/logger';
 
 import { Wordnet, IndexEntry, Sense } from 'wordnet-binary-search';
 
-Wordnet.setDataDir('assets/wordnet/');
+Wordnet.dataDir = 'assets/wordnet/';
 
 export interface Iknownas2id {
   [key: string]: number;
