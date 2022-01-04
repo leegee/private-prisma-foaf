@@ -52,6 +52,7 @@
     "test:watch:unit": "cross-env JEST_WATCH=1 jest --watch -- .int.ts",
     "test:coverage": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "pretest:e2e": "tsc ",
     "test:e2e": "npx playwright test --headed",
     "db:start": "docker-compose up -d --remove-orphans",
     "db:stop": "docker-compose down",
@@ -71,6 +72,7 @@
     "fastify": "^3.24.1",
     "fastify-cors": "^6.0.2",
     "fastify-openapi-glue": "^2.6.5",
+    "fastify-swagger": "^4.13.0",
     "graphviz": "^0.0.9",
     "module-alias": "^2.2.2",
     "node-fetch": "^2.0.0",
@@ -78,7 +80,7 @@
     "temporary": "^1.1.0",
     "tmp-promise": "^3.0.3",
     "ts-jest": "^27.0.7",
-    "wordnet-binary-search": "^0.0.2"
+    "wordnet-binary-search": "^0.0.8"
   },
   "engines": {
     "node": ">=16.0.0"
