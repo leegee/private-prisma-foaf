@@ -1,6 +1,7 @@
 import nlp from 'compromise';
 import { Entity, Predicate, Prisma, PrismaClient, Verb } from '@prisma/client';
 import { logger, ILogger } from 'src/service/logger';
+
 import { Wordnet, IndexEntry, Sense } from 'wordnet-binary-search';
 
 Wordnet.dataDir = 'assets/wordnet/';
