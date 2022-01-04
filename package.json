@@ -80,7 +80,7 @@
     "temporary": "^1.1.0",
     "tmp-promise": "^3.0.3",
     "ts-jest": "^27.0.7",
-    "wordnet-binary-search": "^0.0.9"
+    "wordnet-binary-search": "^0.0.10"
   },
   "engines": {
     "node": ">=16.0.0"
