@@ -1,5 +1,3 @@
-// <erd-maker>
-
 import { ErdBaseElement } from './erd-base-element.es6.js';
 
 class ErdMaker extends ErdBaseElement {
@@ -32,6 +30,8 @@ class ErdMaker extends ErdBaseElement {
 
     this.el.submit = this.shadow.querySelector('#submit');
     this.el.submit.addEventListener('submit', () => this.submit());
+
+    this.addSvg();
 
     window.addEventListener('keydown', this.captureSpaceBar);
   }
@@ -93,6 +93,15 @@ class ErdMaker extends ErdBaseElement {
 
       console.error(json);
     }
+  }
+
+  async addSvg() {
+    const res = await fetch(this.apiurlRoot + "graph");
+    const svg = await res.text();
+
+    const el = document.createElement('svg');
+    el.innerHTML = svg;
+    this.shadowRoot.appendChild(el);
   }
 }
 

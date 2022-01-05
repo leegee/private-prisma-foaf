@@ -1,16 +1,11 @@
 <template>
   <style>
-    #root {
-      --dark: black;
-      --light: oldlace;
-    }
-
     #erd {
       width: 100%;
     }
 
     section {
-      border: 1pt solid gray;
+      border: 1pt solid var(--fg);
     }
 
     section#inputs {
@@ -20,12 +15,12 @@
     erd-video-citation::part(input-box) {
       padding: 0.5em;
       margin: 0.5em;
-      border: 1pt solid var(--dark);
+      border: 1pt solid var(--fg);
     }
 
     erd-video-citation::part(input-input) {
       border: 0;
-      border-bottom: 1pt solid var(--dark);
+      border-bottom: 1pt solid var(--fg);
       width: 40em;
     }
   </style>
@@ -59,5 +54,5 @@
   </aside> -->
   </main>
 
-  <img id='erd' src='http://127.0.0.1:3000/graph' onclick='this.src=`http://127.0.0.1:3000/graph?${new Date()}`'>
+  <!-- <img id='erd' src='http://127.0.0.1:3000/graph' onclick='this.src=`http://127.0.0.1:3000/graph?${new Date()}`'> -->
 </template>
