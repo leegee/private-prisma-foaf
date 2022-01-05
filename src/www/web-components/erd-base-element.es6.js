@@ -73,13 +73,14 @@ export class ErdBaseElement extends HTMLElement {
     this.templateUrl = `web-components/${this.constructor.elName}.html`;
   };
 
-  async connectedCallback() {
-    this.template = await Templates.load(this.templateUrl);
-
+  async connectedCallback(loadTemplate = true) {
     this.shadow = this.attachShadow({ mode: 'open' });
-    this.shadow.appendChild(
-      this.template.content.cloneNode(true)
-    );
+    if (loadTemplate) {
+      this.template = await Templates.load(this.templateUrl);
+      this.shadow.appendChild(
+        this.template.content.cloneNode(true)
+      );
+    }
   }
 }
 

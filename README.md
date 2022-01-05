@@ -129,6 +129,10 @@ Logging is via `pino`. `LOG_LEVEL` environment variable takes a lower-case log l
     https://www.prisma.io/docs/guides/testing/unit-testing
     https://www.youtube.com/watch?v=E-FHalzAOFs
 
+    https://css-tricks.com/svg-map-rollovers/
+    https://meowni.ca/posts/part-theme-explainer/
+    https://youtu.be/FlAFg9a2MSs?list=PLzou3TXfEb6brhE3llF3h7j6slBPfS3Hq&t=990
+
 ## Ingestion Format
 
 ### Entities
