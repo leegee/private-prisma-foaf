@@ -1,20 +1,8 @@
 import { test, expect } from '@playwright/test';
-import { FastifyInstance } from 'fastify';
-import { start } from 'src/server/index';
-
-let server: FastifyInstance;
 
 test.describe('e2e', () => {
-  test.beforeAll(async () => {
-    server = await start();
-  });
-
-  test.afterAll(async () => {
-    server.close();
-  });
-
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:8081/index.html');
+    await page.goto('http://localhost:8080/index.html');
   });
 
   test('with known values', async ({ page }) => {
@@ -35,10 +23,10 @@ test.describe('e2e', () => {
     await page.keyboard.type('jfk');
     await page.waitForRequest(/\/entity/);
 
-    await expect(page.locator('#submit > button')).toBeEnabled({ timeout: 100 });
+    await expect(page.locator('#submit > button')).toBeEnabled({ timeout: 10000 });
 
-    page.click('#submit > button');
-    page.waitForResponse(/\/predicate/, { timeout: 5000 });
+    await page.click('#submit > button');
+    await page.waitForResponse(/\/predicate/, { timeout: 10000 });
   });
 });
 

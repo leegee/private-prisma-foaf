@@ -9,6 +9,7 @@
     "lib": [
       "esnext",
     ],
+    "resolveJsonModule": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
     "typeRoots": [
