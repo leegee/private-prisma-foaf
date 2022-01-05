@@ -6,6 +6,8 @@ import { routes as entityRoutes } from './routes/entity';
 import { routes as verbRoutes } from './routes/verb';
 import { routes as predicateRoutes } from './routes/predicate';
 import { routes as graphRoutes } from './routes/graph';
+import { routes as healthcheck } from './routes/healthcheck';
+
 import { prisma } from 'src/service/prisma-client';
 import { DAO } from 'src/service/dao';
 import { logger as loggerInstance } from 'src/service/logger';
@@ -36,6 +38,7 @@ export function buildServer({ logger = loggerInstance }: IBuildServerArgs = {}) 
   );
 
   [
+    ...healthcheck,
     ...graphRoutes,
     ...entityRoutes,
     ...verbRoutes,
