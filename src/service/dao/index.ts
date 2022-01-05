@@ -73,20 +73,13 @@ export function normaliseEntity(subject: string): string {
   return subject.toLowerCase().replace(/[^\w\s'-]+/, '').replace(/\s+/gs, ' ').trim()
 }
 
-interface IndexEntryWithWSense extends IndexEntry {
-  senses: Sense[];
-}
-interface SenseWithHypernym extends Sense {
-  hypernym: Sense[];
-}
-
 export function hypernym(verb: string): string {
   const normalisedVerb = normaliseVerb(verb);
   let rv: string[] = [];
-  const indexEntry = Wordnet.findVerb(normalisedVerb) as IndexEntryWithWSense;
+  const indexEntry = Wordnet.findVerb(normalisedVerb);
 
   if (indexEntry && indexEntry.senses && indexEntry.senses.length) {
-    const senses = indexEntry.senses as SenseWithHypernym[];
+    const senses = indexEntry.senses;
 
     for (let s = 0; s < senses.length; s++) {
       const hypernyms = senses[s].hypernym;
