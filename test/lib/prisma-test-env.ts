@@ -56,7 +56,7 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
 
   /** Maybe faster to load public and copy to test schema when needed */
   static setup({ ingest }: { ingest: boolean } = { ingest: true }) {
-    logger.debug('PrismaTestEnvironment.init Enter');
+    logger.debug('PrismaTestEnvironment.setup Enter');
     jest.setTimeout(20000);
     beforeEach(async () => {
       logger.debug('PrismaTestEnvironment beforeEach enter');
@@ -70,7 +70,7 @@ export default class PrismaTestEnvironment extends NodeEnvironment {
       logger.debug('PrismaTestEnvironment after afterEach Leave');
     });
 
-    logger.debug('PrismaTestEnvironment.init Leave');
+    logger.debug('PrismaTestEnvironment.setup Leave');
   }
 
   static async teardown(envInstance: PrismaTestEnvironment) {

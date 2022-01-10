@@ -25,7 +25,8 @@
     "jest-html-reporter": "^3.4.2",
     "jest-mock-extended": "^2.0.4",
     "module-alias": "^2.2.2",
-    "pactum": "^3.1.0",
+    "pactum": "^3.1.1",
+    "pactum-supertest": "^1.0.0",
     "pg": "^8.7.1",
     "pino-pretty": "^7.2.0",
     "playwright": "^1.17.1",
@@ -42,8 +43,9 @@
     "api:start": "npx ts-node -r dotenv/config -r tsconfig-paths/register  src/scripts/start-api.ts",
     "api:dev": "npx ts-node-dev -r dotenv/config -r tsconfig-paths/register src/scripts/start-api.ts",
     "wc:start": "npx http-server src/www/",
+    "build": "tsc",
     "preapi:build": "rimraf dist",
-    "api:build:prod": "tsc --config tsconfig.testless.json",
+    "api:build": "tsc --config tsconfig.testless.json",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
     "test": "jest -i",
@@ -102,7 +104,7 @@
     "rootDir": ".",
     "testMatch": [
       "<rootDir>/src/**/*.spec.ts",
-      "<rootDir>/test/**/*.spec.ts"
+      "<rootDir>/test/**/*.spec.(t|j)s"
     ],
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
