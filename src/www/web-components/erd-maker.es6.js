@@ -30,8 +30,9 @@ class ErdMaker extends ErdBaseElement {
       }
     );
 
-    this.el.submit = this.shadow.querySelector('#submit');
     this.el.submit.addEventListener('submit', () => this.submit());
+
+    this.el.eventList = this.shadow.querySelector('erd-event-list');
 
     window.addEventListener('keydown', this.captureSpaceBar);
   }
@@ -52,12 +53,15 @@ class ErdMaker extends ErdBaseElement {
 
   change(elId, e) {
     this.state[elId] = e.detail;
-    console.log('Set', elId, this.state[elId]);
 
-    const missing = ['subject', 'verb', 'object', 'video'].reduce(
+    const missing = ['subject', 'verb', 'object',].reduce(
       (stack, id) => !this.state[id] || this.state[id].trim() === '' ? [...stack, id] : stack,
       []
     );
+
+    if (!this.state.video || this.state.video.url.trim() === '') {
+      missing.push('video');
+    }
 
     this.el.submit.setAttribute('disabled', missing.length > 0);
   }
@@ -67,19 +71,28 @@ class ErdMaker extends ErdBaseElement {
       Subject: this.state.subject,
       Verb: this.state.subject,
       Object: this.state.object,
-      Citations: [this.state.video],
+      Citations: [this.state.video.url],
     };
 
     const res = await fetch(this.apiurl, {
       headers: { 'Content-Type': 'application/json' },
       method: 'POST',
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
     });
 
     if (res.status === 201) {
-      this.state = {};
       this.dispatchEvent(new CustomEvent('rest'));
-    } else {
+      this.el.eventList.dispatchEvent(new CustomEvent('add', {
+        detail: {
+          body: {
+            ...body,
+            time: this.state.video.time,
+          }
+        }
+      }));
+    }
+    else {
+      console.error('Error sending', body);
       const json = await res.json();
       document.dispatchEvent(
         new CustomEvent('erd-message', {

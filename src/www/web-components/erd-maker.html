@@ -31,29 +31,28 @@
     </section>
 
     <section id='inputs'>
-      <erd-entity-input id='subject'>
-        <span slot="label">Subject</span>
-      </erd-entity-input>
-
+      <erd-entity-input id='subject'> <span slot="label">Subject</span> </erd-entity-input>
       <erd-verb-input id='verb'><span slot="label">Verb</span></erd-verb-input>
-
       <erd-entity-input id='object'><span slot="label">Object</span></erd-entity-input>
-
       <erd-submit id='submit'></erd-submit>
-
     </section>
 
     <aside>
       <erd-messages></erd-messages>
     </aside>
 
-    <!-- <aside id='previews'>
-    <erd-entity-preview id='subject-preview'></erd-entity-preview>
-    <erd-verb-preview id='verb-preview'></erd-verb-preview>
-    <erd-entity-preview id='object-preview'></erd-entity-preview>
-  </aside> -->
+    <aside>
+      <erd-event-list></erd-event-list>
+    </aside>
+
+    <!--
+      <aside id='previews'>
+        <erd-entity-preview id='subject-preview'></erd-entity-preview>
+        <erd-verb-preview id='verb-preview'></erd-verb-preview>
+        <erd-entity-preview id='object-preview'></erd-entity-preview>
+      </aside>
+  -->
   </main>
 
-  <!-- <img id='erd' src='http://127.0.0.1:3000/graph' onclick='this.src=`http://127.0.0.1:3000/graph?${new Date()}`'> -->
   <erd-svg id='svg'></erd-svg>
 </template>
