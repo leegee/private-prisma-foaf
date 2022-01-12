@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
 test.describe('e2e', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('http://localhost:8080/index.html');
@@ -23,10 +25,14 @@ test.describe('e2e', () => {
     await page.keyboard.type('jfk');
     await page.waitForRequest(/\/entity/);
 
-    await expect(page.locator('#submit > button')).toBeEnabled({ timeout: 10000 });
+    await expect(
+      page.locator('erd-submit > button')
+    ).toBeEnabled({ timeout: 10000 });
 
-    await page.click('#submit > button');
+    await page.click('erd-submit > button');
     await page.waitForResponse(/\/predicate/, { timeout: 10000 });
+
+    await delay(100000);
   });
 });
 
