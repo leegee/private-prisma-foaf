@@ -51,13 +51,15 @@ Both predicates and entities have date optional ranges (`start`/`end` and `dob`/
 
 [![ERD](./erd.svg)](./erd.svg)
 
-## About the environment
+## Tests
+
+### Test Environment
 
 Tests need to look after the environment, to leave things as they were found. Whilst this is always a good habit to maintain, it can ben an effort that quickly becomes a chore, and so frequently gets discarded, leading to a build up of unused cruft in the database that is never in a known state, leading to false positive test failures, leading to time spent debugging tests rather than writing logic.
 
 Thus the test suite aims to make keeping the environment clean as easy as possible, by mocking where possible and practicle, and using known-state environment fixetures.
 
-## Writiing integration tests
+### Writiing Integration Tests
 
 Tests which touch any real system, other than the unit under test, are considered integration tests, and are suffixed `.int.spec.ts`.
 
@@ -81,13 +83,17 @@ Instead, call the custom environment manually, so it can set beforeEach and afte
 
 Because use of long-running global transactions are apparently not supported by Prisma, the above creates a PG DB schema per test, which it destroys after the test.
 
-## Writing Unit Tests
+### Writing Unit Tests
 
 See examples.
 
 ## Logging
 
 Logging is via `pino`. `LOG_LEVEL` environment variable takes a lower-case log level (eg `debug`).
+
+## UI
+
+The UI was just meant to be a quick toy to help me test Prisma but it has grown and should probably switch to Vue to create its compoents.
 
 ## TODO
 
